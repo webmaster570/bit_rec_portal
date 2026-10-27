@@ -1618,7 +1618,28 @@ export const AdminPortal: React.FC = () => {
               </div>
             </div>
 
-            {mongoStatus.error && !mongoStatus.connected && (
+            {mongoStatus.missingUri && (
+              <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-900 text-xs space-y-3 shadow-sm">
+                <div className="flex items-center space-x-2 font-black text-rose-800 uppercase tracking-tight">
+                  <AlertTriangle className="w-5 h-5 text-rose-600" />
+                  <span>Critical: MONGODB_URI Not Found</span>
+                </div>
+                <div className="space-y-2 text-[11px] leading-relaxed text-rose-900/90 font-medium">
+                  <p>
+                    The application is unable to find the <code className="bg-rose-100 px-1 rounded text-rose-950 font-bold">MONGODB_URI</code> environment variable. Since you have switched repositories, you <strong>must</strong> re-add this variable to your new Vercel project.
+                  </p>
+                  <div className="bg-white/60 p-3 rounded-xl border border-rose-200 space-y-1.5">
+                    <p>1. Go to your <strong>Vercel Dashboard</strong>.</p>
+                    <p>2. Select your new project: <strong>bit_rec_portal</strong>.</p>
+                    <p>3. Go to <strong>Settings</strong> &gt; <strong>Environment Variables</strong>.</p>
+                    <p>4. Add a new variable: <strong>Key:</strong> <code className="font-bold">MONGODB_URI</code> | <strong>Value:</strong> (your connection string).</p>
+                    <p>5. <strong>Save</strong> and <strong>Redeploy</strong> your project for changes to take effect.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {mongoStatus.error && !mongoStatus.connected && !mongoStatus.missingUri && (
               <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs space-y-2.5">
                 <div className="flex items-center space-x-2 font-black text-amber-800 uppercase tracking-tight">
                   <Activity className="w-4 h-4" />

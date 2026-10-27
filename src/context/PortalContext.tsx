@@ -40,6 +40,8 @@ export interface MongoDbStatus {
   error: string | null;
   uriMasked: string;
   lastSyncedAt?: string;
+  missingUri?: boolean;
+  ipWhitelistHint?: boolean;
 }
 
 interface PortalContextType {
@@ -359,11 +361,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           error: data.dbStatus?.error || null,
           uriMasked: data.dbStatus?.uriMasked || 'mongodb+srv://****:****@bit-recruitment-portal.ze21uvt.mongodb.net/',
           lastSyncedAt: new Date().toLocaleTimeString(),
+          missingUri: data.dbStatus?.missingUri || false,
+          ipWhitelistHint: data.dbStatus?.ipWhitelistHint || false,
         };
         if (
           prev.connected === next.connected &&
           prev.database === next.database &&
-          prev.error === next.error
+          prev.error === next.error &&
+          prev.missingUri === next.missingUri
         ) {
           return prev;
         }

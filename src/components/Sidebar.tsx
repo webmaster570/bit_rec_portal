@@ -285,18 +285,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className={`p-2 rounded-xl border flex items-center justify-between cursor-pointer transition hover:scale-101 ${
                 mongoStatus.connected 
                   ? 'bg-emerald-50/50 border-emerald-200' 
-                  : 'bg-amber-50/50 border-amber-200'
+                  : mongoStatus.missingUri 
+                    ? 'bg-rose-50/50 border-rose-200'
+                    : 'bg-amber-50/50 border-amber-200'
               }`}
               onClick={() => setActiveTab('admin')}
-              title="View Detailed System Health"
+              title={mongoStatus.missingUri ? "System Critical: Config Missing" : "View Detailed System Health"}
             >
               <div className="flex items-center space-x-2">
-                <div className={`w-1.5 h-1.5 rounded-full ${mongoStatus.connected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                <span className={`text-[10px] font-black uppercase tracking-tight ${mongoStatus.connected ? 'text-emerald-800' : 'text-amber-800'}`}>
-                  System: {mongoStatus.connected ? 'Healthy' : 'Connecting'}
+                <div className={`w-1.5 h-1.5 rounded-full ${
+                  mongoStatus.connected 
+                    ? 'bg-emerald-500 animate-pulse' 
+                    : mongoStatus.missingUri 
+                      ? 'bg-rose-500 animate-bounce' 
+                      : 'bg-amber-500 animate-pulse'
+                }`} />
+                <span className={`text-[10px] font-black uppercase tracking-tight ${
+                  mongoStatus.connected 
+                    ? 'text-emerald-800' 
+                    : mongoStatus.missingUri 
+                      ? 'text-rose-800' 
+                      : 'text-amber-800'
+                }`}>
+                  System: {mongoStatus.connected ? 'Healthy' : mongoStatus.missingUri ? 'Config Error' : 'Connecting'}
                 </span>
               </div>
-              <Activity className={`w-3 h-3 ${mongoStatus.connected ? 'text-emerald-500' : 'text-amber-500'}`} />
+              <Activity className={`w-3 h-3 ${
+                mongoStatus.connected 
+                  ? 'text-emerald-500' 
+                  : mongoStatus.missingUri 
+                    ? 'text-rose-500' 
+                    : 'text-amber-500'
+              }`} />
             </div>
           )}
 

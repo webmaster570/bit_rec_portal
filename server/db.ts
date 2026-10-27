@@ -52,14 +52,17 @@ const memoryState = {
 };
 
 export function getDbStatus() {
+  const uri = getMongoUri();
   return {
     connected: isConnected,
     database: DB_NAME,
     error: connectionError,
-    uriMasked: (getMongoUri() || '').replace(/:\/\/[^:]+:[^@]+@/, '://****:****@'),
+    uriMasked: (uri || '').replace(/:\/\/[^:]+:[^@]+@/, '://****:****@'),
     isConnecting,
-    env: process.env.NODE_ENV || 'development',
-    hasUri: !!process.env.MONGODB_URI,
+    env: process.env.NODE_ENV || 'production',
+    hasUri: !!uri,
+    missingUri: !uri,
+    ipWhitelistHint: connectionError?.includes('IP Whitelist') || false,
     memorySummary: {
       drives: memoryState.drives.length,
       apps: memoryState.applications.length,
