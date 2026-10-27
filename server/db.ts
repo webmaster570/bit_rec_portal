@@ -22,7 +22,12 @@ import {
 } from '../src/types';
 
 function getMongoUri(): string | undefined {
-  let uri = process.env.MONGODB_URI || process.env.MONGO_URI || process.env.DATABASE_URL;
+  let uri =
+    process.env.MONGODB_URI ||
+    process.env.MONGO_URI ||
+    process.env.MONGODB_URL ||
+    process.env.MONGO_URL ||
+    process.env.DATABASE_URL;
   if (!uri || typeof uri !== 'string') return undefined;
   uri = uri.trim();
   // Strip accidental enclosing quotes from Vercel env var input

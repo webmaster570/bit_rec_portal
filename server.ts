@@ -31,13 +31,17 @@ const PORT = process.env.PORT || 3000;
 
 // URL Normalization & request logging
 app.use((req, res, next) => {
-  if (req.url.startsWith('/api/index.ts')) {
-    req.url = req.url.replace('/api/index.ts', '/api') || '/';
-  } else if (req.url.startsWith('/index.ts')) {
-    req.url = req.url.replace('/index.ts', '') || '/';
+  const matchedPath = (req.headers['x-matched-path'] as string) || (req.headers['x-forwarded-uri'] as string);
+  if (matchedPath && matchedPath.startsWith('/api')) {
+    req.url = matchedPath;
+  }
+  if (req.url.startsWith('/api/index.ts') || req.url.startsWith('/api/index.js')) {
+    req.url = req.url.replace(/^\/api\/index(\.(ts|js))?/, '/api') || '/';
+  } else if (req.url.startsWith('/index.ts') || req.url.startsWith('/index.js')) {
+    req.url = req.url.replace(/^\/index(\.(ts|js))?/, '') || '/';
   }
   if (!req.path.startsWith('/assets')) {
-    console.log(`[Server] ${req.method} ${req.path}`);
+    console.log(`[Server] ${req.method} ${req.url}`);
   }
   next();
 });

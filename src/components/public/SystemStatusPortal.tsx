@@ -129,7 +129,7 @@ export const SystemStatusPortal: React.FC = () => {
             <Info className="w-5 h-5 text-indigo-400" />
             <h2 className="font-bold">Production Troubleshooting Guide</h2>
           </div>
-          <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-mono border border-white/20">v1.2.0</span>
+          <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-mono border border-white/20">v1.3.0</span>
         </div>
 
         <div className="p-6 space-y-8">
@@ -154,14 +154,16 @@ export const SystemStatusPortal: React.FC = () => {
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-black text-sm shrink-0">2</div>
-              <h3 className="font-extrabold text-slate-900">Trigger a New Deployment</h3>
+              <h3 className="font-extrabold text-slate-900">Redeploy and Use the Production URL</h3>
             </div>
             <div className="ml-10 text-xs text-slate-600 space-y-2 leading-relaxed">
-              <p>Adding an environment variable in Vercel <strong>does not</strong> affect existing builds. You must redeploy for the server to see the new key.</p>
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 font-medium">
-                <p>1. Go to the <strong>Deployments</strong> tab in Vercel.</p>
-                <p>2. Find the latest deployment and click the <strong className="text-slate-900">...</strong> menu.</p>
-                <p>3. Select <strong>Redeploy</strong> (ensure "Use existing Build Cache" is unchecked if possible).</p>
+              <p className="text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200 font-semibold">
+                IMPORTANT: Adding an environment variable in Vercel <strong>never updates existing deployments</strong>. If your URL contains a hash like <code className="bg-white px-1 rounded">-mkr0xycsh-</code>, that is a frozen past build without your new variables!
+              </p>
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 font-medium mt-2">
+                <p>1. Go to <strong>Deployments</strong> in the Vercel Dashboard.</p>
+                <p>2. Click the <strong className="text-slate-900">...</strong> menu on the latest deployment and click <strong>Redeploy</strong> (uncheck "Use existing Build Cache").</p>
+                <p>3. Always visit your main domain: <code className="bg-indigo-50 px-1.5 py-0.5 rounded text-indigo-700 font-bold">https://bit-rec-portal.vercel.app</code>.</p>
               </div>
             </div>
           </div>
