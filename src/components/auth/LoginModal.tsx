@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
 import { UserRole } from '../../types';
-import { X, LogIn, Shield, Sparkles, User, Lock, Mail, AlertCircle, RefreshCw } from 'lucide-react';
+import { X, LogIn, Shield, Sparkles, User, Lock, Mail, AlertCircle, RefreshCw, Activity } from 'lucide-react';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -18,9 +18,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onLoginSuccess,
   targetPostTitle,
 }) => {
-  const { roles, allowDevRoleSelector, secureLogin } = usePortal();
+  const { roles, allowDevRoleSelector, secureLogin, login, setActiveTab } = usePortal();
 
-  const [selectedRole, setSelectedRole] = useState<UserRole>('applicant');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('super_admin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,7 +40,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     // Call secureLogin
     const success = await secureLogin(email, password);
     if (success) {
-      onLoginSuccess('super_admin' as any); // The exact role will be set in context
+      onLoginSuccess(selectedRole); 
       onClose();
     } else {
       setError('Invalid email or password. Please try again.');
@@ -48,9 +48,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setIsSubmitting(false);
   };
 
-  const handleQuickRoleSelect = (roleId: UserRole) => {
-    setSelectedRole(roleId);
-    setError('');
+  const handleBypassLogin = () => {
+    const roleInfo = roles.find(r => r.id === selectedRole);
+    const dummyEmail = email.trim() || `${selectedRole}@univ.edu`;
+    const dummyName = roleInfo?.name || 'Administrator';
+    
+    // Directly call context login (bypass API/Database)
+    login(selectedRole, dummyEmail, dummyName);
+    onLoginSuccess(selectedRole);
+    onClose();
   };
 
   return (
@@ -76,7 +82,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         </div>
 
         {/* Content Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <div className="p-6 space-y-4">
           {targetPostTitle && (
             <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-800 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
@@ -86,82 +92,123 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             </div>
           )}
 
-          {/* Dev Mode Role Selector removed for production */}
-
           {error && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2 font-medium">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          {/* Email / Registration Number */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Email Address / Registration ID
-            </label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-              <input
-                type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="superadmin@univ.edu"
-                className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
-                required
-              />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email / Registration Number */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Email Address / Registration ID
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                <input
+                  type="text"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="superadmin@univ.edu"
+                  className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
             </div>
-            <p className="text-[10px] text-slate-400 mt-1">
-              Hint: Use <strong>superadmin@univ.edu</strong> for system administration.
-            </p>
-          </div>
 
-          {/* Password */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
-                required
-              />
+            {/* Password */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-700 hover:to-purple-800 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2 disabled:opacity-50"
-          >
-            {isSubmitting ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <LogIn className="w-4 h-4" />
-            )}
-            <span>{isSubmitting ? 'Signing In...' : 'Sign In to Dashboard'}</span>
-          </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2 disabled:opacity-50"
+            >
+              {isSubmitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+              <span>{isSubmitting ? 'Verifying...' : 'Secure Database Login'}</span>
+            </button>
+          </form>
+
+          {/* Role Selector (Dev Mode Bypass) */}
+          {allowDevRoleSelector && (
+            <div className="pt-2">
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-3 shadow-xs">
+                <div className="flex items-center gap-2 text-amber-800 font-bold text-[10px] uppercase tracking-wider">
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>Temporary Bypass (No Database Required)</span>
+                </div>
+                
+                <div className="relative">
+                  <User className="w-4 h-4 text-amber-500 absolute left-3 top-2.5" />
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value as UserRole)}
+                    className="w-full bg-white border border-amber-200 rounded-lg pl-9 pr-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 appearance-none"
+                  >
+                    {roles.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleBypassLogin}
+                  className="w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs shadow-sm transition transform active:scale-98"
+                >
+                  Quick Bypass Login as {roles.find(r => r.id === selectedRole)?.name}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Footer Switcher */}
-          <div className="text-center pt-2 border-t border-slate-200 text-xs text-slate-600">
-            <span>Don't have an applicant account? </span>
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                onSwitchToRegister();
-              }}
-              className="text-indigo-600 font-bold hover:underline"
-            >
-              Register here
-            </button>
+          <div className="text-center pt-2 border-t border-slate-200 text-xs text-slate-600 space-y-2">
+            <div>
+              <span>Don't have an applicant account? </span>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onSwitchToRegister();
+                }}
+                className="text-indigo-600 font-bold hover:underline"
+              >
+                Register here
+              </button>
+            </div>
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  setActiveTab('system_status');
+                }}
+                className="text-[10px] text-slate-400 hover:text-indigo-500 transition flex items-center justify-center gap-1 mx-auto font-medium"
+              >
+                <Activity className="w-3 h-3" />
+                <span>Unable to log in? Check System API Health</span>
+              </button>
+            </div>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

@@ -180,13 +180,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: ShieldAlert,
       roles: ['super_admin'],
     },
+    {
+      id: 'system_status',
+      label: 'System API Health',
+      icon: Activity,
+      roles: [
+        'super_admin',
+        'recruitment_admin',
+        'recruitment_officer',
+        'department_admin',
+        'screening_committee',
+        'interview_panel',
+        'doc_verifier',
+        'finance_admin',
+        'applicant',
+      ],
+    },
   ];
 
   // Filter items visible to current active role
   const visibleNavItems = navItems.filter((item) => {
     if (!isLoggedIn) {
-      // Unauthenticated visitor on public page: display public notices and apply portal
-      return item.id === 'public_recruitment' || item.id === 'applicant_portal';
+      // Unauthenticated visitor on public page: display public notices, apply portal and system status
+      return item.id === 'public_recruitment' || item.id === 'applicant_portal' || item.id === 'system_status';
     }
     return item.roles.includes(currentRole);
   });

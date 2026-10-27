@@ -22,7 +22,9 @@ import {
 } from '../src/types';
 
 function getMongoUri() {
-  return process.env.MONGODB_URI;
+  const uri = process.env.MONGODB_URI;
+  if (!uri || uri.trim() === '') return undefined;
+  return uri.trim();
 }
 
 const DB_NAME = 'bit_recruitment_portal';
@@ -88,7 +90,14 @@ export async function tryConnectDb(): Promise<Db | null> {
   try {
     console.log('[MongoDB] Attempting connection...');
     const uri = getMongoUri();
-    console.log(`[MongoDB] Using URI from Environment Variable: ${uri ? 'Detected' : 'Missing'}`);
+    const env = process.env.NODE_ENV || 'development';
+    console.log(`[MongoDB] Runtime Environment: ${env}`);
+    console.log(`[MongoDB] MONGODB_URI presence: ${uri ? 'FOUND (valid length)' : 'NOT FOUND or EMPTY'}`);
+    
+    if (uri) {
+      const masked = uri.replace(/:\/\/[^:]+:[^@]+@/, '://****:****@');
+      console.log(`[MongoDB] Connection Target: ${masked}`);
+    }
     
     if (!client) {
       if (!uri) {

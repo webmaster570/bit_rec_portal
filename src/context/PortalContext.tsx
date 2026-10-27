@@ -178,7 +178,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => loadInitialState('isLoggedIn', false, AUTH_STORAGE_KEY));
   const [currentUser, setCurrentUser] = useState<UserSession | null>(() => loadInitialState('currentUser', null, AUTH_STORAGE_KEY));
   const [activeTab, setActiveTabState] = useState<string>(() => loadInitialState('activeTab', 'public_recruitment', AUTH_STORAGE_KEY));
-  const [allowDevRoleSelector, setAllowDevRoleSelector] = useState<boolean>(false);
+  const [allowDevRoleSelector, setAllowDevRoleSelector] = useState<boolean>(true);
   const [currentRole, setCurrentRole] = useState<UserRole>(() => loadInitialState('currentRole', 'super_admin', AUTH_STORAGE_KEY));
   const [roles, setRoles] = useState<RoleInfo[]>(() => loadInitialState('roles', INITIAL_ROLES));
   const [drives, setDrives] = useState<RecruitmentDrive[]>(() => loadInitialState('drives', INITIAL_DRIVES));

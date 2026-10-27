@@ -22,6 +22,8 @@ import { AdminPortal } from './components/admin/AdminPortal';
 import { ServerTransactionToastContainer } from './components/common/ServerTransactionToastContainer';
 import { THEME_CONFIGS } from './themeStyles';
 
+import { SystemStatusPortal } from './components/public/SystemStatusPortal';
+
 const MainAppContent: React.FC = () => {
   const { currentRole, isLoggedIn, branding, activeTab, setActiveTab } = usePortal();
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
@@ -65,6 +67,11 @@ const MainAppContent: React.FC = () => {
   };
 
   const renderContent = () => {
+    // PUBLIC ROUTES (accessible without login)
+    if (activeTab === 'system_status') {
+      return <SystemStatusPortal />;
+    }
+
     // Unauthenticated visitor guard: restrict access to protected admin/dashboard tabs
     if (!isLoggedIn && activeTab !== 'public_recruitment' && activeTab !== 'applicant_portal') {
       return (
@@ -140,6 +147,8 @@ const MainAppContent: React.FC = () => {
         return <AuditLogViewer />;
       case 'admin':
         return <AdminPortal />;
+      case 'system_status':
+        return <SystemStatusPortal />;
       default:
         return (
           <PublicRecruitmentPortal
