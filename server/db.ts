@@ -22,7 +22,7 @@ import {
 } from '../src/types';
 
 function getMongoUri(): string | undefined {
-  let uri = process.env.MONGODB_URI;
+  let uri = process.env.MONGODB_URI || process.env.MONGO_URI || process.env.DATABASE_URL;
   if (!uri || typeof uri !== 'string') return undefined;
   uri = uri.trim();
   // Strip accidental enclosing quotes from Vercel env var input
@@ -153,6 +153,15 @@ export async function tryConnectDb(): Promise<Db | null> {
     return db;
   } catch (err: any) {
     isConnected = false;
+    try {
+      if (client) {
+        client.close().catch(() => {});
+      }
+    } catch {}
+    client = null;
+    globalThis._mongoClientInstance = null;
+    globalThis._mongoDbInstance = null;
+
     const msg = err?.message || String(err);
     console.error(`[MongoDB] Connection error:`, msg);
     
@@ -197,7 +206,11 @@ async function syncInitialDatabase(database: Db) {
   }
   try {
     const brandingCol = database.collection('branding');
-    const existingBranding = await brandingCol.findOne({ _id: 'portal_branding' as any });
+    const existingBranding = await Promise.race([
+      brandingCol.findOne({ _id: 'portal_branding' as any }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Seed check timeout')), 3000)),
+    ]).catch(() => null);
+
     if (existingBranding) {
       // Database has already been initialized in MongoDB Atlas!
       globalThis._hasInitialSyncDone = true;
@@ -207,7 +220,7 @@ async function syncInitialDatabase(database: Db) {
 
     // First time setup on clean cluster: seed defaults
     console.log('[MongoDB] Initializing collections on fresh database cluster...');
-    await brandingCol.insertOne({ _id: 'portal_branding' as any, ...memoryState.branding });
+    await brandingCol.insertOne({ _id: 'portal_branding' as any, ...memoryState.branding }).catch(() => {});
 
     const rolesCol = database.collection('roles');
     await rolesCol.insertMany(memoryState.roles.map((r) => ({ ...r, _id: r.id as any }))).catch(() => {});

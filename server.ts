@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
 import path from 'path';
-import { createServer as createViteServer } from 'vite';
 import {
   tryConnectDb,
   getDbStatus,
@@ -27,26 +26,31 @@ import {
   verifyLoginDb,
 } from './server/db';
 
-async function startServer() {
-  const app = express();
-  const PORT = process.env.PORT || 3000;
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-  app.use((req, res, next) => {
-    if (!req.path.startsWith('/assets')) {
-      console.log(`[Server] ${req.method} ${req.path}`);
-    }
-    next();
-  });
+// URL Normalization & request logging
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api/index.ts')) {
+    req.url = req.url.replace('/api/index.ts', '/api') || '/';
+  } else if (req.url.startsWith('/index.ts')) {
+    req.url = req.url.replace('/index.ts', '') || '/';
+  }
+  if (!req.path.startsWith('/assets')) {
+    console.log(`[Server] ${req.method} ${req.path}`);
+  }
+  next();
+});
 
-  app.use(express.json({ limit: '15mb' }));
+app.use(express.json({ limit: '15mb' }));
 
-  // Initial database connection attempt (non-blocking)
-  console.log(`[Server] Environment: ${process.env.NODE_ENV || 'production'}`);
-  tryConnectDb().then(() => {
-    console.log('[Server] Database sync completed or initial attempt finished.');
-  }).catch((err) => {
-    console.error('[Server] Database connection error during startup:', err);
-  });
+// Initial database connection attempt (non-blocking)
+console.log(`[Server] Environment: ${process.env.NODE_ENV || 'production'} (Vercel: ${!!process.env.VERCEL})`);
+tryConnectDb().then(() => {
+  console.log('[Server] Initial database check finished.');
+}).catch((err) => {
+  console.error('[Server] Database connection error during startup:', err);
+});
 
   // ----------------------------------------------------
   // API ROUTES
@@ -77,10 +81,18 @@ async function startServer() {
       res.json({ 
         success: !!database, 
         connected: status.connected, 
-        error: status.error 
+        error: status.error,
+        dbStatus: status,
       });
     } catch (err: any) {
-      res.status(500).json({ success: false, error: err.message });
+      console.error('[API] /reconnect error:', err);
+      const status = getDbStatus();
+      res.json({ 
+        success: false, 
+        connected: false, 
+        error: err?.message || 'Reconnection attempt failed',
+        dbStatus: status,
+      });
     }
   });
 
@@ -90,13 +102,9 @@ async function startServer() {
       const state = await getFullState();
       res.json(state);
     } catch (err: any) {
-      console.error('[API] /api/state fatal error:', err);
-      // Return a partial state with the error status so the frontend can display it
-      res.status(500).json({ 
-        error: true, 
-        message: err?.message || 'Internal Server Error during state fetch',
-        dbStatus: getDbStatus()
-      });
+      console.error('[API] /api/state fallback:', err);
+      const state = await getFullState();
+      res.json(state);
     }
   });
 
@@ -301,15 +309,22 @@ async function startServer() {
   // VITE OR STATIC ASSETS MIDDLEWARE
   // ----------------------------------------------------
   if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
+    import('vite').then(async ({ createServer }) => {
+      const vite = await createServer({
+        server: { middlewareMode: true },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+      app.listen(Number(PORT), '0.0.0.0', () => {
+        console.log(`[Server] Recruitment Portal Server running on http://0.0.0.0:${PORT}`);
+      });
+    }).catch((err) => {
+      console.error('[Server] Failed to initialize Vite dev server:', err);
     });
-    app.use(vite.middlewares);
   } else if (!process.env.VERCEL) {
     // Only serve static assets from Express if NOT running in Vercel serverless
     // In Vercel, static assets are served directly by Vercel's global CDN from dist/
-    const distPath = path.join(__dirname, 'dist');
+    const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       const indexPath = path.join(distPath, 'index.html');
@@ -318,6 +333,9 @@ async function startServer() {
           res.status(404).send('Static assets not found. Please run "npm run build" first.');
         }
       });
+    });
+    app.listen(Number(PORT), '0.0.0.0', () => {
+      console.log(`[Server] Recruitment Portal Server running on http://0.0.0.0:${PORT}`);
     });
   } else {
     // Fallback for unmatched API routes inside Vercel serverless function
@@ -329,20 +347,4 @@ async function startServer() {
     });
   }
 
-  if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
-    app.listen(Number(PORT), '0.0.0.0', () => {
-      console.log(`[Server] Recruitment Portal Server running on http://0.0.0.0:${PORT}`);
-    });
-  }
-
-  return app;
-}
-
-// For Vercel, we need to export the app itself or a promise of it
-export const appPromise = startServer();
-
-// Standard Vercel Node.js handler
-export default async (req: any, res: any) => {
-  const app = await appPromise;
-  return app(req, res);
-};
+export default app;

@@ -412,9 +412,23 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       'Database reconnection attempt completed.',
       async () => {
         const res = await fetch('/api/reconnect', { method: 'POST' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        let data: any = null;
+        try {
+          data = await res.json();
+        } catch {
+          // ignore parse errors
+        }
+
+        if (!res.ok) {
+          throw new Error(data?.error || `HTTP ${res.status}`);
+        }
+
         await refreshFromDatabase(false);
+
+        if (data && data.connected === false && data.error) {
+          throw new Error(data.error);
+        }
+
         return data;
       }
     );
