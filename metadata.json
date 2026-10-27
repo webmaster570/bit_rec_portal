@@ -1,0 +1,6 @@
+{
+  "name": "Enterprise Recruitment Portal",
+  "description": "Comprehensive recruitment lifecycle management system with role-based access control, applicant workflows, screening, interviews, document verification, merit list generation, and analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
