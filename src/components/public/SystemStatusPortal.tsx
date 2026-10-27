@@ -15,14 +15,14 @@ import {
 } from 'lucide-react';
 
 export const SystemStatusPortal: React.FC = () => {
-  const { mongoStatus, refreshFromDatabase, branding } = usePortal();
+  const { mongoStatus, refreshFromDatabase, reconnectDb, branding } = usePortal();
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
   const handleManualSync = async () => {
     setIsRefreshing(true);
-    await refreshFromDatabase(true);
+    await reconnectDb();
     setIsRefreshing(false);
     setNotice('Connectivity status checked and updated.');
     setTimeout(() => setNotice(null), 3000);

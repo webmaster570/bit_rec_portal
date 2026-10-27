@@ -66,6 +66,7 @@ interface PortalContextType {
   updateBranding: (updates: Partial<PortalBranding>) => void;
   mongoStatus: MongoDbStatus;
   refreshFromDatabase: (isManualTrigger?: boolean) => Promise<void>;
+  reconnectDb: () => Promise<any>;
 
   // Server Transaction Toasts
   transactionToasts: ServerTransactionToast[];
@@ -402,6 +403,22 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     }
   }, [runDbTransaction]);
+
+  const reconnectDb = useCallback(async () => {
+    return await runDbTransaction(
+      'Database Reconnection',
+      'POST /api/reconnect',
+      'Attempting to establish a direct connection to MongoDB Atlas...',
+      'Database reconnection attempt completed.',
+      async () => {
+        const res = await fetch('/api/reconnect', { method: 'POST' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        await refreshFromDatabase(false);
+        return data;
+      }
+    );
+  }, [runDbTransaction, refreshFromDatabase]);
 
   // Initial load and periodic real-time sync with MongoDB
   useEffect(() => {
@@ -1486,6 +1503,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         updateBranding,
         mongoStatus,
         refreshFromDatabase,
+        reconnectDb,
         transactionToasts,
         emitTransactionToast,
         updateTransactionToast,

@@ -88,36 +88,44 @@ export async function tryConnectDb(): Promise<Db | null> {
 
   isConnecting = true;
   try {
-    console.log('[MongoDB] Attempting connection...');
     const uri = getMongoUri();
-    const env = process.env.NODE_ENV || 'development';
-    console.log(`[MongoDB] Runtime Environment: ${env}`);
-    console.log(`[MongoDB] MONGODB_URI presence: ${uri ? 'FOUND (valid length)' : 'NOT FOUND or EMPTY'}`);
+    const env = process.env.NODE_ENV || 'production';
+    console.log(`[MongoDB] Attempting connection (Env: ${env})...`);
     
-    if (uri) {
-      const masked = uri.replace(/:\/\/[^:]+:[^@]+@/, '://****:****@');
-      console.log(`[MongoDB] Connection Target: ${masked}`);
+    if (!uri) {
+      console.warn('[MongoDB] MONGODB_URI is MISSING or EMPTY.');
+      isConnected = false;
+      connectionError = 'MONGODB_URI environment variable is not defined.';
+      return null;
     }
+
+    const masked = uri.replace(/:\/\/[^:]+:[^@]+@/, '://****:****@');
+    console.log(`[MongoDB] URI format check: ${uri.startsWith('mongodb+srv://') ? 'SRV' : 'Standard'}`);
+    console.log(`[MongoDB] Connection Target: ${masked}`);
     
     if (!client) {
-      if (!uri) {
-        throw new Error('MONGODB_URI is not defined in environment variables.');
-      }
       client = new MongoClient(uri, {
-        connectTimeoutMS: 20000,
-        serverSelectionTimeoutMS: 20000,
-        socketTimeoutMS: 45000,
+        connectTimeoutMS: 30000,
+        serverSelectionTimeoutMS: 30000,
+        socketTimeoutMS: 60000,
         maxPoolSize: 10,
         minPoolSize: 1,
         retryWrites: true,
       });
     }
 
-    await client.connect();
+    // Explicitly handle connection timeout to avoid hanging
+    const connectPromise = client.connect();
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Connection attempt timed out (30s)')), 30000)
+    );
+
+    await Promise.race([connectPromise, timeoutPromise]);
+    
     db = client.db(DB_NAME);
     isConnected = true;
     connectionError = null;
-    console.log(`[MongoDB] Connected successfully to "${DB_NAME}".`);
+    console.log(`[MongoDB] Successfully connected to database: "${DB_NAME}"`);
 
     // Sync in-memory state to / from MongoDB collections
     await syncInitialDatabase(db);
@@ -125,16 +133,20 @@ export async function tryConnectDb(): Promise<Db | null> {
   } catch (err: any) {
     isConnected = false;
     const msg = err?.message || String(err);
-    console.error(`[MongoDB] Connection failed detail:`, err);
+    console.error(`[MongoDB] Connection failed:`, err);
+    
     if (msg.includes('SSL alert number 80') || msg.includes('TLS alert') || msg.includes('ServerSelection')) {
       connectionError =
-        'MongoDB Atlas IP Whitelist pending: Add 0.0.0.0/0 in MongoDB Atlas > Network Access to enable direct remote sync.';
-    } else if (msg.includes('ENOTFOUND') || msg.includes('ETIMEDOUT')) {
-      connectionError = `Network / DNS error: ${msg}. Check if your MongoDB cluster URL is correct and accessible.`;
+        'MongoDB Atlas IP Whitelist pending or invalid credentials. Ensure 0.0.0.0/0 is active in Atlas > Network Access.';
+    } else if (msg.includes('ENOTFOUND') || msg.includes('ETIMEDOUT') || msg.includes('timed out')) {
+      connectionError = `Network/DNS timeout: ${msg}. Check your MongoDB cluster URL and internet connectivity.`;
+    } else if (msg.includes('Authentication failed')) {
+      connectionError = 'Authentication failed: Invalid username or password in MONGODB_URI.';
     } else {
       connectionError = msg;
     }
-    console.error(`[MongoDB] Connection error summary: ${connectionError}`);
+    
+    console.error(`[MongoDB] Error Summary: ${connectionError}`);
     return null;
   } finally {
     isConnecting = false;
@@ -294,19 +306,25 @@ async function syncInitialDatabase(database: Db) {
 
 export async function getFullState() {
   try {
-    const database = await tryConnectDb();
-    if (database) {
+    // Check connection first without forcing a re-connect if already failed recently
+    if (!isConnected && !isConnecting) {
+      // Don't await tryConnectDb here to avoid blocking /api/state if DB is down
+      // The background worker handles reconnection.
+    }
+
+    if (isConnected && db) {
+      console.log('[MongoDB] Fetching state from remote collections...');
       const [brandingDoc, rolesDocs, deptsDocs, drivesDocs, appsDocs, auditDocs, notifsDocs, usersDocs, weightDoc] =
         await Promise.all([
-          database.collection('branding').findOne({ _id: 'portal_branding' as any }),
-          database.collection('roles').find({}).toArray(),
-          database.collection('departments').find({}).toArray(),
-          database.collection('drives').find({}).sort({ startDate: -1 }).toArray(),
-          database.collection('applications').find({}).sort({ submittedAt: -1 }).toArray(),
-          database.collection('audit_logs').find({}).sort({ timestamp: -1 }).limit(100).toArray(),
-          database.collection('notifications').find({}).sort({ timestamp: -1 }).toArray(),
-          database.collection('users').find({}).toArray(),
-          database.collection('weightage_config').findOne({ _id: 'default_config' as any }),
+          db.collection('branding').findOne({ _id: 'portal_branding' as any }).catch(e => null),
+          db.collection('roles').find({}).toArray().catch(e => []),
+          db.collection('departments').find({}).toArray().catch(e => []),
+          db.collection('drives').find({}).sort({ startDate: -1 }).toArray().catch(e => []),
+          db.collection('applications').find({}).sort({ submittedAt: -1 }).toArray().catch(e => []),
+          db.collection('audit_logs').find({}).sort({ timestamp: -1 }).limit(100).toArray().catch(e => []),
+          db.collection('notifications').find({}).sort({ timestamp: -1 }).toArray().catch(e => []),
+          db.collection('users').find({}).toArray().catch(e => []),
+          db.collection('weightage_config').findOne({ _id: 'default_config' as any }).catch(e => null),
         ]);
 
       const clean = (doc: any) => {
@@ -324,9 +342,14 @@ export async function getFullState() {
       if (notifsDocs?.length) memoryState.notifications = notifsDocs.map(clean);
       if (usersDocs?.length) memoryState.users = usersDocs.map(clean);
       if (weightDoc) memoryState.weightageConfig = clean(weightDoc);
+      console.log('[MongoDB] Remote state successfully synchronized to local memory.');
+    } else {
+      if (connectionError) {
+        console.warn(`[MongoDB] Serving from local memory store. Connection error: ${connectionError}`);
+      }
     }
   } catch (e) {
-    console.warn('[MongoDB] Read fallback to live memory store due to error:', e);
+    console.warn('[MongoDB] Read fallback to live memory store due to unexpected error:', e);
   }
 
   return {

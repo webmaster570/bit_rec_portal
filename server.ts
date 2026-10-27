@@ -68,15 +68,35 @@ async function startServer() {
     res.json({ status: 'ok', database: status });
   });
 
+  // Manual reconnection trigger
+  apiRouter.post('/reconnect', async (req, res) => {
+    try {
+      console.log('[API] Manual reconnection triggered.');
+      const database = await tryConnectDb();
+      const status = getDbStatus();
+      res.json({ 
+        success: !!database, 
+        connected: status.connected, 
+        error: status.error 
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
   // 2. Full State for Real-Time synchronization
   apiRouter.get('/state', async (req, res) => {
     try {
       const state = await getFullState();
       res.json(state);
     } catch (err: any) {
-      console.warn('[API] /api/state error:', err?.message);
-      const fallback = await getFullState();
-      res.json(fallback);
+      console.error('[API] /api/state fatal error:', err);
+      // Return a partial state with the error status so the frontend can display it
+      res.status(500).json({ 
+        error: true, 
+        message: err?.message || 'Internal Server Error during state fetch',
+        dbStatus: getDbStatus()
+      });
     }
   });
 
