@@ -21,20 +21,31 @@ import {
   PortalUser,
 } from '../src/types';
 
-function getMongoUri() {
-  const uri = process.env.MONGODB_URI;
-  if (!uri || uri.trim() === '') return undefined;
-  return uri.trim();
+function getMongoUri(): string | undefined {
+  let uri = process.env.MONGODB_URI;
+  if (!uri || typeof uri !== 'string') return undefined;
+  uri = uri.trim();
+  // Strip accidental enclosing quotes from Vercel env var input
+  if ((uri.startsWith('"') && uri.endsWith('"')) || (uri.startsWith("'") && uri.endsWith("'"))) {
+    uri = uri.slice(1, -1).trim();
+  }
+  return uri || undefined;
 }
 
 const DB_NAME = 'bit_recruitment_portal';
 
-let client: MongoClient | null = null;
-let db: Db | null = null;
-let isConnected = false;
+// Global caching for Vercel / AWS Lambda container reuse
+declare global {
+  var _mongoClientInstance: MongoClient | null | undefined;
+  var _mongoDbInstance: Db | null | undefined;
+  var _hasInitialSyncDone: boolean | undefined;
+}
+
+let client: MongoClient | null = globalThis._mongoClientInstance || null;
+let db: Db | null = globalThis._mongoDbInstance || null;
+let isConnected = !!(client && db);
 let isConnecting = false;
 let connectionError: string | null = null;
-
 
 // ------------------------------------------------------------------
 // Resilient In-Memory Master Store
@@ -62,6 +73,7 @@ export function getDbStatus() {
     uriMasked: (uri || '').replace(/:\/\/[^:]+:[^@]+@/, '://****:****@'),
     isConnecting,
     env: process.env.NODE_ENV || 'production',
+    isVercel: !!process.env.VERCEL,
     hasUri: !!uri,
     missingUri: !uri,
     ipWhitelistHint: connectionError?.includes('IP Whitelist') || false,
@@ -74,13 +86,20 @@ export function getDbStatus() {
 }
 
 export async function tryConnectDb(): Promise<Db | null> {
-  if (db && isConnected) return db;
+  // If already connected and client is active, reuse instantly (0ms)
+  if (db && isConnected && client) return db;
+  if (globalThis._mongoDbInstance && globalThis._mongoClientInstance) {
+    db = globalThis._mongoDbInstance;
+    client = globalThis._mongoClientInstance;
+    isConnected = true;
+    return db;
+  }
   
-  // If we're already connecting, wait for that connection to finish
+  // If we're already connecting in this instance, wait for it
   if (isConnecting) {
     let attempts = 0;
-    while (isConnecting && attempts < 10) {
-      await new Promise(resolve => setTimeout(resolve, 500));
+    while (isConnecting && attempts < 15) {
+      await new Promise(resolve => setTimeout(resolve, 300));
       attempts++;
     }
     if (db && isConnected) return db;
@@ -90,63 +109,65 @@ export async function tryConnectDb(): Promise<Db | null> {
   try {
     const uri = getMongoUri();
     const env = process.env.NODE_ENV || 'production';
-    console.log(`[MongoDB] Attempting connection (Env: ${env})...`);
+    console.log(`[MongoDB] Initiating connection (Env: ${env}, Vercel: ${!!process.env.VERCEL})...`);
     
     if (!uri) {
-      console.warn('[MongoDB] MONGODB_URI is MISSING or EMPTY.');
+      console.warn('[MongoDB] MONGODB_URI is MISSING or EMPTY in current environment.');
       isConnected = false;
       connectionError = 'MONGODB_URI environment variable is not defined.';
       return null;
     }
 
     const masked = uri.replace(/:\/\/[^:]+:[^@]+@/, '://****:****@');
-    console.log(`[MongoDB] URI format check: ${uri.startsWith('mongodb+srv://') ? 'SRV' : 'Standard'}`);
     console.log(`[MongoDB] Connection Target: ${masked}`);
     
     if (!client) {
       client = new MongoClient(uri, {
-        connectTimeoutMS: 30000,
-        serverSelectionTimeoutMS: 30000,
-        socketTimeoutMS: 60000,
+        connectTimeoutMS: 6000,
+        serverSelectionTimeoutMS: 6000,
+        socketTimeoutMS: 15000,
         maxPoolSize: 10,
-        minPoolSize: 1,
+        minPoolSize: 0,
+        maxIdleTimeMS: 10000,
         retryWrites: true,
       });
+      globalThis._mongoClientInstance = client;
     }
 
-    // Explicitly handle connection timeout to avoid hanging
+    // Explicitly enforce serverless timeout ceiling (7s) so Vercel lambdas never crash with 504
     const connectPromise = client.connect();
     const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Connection attempt timed out (30s)')), 30000)
+      setTimeout(() => reject(new Error('Connection timed out (7s). Check MongoDB Atlas Network Access (0.0.0.0/0).')), 7000)
     );
 
     await Promise.race([connectPromise, timeoutPromise]);
     
     db = client.db(DB_NAME);
+    globalThis._mongoDbInstance = db;
     isConnected = true;
     connectionError = null;
     console.log(`[MongoDB] Successfully connected to database: "${DB_NAME}"`);
 
-    // Sync in-memory state to / from MongoDB collections
+    // Sync in-memory state to / from MongoDB collections (fast check)
     await syncInitialDatabase(db);
     return db;
   } catch (err: any) {
     isConnected = false;
     const msg = err?.message || String(err);
-    console.error(`[MongoDB] Connection failed:`, err);
+    console.error(`[MongoDB] Connection error:`, msg);
     
-    if (msg.includes('SSL alert number 80') || msg.includes('TLS alert') || msg.includes('ServerSelection')) {
+    if (msg.includes('SSL alert') || msg.includes('TLS alert') || msg.includes('ServerSelection') || msg.includes('timed out')) {
       connectionError =
-        'MongoDB Atlas IP Whitelist pending or invalid credentials. Ensure 0.0.0.0/0 is active in Atlas > Network Access.';
-    } else if (msg.includes('ENOTFOUND') || msg.includes('ETIMEDOUT') || msg.includes('timed out')) {
-      connectionError = `Network/DNS timeout: ${msg}. Check your MongoDB cluster URL and internet connectivity.`;
-    } else if (msg.includes('Authentication failed')) {
-      connectionError = 'Authentication failed: Invalid username or password in MONGODB_URI.';
+        'MongoDB Atlas connection timeout: Ensure 0.0.0.0/0 is Active in Atlas > Network Access, and database credentials are valid.';
+    } else if (msg.includes('ENOTFOUND') || msg.includes('ETIMEDOUT') || msg.includes('DNS')) {
+      connectionError = `Network / DNS error: ${msg}. Check if your MongoDB cluster host address is correct.`;
+    } else if (msg.includes('Authentication failed') || msg.includes('bad auth')) {
+      connectionError = 'Authentication failed: Invalid database username or password in MONGODB_URI.';
     } else {
       connectionError = msg;
     }
     
-    console.error(`[MongoDB] Error Summary: ${connectionError}`);
+    console.error(`[MongoDB] Diagnostics: ${connectionError}`);
     return null;
   } finally {
     isConnecting = false;
@@ -161,141 +182,55 @@ async function ensureDb(): Promise<Db> {
   return database;
 }
 
-// Background auto-reconnect worker
-setInterval(() => {
-  if (!isConnected) {
-    tryConnectDb().catch(() => {});
-  }
-}, 12000);
+// Background auto-reconnect worker for persistent environments (disabled on Vercel to prevent frozen timer leaks)
+if (!process.env.VERCEL) {
+  setInterval(() => {
+    if (!isConnected) {
+      tryConnectDb().catch(() => {});
+    }
+  }, 12000);
+}
 
 async function syncInitialDatabase(database: Db) {
+  if (globalThis._hasInitialSyncDone) {
+    return;
+  }
   try {
-    // 1. Branding
     const brandingCol = database.collection('branding');
     const existingBranding = await brandingCol.findOne({ _id: 'portal_branding' as any });
-    if (!existingBranding) {
-      await brandingCol.insertOne({ _id: 'portal_branding' as any, ...memoryState.branding });
-    } else {
-      const { _id, ...rest } = existingBranding as any;
-      memoryState.branding = { ...memoryState.branding, ...rest };
+    if (existingBranding) {
+      // Database has already been initialized in MongoDB Atlas!
+      globalThis._hasInitialSyncDone = true;
+      console.log('[MongoDB] Database already initialized in Atlas. Skipping redundant re-seed.');
+      return;
     }
 
-    // 2. Roles
+    // First time setup on clean cluster: seed defaults
+    console.log('[MongoDB] Initializing collections on fresh database cluster...');
+    await brandingCol.insertOne({ _id: 'portal_branding' as any, ...memoryState.branding });
+
     const rolesCol = database.collection('roles');
-    const rolesCount = await rolesCol.countDocuments();
-    if (rolesCount === 0) {
-      const docs = memoryState.roles.map((r) => ({ ...r, _id: r.id as any }));
-      await rolesCol.insertMany(docs);
-    } else {
-      const docs = await rolesCol.find({}).toArray();
-      memoryState.roles = docs.map(({ _id, ...r }: any) => ({ ...r, id: r.id || _id }));
-    }
+    await rolesCol.insertMany(memoryState.roles.map((r) => ({ ...r, _id: r.id as any }))).catch(() => {});
 
-    // 3. Departments
     const deptsCol = database.collection('departments');
-    const deptsCount = await deptsCol.countDocuments();
-    if (deptsCount === 0) {
-      const docs = memoryState.departments.map((d) => ({ ...d, _id: d.id as any }));
-      await deptsCol.insertMany(docs);
-    } else {
-      const docs = await deptsCol.find({}).toArray();
-      memoryState.departments = docs.map(({ _id, ...d }: any) => ({ ...d, id: d.id || _id }));
-    }
+    await deptsCol.insertMany(memoryState.departments.map((d) => ({ ...d, _id: d.id as any }))).catch(() => {});
 
-    // 4. Drives
     const drivesCol = database.collection('drives');
-    const drivesCount = await drivesCol.countDocuments();
-    if (drivesCount === 0) {
-      const docs = memoryState.drives.map((d) => ({ ...d, _id: d.id as any }));
-      await drivesCol.insertMany(docs);
-    } else {
-      const docs = await drivesCol.find({}).toArray();
-      memoryState.drives = docs.map(({ _id, ...d }: any) => ({ ...d, id: d.id || _id }));
-    }
+    await drivesCol.insertMany(memoryState.drives.map((d) => ({ ...d, _id: d.id as any }))).catch(() => {});
 
-    // 5. Applications
     const appsCol = database.collection('applications');
-    const appsCount = await appsCol.countDocuments();
-    if (appsCount === 0) {
-      const docs = memoryState.applications.map((a) => ({ ...a, _id: a.id as any }));
-      await appsCol.insertMany(docs);
-    } else {
-      const docs = await appsCol.find({}).toArray();
-      memoryState.applications = docs.map(({ _id, ...a }: any) => ({ ...a, id: a.id || _id }));
-    }
+    await appsCol.insertMany(memoryState.applications.map((a) => ({ ...a, _id: a.id as any }))).catch(() => {});
 
-    // 6. Audit Logs
-    const auditCol = database.collection('audit_logs');
-    const auditCount = await auditCol.countDocuments();
-    if (auditCount === 0) {
-      const docs = memoryState.auditLogs.map((l) => ({ ...l, _id: l.id as any }));
-      await auditCol.insertMany(docs);
-    }
-
-    // 7. Notifications
-    const notifsCol = database.collection('notifications');
-    const notifsCount = await notifsCol.countDocuments();
-    if (notifsCount === 0) {
-      const docs = memoryState.notifications.map((n) => ({ ...n, _id: n.id as any }));
-      await notifsCol.insertMany(docs);
-    }
-
-    console.log('[MongoDB] 8. Syncing users...');
     const usersCol = database.collection('users');
-    const usersCount = await usersCol.countDocuments();
-    
-    try {
-      await usersCol.updateMany(
-        { 
-          $or: [
-            { password: { $exists: false } }, 
-            { password: "" }, 
-            { password: null }
-          ] 
-        },
-        { $set: { password: 'pass123' } }
-      );
-    } catch (err) {
-      console.warn('[MongoDB] User password migration notice:', err);
-    }
+    await usersCol.insertMany(memoryState.users.map((u) => ({ ...u, _id: u.id as any }))).catch(() => {});
 
-    if (usersCount === 0) {
-      const docs = memoryState.users.map((u) => ({ ...u, _id: u.id as any }));
-      await usersCol.insertMany(docs);
-    } else {
-      for (const initialUser of INITIAL_USERS) {
-        const exists = await usersCol.findOne({ email: initialUser.email });
-        if (!exists) {
-          await usersCol.insertOne({ ...initialUser, _id: initialUser.id as any });
-        }
-      }
-      const docs = await usersCol.find({}).toArray();
-      memoryState.users = docs.map(({ _id, ...u }: any) => ({ ...u, id: u.id || _id }));
-    }
-
-    console.log('[MongoDB] 9. Syncing weightage...');
     const weightCol = database.collection('weightage_config');
-    const weightDoc = await weightCol.findOne({ _id: 'default_config' as any });
-    if (!weightDoc) {
-      await weightCol.insertOne({ _id: 'default_config' as any, ...memoryState.weightageConfig });
-    } else {
-      const { _id, ...rest } = weightDoc as any;
-      memoryState.weightageConfig = { ...memoryState.weightageConfig, ...rest };
-    }
+    await weightCol.insertOne({ _id: 'default_config' as any, ...memoryState.weightageConfig }).catch(() => {});
 
-    // 10. Indexes
-    console.log('[MongoDB] 10. Ensuring indexes...');
-    await Promise.all([
-      database.collection('users').createIndex({ email: 1 }, { unique: true }),
-      database.collection('users').createIndex({ id: 1 }),
-      database.collection('drives').createIndex({ id: 1 }),
-      database.collection('applications').createIndex({ id: 1 }),
-      database.collection('applications').createIndex({ applicationNo: 1 }, { unique: true }),
-    ]).catch(err => console.warn('[MongoDB] Index creation notice (some may already exist):', err.message));
-
-    console.log('[MongoDB] All collections verified and synced.');
+    globalThis._hasInitialSyncDone = true;
+    console.log('[MongoDB] Initial database seeding completed.');
   } catch (err) {
-    console.warn('[MongoDB] Sync process encountered a notice (possible timeout):', err);
+    console.warn('[MongoDB] Sync process notice:', err);
   }
 }
 
@@ -306,25 +241,21 @@ async function syncInitialDatabase(database: Db) {
 
 export async function getFullState() {
   try {
-    // Check connection first without forcing a re-connect if already failed recently
-    if (!isConnected && !isConnecting) {
-      // Don't await tryConnectDb here to avoid blocking /api/state if DB is down
-      // The background worker handles reconnection.
-    }
+    const database = await tryConnectDb();
 
-    if (isConnected && db) {
+    if (database) {
       console.log('[MongoDB] Fetching state from remote collections...');
       const [brandingDoc, rolesDocs, deptsDocs, drivesDocs, appsDocs, auditDocs, notifsDocs, usersDocs, weightDoc] =
         await Promise.all([
-          db.collection('branding').findOne({ _id: 'portal_branding' as any }).catch(e => null),
-          db.collection('roles').find({}).toArray().catch(e => []),
-          db.collection('departments').find({}).toArray().catch(e => []),
-          db.collection('drives').find({}).sort({ startDate: -1 }).toArray().catch(e => []),
-          db.collection('applications').find({}).sort({ submittedAt: -1 }).toArray().catch(e => []),
-          db.collection('audit_logs').find({}).sort({ timestamp: -1 }).limit(100).toArray().catch(e => []),
-          db.collection('notifications').find({}).sort({ timestamp: -1 }).toArray().catch(e => []),
-          db.collection('users').find({}).toArray().catch(e => []),
-          db.collection('weightage_config').findOne({ _id: 'default_config' as any }).catch(e => null),
+          database.collection('branding').findOne({ _id: 'portal_branding' as any }).catch(e => null),
+          database.collection('roles').find({}).toArray().catch(e => []),
+          database.collection('departments').find({}).toArray().catch(e => []),
+          database.collection('drives').find({}).sort({ startDate: -1 }).toArray().catch(e => []),
+          database.collection('applications').find({}).sort({ submittedAt: -1 }).toArray().catch(e => []),
+          database.collection('audit_logs').find({}).sort({ timestamp: -1 }).limit(100).toArray().catch(e => []),
+          database.collection('notifications').find({}).sort({ timestamp: -1 }).toArray().catch(e => []),
+          database.collection('users').find({}).toArray().catch(e => []),
+          database.collection('weightage_config').findOne({ _id: 'default_config' as any }).catch(e => null),
         ]);
 
       const clean = (doc: any) => {
@@ -345,7 +276,7 @@ export async function getFullState() {
       console.log('[MongoDB] Remote state successfully synchronized to local memory.');
     } else {
       if (connectionError) {
-        console.warn(`[MongoDB] Serving from local memory store. Connection error: ${connectionError}`);
+        console.warn(`[MongoDB] Serving from local memory store. Reason: ${connectionError}`);
       }
     }
   } catch (e) {

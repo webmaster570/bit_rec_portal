@@ -290,8 +290,9 @@ async function startServer() {
     }
   });
 
-  // Mount API router
+  // Mount API router at both /api and root to eliminate Vercel rewrite prefix mismatches
   app.use('/api', apiRouter);
+  app.use(apiRouter);
 
   // Global ping for diagnostics
   app.get('/ping', (req, res) => res.send('pong'));
@@ -299,38 +300,31 @@ async function startServer() {
   // ----------------------------------------------------
   // VITE OR STATIC ASSETS MIDDLEWARE
   // ----------------------------------------------------
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
-  } else {
-    // More robust path resolution for Vercel lambdas and local execution
-    let distPath = '';
-    if (__filename.endsWith('.cjs')) {
-      // Bundled output in dist/server.cjs
-      distPath = __dirname;
-    } else if (__dirname.includes('api')) {
-      // Running from api/index.ts source
-      distPath = path.join(__dirname, '..', 'dist');
-    } else {
-      // Running from root server.ts
-      distPath = path.join(__dirname, 'dist');
-    }
-    
-    console.log(`[Server] Detected distPath: ${distPath}`);
-    console.log(`[Server] __dirname: ${__dirname}`);
-    
+  } else if (!process.env.VERCEL) {
+    // Only serve static assets from Express if NOT running in Vercel serverless
+    // In Vercel, static assets are served directly by Vercel's global CDN from dist/
+    const distPath = path.join(__dirname, 'dist');
     app.use(express.static(distPath));
-    
     app.get('*', (req, res) => {
       const indexPath = path.join(distPath, 'index.html');
       res.sendFile(indexPath, (err) => {
         if (err) {
-          console.error(`[Server] Error sending index.html from ${indexPath}:`, err);
           res.status(404).send('Static assets not found. Please run "npm run build" first.');
         }
+      });
+    });
+  } else {
+    // Fallback for unmatched API routes inside Vercel serverless function
+    app.use((req, res) => {
+      res.status(404).json({
+        error: true,
+        message: `API route ${req.method} ${req.url} not found on serverless handler.`,
       });
     });
   }
