@@ -129,7 +129,7 @@ export const SystemStatusPortal: React.FC = () => {
             <Info className="w-5 h-5 text-indigo-400" />
             <h2 className="font-bold">Production Troubleshooting Guide</h2>
           </div>
-          <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-mono border border-white/20">v1.3.0</span>
+          <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-mono border border-white/20">v1.3.1</span>
         </div>
 
         <div className="p-6 space-y-8">

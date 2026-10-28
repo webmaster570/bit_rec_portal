@@ -1,16 +1,10 @@
-import app from '../server';
+import app from '../server/app';
 
 export default function handler(req: any, res: any) {
-  // If Vercel passed the path in x-matched-path, ensure req.url is set correctly
-  const matched = req.headers['x-matched-path'] || req.headers['x-forwarded-uri'];
+  // If Vercel passed the path in x-matched-path or x-forwarded-uri, normalize req.url
+  const matched = (req.headers['x-matched-path'] as string) || (req.headers['x-forwarded-uri'] as string);
   if (matched && typeof matched === 'string' && matched.startsWith('/api')) {
     req.url = matched;
   }
-  return new Promise<void>((resolve, reject) => {
-    res.on('finish', () => resolve());
-    res.on('close', () => resolve());
-    res.on('error', (err: any) => reject(err));
-    app(req, res);
-  });
+  return app(req, res);
 }
-

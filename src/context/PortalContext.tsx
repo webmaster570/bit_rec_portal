@@ -426,7 +426,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         await refreshFromDatabase(false);
 
         if (data && data.connected === false && data.error) {
-          throw new Error(data.error);
+          setMongoStatus((prev) => ({
+            ...prev,
+            connected: false,
+            error: data.error,
+          }));
         }
 
         return data;
