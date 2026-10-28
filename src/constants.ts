@@ -7,6 +7,7 @@ export const INITIAL_BRANDING: PortalBranding = {
   logoIconName: 'Building2',
   logoImageUrl: '',
   theme: 'classic',
+  allowDevRoleSelector: true,
 };
 
 export const DEFAULT_WEIGHTAGE_CONFIG: WeightageConfig = {

@@ -179,7 +179,6 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => loadInitialState('isLoggedIn', false, AUTH_STORAGE_KEY));
   const [currentUser, setCurrentUser] = useState<UserSession | null>(() => loadInitialState('currentUser', null, AUTH_STORAGE_KEY));
   const [activeTab, setActiveTabState] = useState<string>(() => loadInitialState('activeTab', 'public_recruitment', AUTH_STORAGE_KEY));
-  const [allowDevRoleSelector, setAllowDevRoleSelector] = useState<boolean>(() => loadInitialState('allowDevRoleSelector', true, AUTH_STORAGE_KEY));
   const [currentRole, setCurrentRole] = useState<UserRole>(() => loadInitialState('currentRole', 'super_admin', AUTH_STORAGE_KEY));
   const [roles, setRoles] = useState<RoleInfo[]>(() => loadInitialState('roles', INITIAL_ROLES));
   const [drives, setDrives] = useState<RecruitmentDrive[]>(() => loadInitialState('drives', INITIAL_DRIVES));
@@ -463,13 +462,12 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           currentUser,
           currentRole,
           activeTab,
-          allowDevRoleSelector,
         })
       );
     } catch (e) {
       console.warn('Failed to save auth state locally:', e);
     }
-  }, [isLoggedIn, currentUser, currentRole, activeTab, allowDevRoleSelector]);
+  }, [isLoggedIn, currentUser, currentRole, activeTab]);
 
   // Keep data backup in localStorage
   useEffect(() => {
@@ -579,7 +577,6 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         currentUser: session,
         currentRole: role,
         activeTab: role === 'applicant' ? 'applicant_portal' : 'overview',
-        allowDevRoleSelector,
       }));
     } catch (e) {
       console.warn('Failed to persist login state:', e);
@@ -620,7 +617,6 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           currentUser: session,
           currentRole: user.role,
           activeTab: user.role === 'applicant' ? 'applicant_portal' : 'overview',
-          allowDevRoleSelector,
         }));
       } catch (e) {
         console.warn('Failed to persist secure login state:', e);
@@ -685,7 +681,6 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         currentUser: session,
         currentRole: 'applicant',
         activeTab: 'applicant_portal',
-        allowDevRoleSelector,
       }));
     } catch (e) {
       console.warn('Failed to persist registration state:', e);
@@ -696,16 +691,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const toggleDevRoleSelector = (allow?: boolean) => {
-    const next = typeof allow === 'boolean' ? allow : !allowDevRoleSelector;
-    setAllowDevRoleSelector(next);
-    
-    // Immediate persistence
-    try {
-      const authData = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || '{}');
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ ...authData, allowDevRoleSelector: next }));
-    } catch (e) {
-      console.warn('Failed to persist dev role selector state:', e);
-    }
+    const next = typeof allow === 'boolean' ? allow : !branding.allowDevRoleSelector;
+    updateBranding({ allowDevRoleSelector: next });
   };
 
   const switchRole = (newRole: UserRole) => {
@@ -1580,7 +1567,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         currentUser,
         activeTab,
         setActiveTab,
-        allowDevRoleSelector,
+        allowDevRoleSelector: branding.allowDevRoleSelector,
         currentRole,
         roles,
         drives,

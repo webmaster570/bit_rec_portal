@@ -26,6 +26,7 @@ export interface PortalBranding {
   logoIconName: string;
   logoImageUrl: string;
   theme: PortalTheme;
+  allowDevRoleSelector: boolean;
 }
 
 export interface PortalUser {
