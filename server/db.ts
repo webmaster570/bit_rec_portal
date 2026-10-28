@@ -1,4 +1,4 @@
-import { MongoClient, Db } from 'mongodb';
+import { MongoClient, Db, ServerApiVersion } from 'mongodb';
 import { INITIAL_BRANDING, DEFAULT_WEIGHTAGE_CONFIG } from '../src/constants';
 import {
   INITIAL_ROLES,
@@ -22,13 +22,10 @@ import {
 } from '../src/types';
 
 function getMongoUri(): string | undefined {
-  let uri =
-    process.env.MONGODB_URI ||
-    process.env.MONGO_URI ||
-    process.env.MONGODB_URL ||
-    process.env.MONGO_URL ||
-    process.env.DATABASE_URL;
+  let uri = process.env.MONGODB_URI;
+  
   if (!uri || typeof uri !== 'string') return undefined;
+  
   uri = uri.trim();
   // Strip accidental enclosing quotes from Vercel env var input
   if ((uri.startsWith('"') && uri.endsWith('"')) || (uri.startsWith("'") && uri.endsWith("'"))) {
@@ -54,8 +51,6 @@ let connectionError: string | null = null;
 
 // ------------------------------------------------------------------
 // Resilient In-Memory Master Store
-// Ensures the entire web application runs 100% smoothly at all times
-// with zero downtime, even if MongoDB is reconnecting or pending IP whitelist
 // ------------------------------------------------------------------
 const memoryState = {
   branding: { ...INITIAL_BRANDING },
@@ -81,7 +76,7 @@ export function getDbStatus() {
     isVercel: !!process.env.VERCEL,
     hasUri: !!uri,
     missingUri: !uri,
-    ipWhitelistHint: connectionError?.includes('IP Whitelist') || false,
+    ipWhitelistHint: connectionError?.includes('IP Access List') || connectionError?.includes('whitelist') || false,
     memorySummary: {
       drives: memoryState.drives.length,
       apps: memoryState.applications.length,
@@ -91,100 +86,101 @@ export function getDbStatus() {
 }
 
 export async function tryConnectDb(): Promise<Db | null> {
-  // If already connected and client is active, reuse instantly (0ms)
-  if (db && isConnected && client) return db;
+  // 1. Instant check for cached connection
+  if (db && isConnected && client) {
+    try {
+      await db.command({ ping: 1 });
+      return db;
+    } catch (e) {
+      console.warn('[MongoDB] Cached connection stale, reconnecting...');
+      isConnected = false;
+    }
+  }
+
   if (globalThis._mongoDbInstance && globalThis._mongoClientInstance) {
-    db = globalThis._mongoDbInstance;
-    client = globalThis._mongoClientInstance;
-    isConnected = true;
-    return db;
+    try {
+      await globalThis._mongoDbInstance.command({ ping: 1 });
+      db = globalThis._mongoDbInstance;
+      client = globalThis._mongoClientInstance;
+      isConnected = true;
+      return db;
+    } catch (e) {
+      globalThis._mongoDbInstance = null;
+      globalThis._mongoClientInstance = null;
+    }
   }
   
-  // If we're already connecting in this instance, wait for it
   if (isConnecting) {
     let attempts = 0;
-    while (isConnecting && attempts < 15) {
-      await new Promise(resolve => setTimeout(resolve, 300));
+    while (isConnecting && attempts < 20) {
+      await new Promise(resolve => setTimeout(resolve, 250));
       attempts++;
+      if (db && isConnected) return db;
     }
-    if (db && isConnected) return db;
   }
 
   isConnecting = true;
   try {
     const uri = getMongoUri();
-    const env = process.env.NODE_ENV || 'production';
-    console.log(`[MongoDB] Initiating connection (Env: ${env}, Vercel: ${!!process.env.VERCEL})...`);
+    const isVercel = !!process.env.VERCEL;
     
     if (!uri) {
-      console.warn('[MongoDB] MONGODB_URI is MISSING or EMPTY in current environment.');
-      isConnected = false;
-      connectionError = 'MONGODB_URI environment variable is not defined.';
+      connectionError = 'MONGODB_URI is missing in environment variables.';
       return null;
     }
 
-    const masked = uri.replace(/:\/\/[^:]+:[^@]+@/, '://****:****@');
-    console.log(`[MongoDB] Connection Target: ${masked}`);
-    
     if (!client) {
       client = new MongoClient(uri, {
-        connectTimeoutMS: 6000,
-        serverSelectionTimeoutMS: 6000,
-        socketTimeoutMS: 15000,
-        maxPoolSize: 10,
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: true,
+          deprecationErrors: true,
+        },
+        connectTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 30000,
+        maxPoolSize: 1, // Minimize connections in serverless
         minPoolSize: 0,
-        maxIdleTimeMS: 10000,
         retryWrites: true,
       });
       globalThis._mongoClientInstance = client;
     }
 
-    // Explicitly enforce serverless timeout ceiling (7s) so Vercel lambdas never crash with 504
-    const connectPromise = client.connect();
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Connection timed out (7s). Check MongoDB Atlas Network Access (0.0.0.0/0).')), 7000)
-    );
-
-    await Promise.race([connectPromise, timeoutPromise]);
+    // Attempt connection with explicit timeout
+    await client.connect();
     
-    // Use the database name from the URI if specified, otherwise fall back to default
-    db = client.db();
-    const activeDbName = db.databaseName || DEFAULT_DB_NAME;
-    
+    db = client.db(); // Uses db name from URI if present
     globalThis._mongoDbInstance = db;
     isConnected = true;
     connectionError = null;
-    console.log(`[MongoDB] Successfully connected to database: "${activeDbName}"`);
+    
+    console.log(`[MongoDB] Connected to: ${db.databaseName}`);
 
-    // Sync in-memory state to / from MongoDB collections (fast check)
+    // Seed if empty
     await syncInitialDatabase(db);
     return db;
   } catch (err: any) {
     isConnected = false;
-    try {
-      if (client) {
-        client.close().catch(() => {});
-      }
-    } catch {}
-    client = null;
-    globalThis._mongoClientInstance = null;
-    globalThis._mongoDbInstance = null;
-
     const msg = err?.message || String(err);
-    console.error(`[MongoDB] Connection error:`, msg);
+    console.error(`[MongoDB] Connection failed:`, msg);
     
-    if (msg.includes('SSL alert') || msg.includes('TLS alert') || msg.includes('ServerSelection') || msg.includes('timed out')) {
-      connectionError =
-        'MongoDB Atlas connection timeout: Ensure 0.0.0.0/0 is Active in Atlas > Network Access, and database credentials are valid.';
-    } else if (msg.includes('ENOTFOUND') || msg.includes('ETIMEDOUT') || msg.includes('DNS')) {
-      connectionError = `Network / DNS error: ${msg}. Check if your MongoDB cluster host address is correct.`;
-    } else if (msg.includes('Authentication failed') || msg.includes('bad auth')) {
-      connectionError = 'Authentication failed: Invalid database username or password in MONGODB_URI.';
+    if (msg.includes('IP Access List') || msg.includes('not whitelisted')) {
+      connectionError = 'Vercel IP is not whitelisted. Ensure 0.0.0.0/0 is Active in MongoDB Atlas > Network Access.';
+    } else if (msg.includes('timed out') || msg.includes('ServerSelectionTimeout')) {
+      connectionError = 'Connection timed out. Check MongoDB Atlas status and whitelist (0.0.0.0/0).';
+    } else if (msg.includes('Authentication failed')) {
+      connectionError = 'Invalid MongoDB credentials. Check your MONGODB_URI username/password.';
     } else {
       connectionError = msg;
     }
     
-    console.error(`[MongoDB] Diagnostics: ${connectionError}`);
+    // Cleanup failed client to prevent leak
+    if (client) {
+      client.close().catch(() => {});
+      client = null;
+      globalThis._mongoClientInstance = null;
+    }
+    
     return null;
   } finally {
     isConnecting = false;
@@ -199,84 +195,51 @@ async function ensureDb(): Promise<Db> {
   return database;
 }
 
-// Background auto-reconnect worker for persistent environments (disabled on Vercel to prevent frozen timer leaks)
-if (!process.env.VERCEL) {
-  setInterval(() => {
-    if (!isConnected) {
-      tryConnectDb().catch(() => {});
-    }
-  }, 12000);
-}
-
 async function syncInitialDatabase(database: Db) {
-  if (globalThis._hasInitialSyncDone) {
-    return;
-  }
+  if (globalThis._hasInitialSyncDone) return;
   try {
     const brandingCol = database.collection('branding');
-    const existingBranding = await Promise.race([
-      brandingCol.findOne({ _id: 'portal_branding' as any }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Seed check timeout')), 3000)),
-    ]).catch(() => null);
+    const existingBranding = await brandingCol.findOne({ _id: 'portal_branding' as any }).catch(() => null);
 
     if (existingBranding) {
-      // Database has already been initialized in MongoDB Atlas!
       globalThis._hasInitialSyncDone = true;
-      console.log('[MongoDB] Database already initialized in Atlas. Skipping redundant re-seed.');
+      console.log('[MongoDB] Existing database detected. Sync complete.');
       return;
     }
 
-    // First time setup on clean cluster: seed defaults
-    console.log('[MongoDB] Initializing collections on fresh database cluster...');
+    console.log('[MongoDB] Initializing clean database...');
     await brandingCol.insertOne({ _id: 'portal_branding' as any, ...memoryState.branding }).catch(() => {});
 
-    const rolesCol = database.collection('roles');
-    await rolesCol.insertMany(memoryState.roles.map((r) => ({ ...r, _id: r.id as any }))).catch(() => {});
-
-    const deptsCol = database.collection('departments');
-    await deptsCol.insertMany(memoryState.departments.map((d) => ({ ...d, _id: d.id as any }))).catch(() => {});
-
-    const drivesCol = database.collection('drives');
-    await drivesCol.insertMany(memoryState.drives.map((d) => ({ ...d, _id: d.id as any }))).catch(() => {});
-
-    const appsCol = database.collection('applications');
-    await appsCol.insertMany(memoryState.applications.map((a) => ({ ...a, _id: a.id as any }))).catch(() => {});
-
-    const usersCol = database.collection('users');
-    await usersCol.insertMany(memoryState.users.map((u) => ({ ...u, _id: u.id as any }))).catch(() => {});
-
-    const weightCol = database.collection('weightage_config');
-    await weightCol.insertOne({ _id: 'default_config' as any, ...memoryState.weightageConfig }).catch(() => {});
+    // Fast seed
+    await Promise.all([
+      database.collection('roles').insertMany(memoryState.roles.map((r) => ({ ...r, _id: r.id as any }))).catch(() => {}),
+      database.collection('departments').insertMany(memoryState.departments.map((d) => ({ ...d, _id: d.id as any }))).catch(() => {}),
+      database.collection('drives').insertMany(memoryState.drives.map((d) => ({ ...d, _id: d.id as any }))).catch(() => {}),
+      database.collection('users').insertMany(memoryState.users.map((u) => ({ ...u, _id: u.id as any }))).catch(() => {}),
+      database.collection('weightage_config').insertOne({ _id: 'default_config' as any, ...memoryState.weightageConfig }).catch(() => {}),
+    ]);
 
     globalThis._hasInitialSyncDone = true;
-    console.log('[MongoDB] Initial database seeding completed.');
   } catch (err) {
-    console.warn('[MongoDB] Sync process notice:', err);
+    console.warn('[MongoDB] Seeding notice:', err);
   }
 }
-
-// ----------------------------------------------------
-// STATE RETRIEVAL & CRUD FUNCTIONS
-// Always returns immediately with live data
-// ----------------------------------------------------
 
 export async function getFullState() {
   try {
     const database = await tryConnectDb();
-
     if (database) {
-      console.log('[MongoDB] Fetching state from remote collections...');
       const [brandingDoc, rolesDocs, deptsDocs, drivesDocs, appsDocs, auditDocs, notifsDocs, usersDocs, weightDoc] =
         await Promise.all([
-          database.collection('branding').findOne({ _id: 'portal_branding' as any }).catch(e => null),
-          database.collection('roles').find({}).toArray().catch(e => []),
-          database.collection('departments').find({}).toArray().catch(e => []),
-          database.collection('drives').find({}).sort({ startDate: -1 }).toArray().catch(e => []),
-          database.collection('applications').find({}).sort({ submittedAt: -1 }).toArray().catch(e => []),
-          database.collection('audit_logs').find({}).sort({ timestamp: -1 }).limit(100).toArray().catch(e => []),
-          database.collection('notifications').find({}).sort({ timestamp: -1 }).toArray().catch(e => []),
-          database.collection('users').find({}).toArray().catch(e => []),
-          database.collection('weightage_config').findOne({ _id: 'default_config' as any }).catch(e => null),
+          database.collection('branding').findOne({ _id: 'portal_branding' as any }).catch(() => null),
+          database.collection('roles').find({}).toArray().catch(() => []),
+          database.collection('departments').find({}).toArray().catch(() => []),
+          database.collection('drives').find({}).sort({ startDate: -1 }).toArray().catch(() => []),
+          database.collection('applications').find({}).sort({ submittedAt: -1 }).toArray().catch(() => []),
+          database.collection('audit_logs').find({}).sort({ timestamp: -1 }).limit(100).toArray().catch(() => []),
+          database.collection('notifications').find({}).sort({ timestamp: -1 }).toArray().catch(() => []),
+          database.collection('users').find({}).toArray().catch(() => []),
+          database.collection('weightage_config').findOne({ _id: 'default_config' as any }).catch(() => null),
         ]);
 
       const clean = (doc: any) => {
@@ -294,14 +257,9 @@ export async function getFullState() {
       if (notifsDocs?.length) memoryState.notifications = notifsDocs.map(clean);
       if (usersDocs?.length) memoryState.users = usersDocs.map(clean);
       if (weightDoc) memoryState.weightageConfig = clean(weightDoc);
-      console.log('[MongoDB] Remote state successfully synchronized to local memory.');
-    } else {
-      if (connectionError) {
-        console.warn(`[MongoDB] Serving from local memory store. Reason: ${connectionError}`);
-      }
     }
   } catch (e) {
-    console.warn('[MongoDB] Read fallback to live memory store due to unexpected error:', e);
+    console.warn('[MongoDB] State sync failed, using memory fallback');
   }
 
   return {
@@ -313,10 +271,8 @@ export async function getFullState() {
 export async function verifyLoginDb(email: string, password: string): Promise<PortalUser | null> {
   const cleanEmail = (email || '').trim();
   const escapedEmail = cleanEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  
   let user: PortalUser | null = null;
 
-  // 1. Try to find in MongoDB first if connected
   if (isConnected && db) {
     try {
       const doc = await db.collection('users').findOne({ 
@@ -326,36 +282,26 @@ export async function verifyLoginDb(email: string, password: string): Promise<Po
         const { _id, ...rest } = doc;
         user = { ...rest, id: rest.id || _id } as PortalUser;
       }
-    } catch (e) {
-      console.warn('[MongoDB] Login lookup failed, falling back to memory');
-    }
+    } catch (e) {}
   }
 
-  // 2. Fallback to memory state
   if (!user) {
     user = memoryState.users.find(u => u.email.toLowerCase() === cleanEmail.toLowerCase()) || null;
   }
 
-  // 3. Verify password (simple check for now, can be hashed later)
-  if (user) {
-    const userPassword = user.password || 'pass123'; // Default fallback if still missing
-    if (userPassword === password) {
-      // Update last login
-      const lastLoginAt = new Date().toISOString();
-      if (isConnected && db) {
-        db.collection('users').updateOne({ email: user.email }, { $set: { lastLoginAt } }).catch(() => {});
-      }
-      user.lastLoginAt = lastLoginAt;
-      return user;
+  if (user && (user.password || 'pass123') === password) {
+    const lastLoginAt = new Date().toISOString();
+    if (isConnected && db) {
+      db.collection('users').updateOne({ email: user.email }, { $set: { lastLoginAt } }).catch(() => {});
     }
+    user.lastLoginAt = lastLoginAt;
+    return user;
   }
-
   return null;
 }
 
 export async function updateBrandingDb(updates: Partial<PortalBranding>) {
   memoryState.branding = { ...memoryState.branding, ...updates };
-
   try {
     const database = await ensureDb();
     await database.collection('branding').updateOne(
@@ -363,100 +309,67 @@ export async function updateBrandingDb(updates: Partial<PortalBranding>) {
       { $set: updates },
       { upsert: true }
     );
-  } catch (e) {
-    console.error('[MongoDB] Branding save failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
   return memoryState.branding;
 }
 
 export async function updateRolePermissionsDb(roleId: string, permissions: string[]) {
-  memoryState.roles = memoryState.roles.map((r) =>
-    r.id === roleId ? { ...r, permissions } : r
-  );
-
+  memoryState.roles = memoryState.roles.map((r) => r.id === roleId ? { ...r, permissions } : r);
   try {
     const database = await ensureDb();
     await database.collection('roles').updateOne({ id: roleId }, { $set: { permissions } });
-  } catch (e) {
-    console.error('[MongoDB] Role update failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
 }
 
 export async function createDriveDb(drive: RecruitmentDrive) {
   memoryState.drives = [drive, ...memoryState.drives];
-
   try {
     const database = await ensureDb();
     await database.collection('drives').insertOne({ _id: drive.id as any, ...drive });
-  } catch (e) {
-    console.error('[MongoDB] Drive creation failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
   return drive;
 }
 
 export async function updateDriveDb(driveId: string, updates: Partial<RecruitmentDrive>) {
-  memoryState.drives = memoryState.drives.map((d) =>
-    d.id === driveId ? { ...d, ...updates } : d
-  );
-
+  memoryState.drives = memoryState.drives.map((d) => d.id === driveId ? { ...d, ...updates } : d);
   try {
     const database = await ensureDb();
     await database.collection('drives').updateOne(
       { $or: [{ id: driveId }, { _id: driveId as any }] },
       { $set: updates }
     );
-  } catch (e) {
-    console.error('[MongoDB] Drive update failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
 }
 
 export async function addPostToDriveDb(driveId: string, newPost: any) {
   memoryState.drives = memoryState.drives.map((d) => {
-    if (d.id === driveId) {
-      return { ...d, posts: [...(d.posts || []), newPost] };
-    }
+    if (d.id === driveId) return { ...d, posts: [...(d.posts || []), newPost] };
     return d;
   });
-
   try {
     const database = await ensureDb();
     await database.collection('drives').updateOne(
       { $or: [{ id: driveId }, { _id: driveId as any }] },
       { $push: { posts: newPost } as any }
     );
-  } catch (e) {
-    console.error('[MongoDB] Add post failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
 }
 
 export async function deleteDriveDb(driveId: string) {
   memoryState.drives = memoryState.drives.filter((d) => d.id !== driveId);
-
   try {
     const database = await ensureDb();
     await database.collection('drives').deleteOne({ $or: [{ id: driveId }, { _id: driveId as any }] });
-  } catch (e) {
-    console.error('[MongoDB] Drive deletion failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
 }
 
 export async function updatePostInDriveDb(driveId: string, postId: string, postUpdates: any) {
   memoryState.drives = memoryState.drives.map((d) => {
     if (d.id === driveId) {
-      return {
-        ...d,
-        posts: d.posts.map((p) => (p.id === postId ? { ...p, ...postUpdates } : p)),
-      };
+      return { ...d, posts: d.posts.map((p) => (p.id === postId ? { ...p, ...postUpdates } : p)) };
     }
     return d;
   });
-
   try {
     const database = await ensureDb();
     const drive = memoryState.drives.find((d) => d.id === driveId);
@@ -466,43 +379,28 @@ export async function updatePostInDriveDb(driveId: string, postId: string, postU
         { $set: { posts: drive.posts } }
       );
     }
-  } catch (e) {
-    console.error('[MongoDB] Post update failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
 }
 
 export async function deletePostFromDriveDb(driveId: string, postId: string) {
   memoryState.drives = memoryState.drives.map((d) => {
-    if (d.id === driveId) {
-      return {
-        ...d,
-        posts: d.posts.filter((p) => p.id !== postId),
-      };
-    }
+    if (d.id === driveId) return { ...d, posts: d.posts.filter((p) => p.id !== postId) };
     return d;
   });
-
   try {
     const database = await ensureDb();
     await database.collection('drives').updateOne(
       { $or: [{ id: driveId }, { _id: driveId as any }] },
       { $pull: { posts: { id: postId } } as any }
     );
-  } catch (e) {
-    console.error('[MongoDB] Delete post failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
 }
 
 export async function createApplicationDb(app: Application) {
   memoryState.applications = [app, ...memoryState.applications];
   memoryState.drives = memoryState.drives.map((d) =>
-    d.id === app.driveId
-      ? { ...d, totalApplicationsCount: (d.totalApplicationsCount || 0) + 1 }
-      : d
+    d.id === app.driveId ? { ...d, totalApplicationsCount: (d.totalApplicationsCount || 0) + 1 } : d
   );
-
   try {
     const database = await ensureDb();
     await database.collection('applications').insertOne({ _id: app.id as any, ...app });
@@ -510,75 +408,52 @@ export async function createApplicationDb(app: Application) {
       { $or: [{ id: app.driveId }, { _id: app.driveId as any }] },
       { $inc: { totalApplicationsCount: 1 } }
     );
-  } catch (e) {
-    console.error('[MongoDB] Application creation failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
   return app;
 }
 
 export async function updateApplicationDb(appId: string, updates: Partial<Application>) {
-  memoryState.applications = memoryState.applications.map((a) =>
-    a.id === appId ? { ...a, ...updates } : a
-  );
-
+  memoryState.applications = memoryState.applications.map((a) => a.id === appId ? { ...a, ...updates } : a);
   try {
     const database = await ensureDb();
     await database.collection('applications').updateOne(
       { $or: [{ id: appId }, { _id: appId as any }] },
       { $set: updates }
     );
-  } catch (e) {
-    console.error('[MongoDB] Application update failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
 }
 
 export async function createDepartmentDb(dept: Department) {
   memoryState.departments = [...memoryState.departments, dept];
-
   try {
     const database = await ensureDb();
     await database.collection('departments').insertOne({ _id: dept.id as any, ...dept });
-  } catch (e) {
-    console.error('[MongoDB] Department creation failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
   return dept;
 }
 
 export async function createAuditLogDb(log: AuditLog) {
   memoryState.auditLogs = [log, ...memoryState.auditLogs];
-
   try {
     const database = await ensureDb();
     await database.collection('audit_logs').insertOne({ _id: log.id as any, ...log });
-  } catch (e) {
-    console.warn('[MongoDB] Async audit log save failed (non-critical):', e);
-  }
+  } catch (e) {}
   return log;
 }
 
 export async function markNotificationReadDb(notifId: string) {
-  memoryState.notifications = memoryState.notifications.map((n) =>
-    n.id === notifId ? { ...n, read: true } : n
-  );
-
+  memoryState.notifications = memoryState.notifications.map((n) => n.id === notifId ? { ...n, read: true } : n);
   try {
     const database = await ensureDb();
     await database.collection('notifications').updateOne(
       { $or: [{ id: notifId }, { _id: notifId as any }] },
       { $set: { read: true } }
     );
-  } catch (e) {
-    console.error('[MongoDB] Mark notification read failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
 }
 
 export async function updateWeightageConfigDb(config: WeightageConfig) {
   memoryState.weightageConfig = config;
-
   try {
     const database = await ensureDb();
     await database.collection('weightage_config').updateOne(
@@ -586,53 +461,36 @@ export async function updateWeightageConfigDb(config: WeightageConfig) {
       { $set: config },
       { upsert: true }
     );
-  } catch (e) {
-    console.error('[MongoDB] Weightage config save failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
 }
 
 export async function createUserDb(user: PortalUser) {
   memoryState.users = [user, ...memoryState.users];
-
   try {
     const database = await ensureDb();
     await database.collection('users').insertOne({ _id: user.id as any, ...user });
-  } catch (e) {
-    console.error('[MongoDB] User creation failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
   return user;
 }
 
 export async function updateUserDb(userId: string, updates: Partial<PortalUser>) {
-  memoryState.users = memoryState.users.map((u) =>
-    u.id === userId ? { ...u, ...updates } : u
-  );
-
+  memoryState.users = memoryState.users.map((u) => u.id === userId ? { ...u, ...updates } : u);
   try {
     const database = await ensureDb();
     await database.collection('users').updateOne(
       { $or: [{ id: userId }, { _id: userId as any }] },
       { $set: updates }
     );
-  } catch (e) {
-    console.error('[MongoDB] User update failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
   return memoryState.users.find((u) => u.id === userId);
 }
 
 export async function deleteUserDb(userId: string) {
   memoryState.users = memoryState.users.filter((u) => u.id !== userId);
-
   try {
     const database = await ensureDb();
     await database.collection('users').deleteOne({ $or: [{ id: userId }, { _id: userId as any }] });
-  } catch (e) {
-    console.error('[MongoDB] User deletion failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
   return true;
 }
 
@@ -660,9 +518,7 @@ export async function resetDatabaseToFactory() {
       database.collection('users').deleteMany({}),
       database.collection('weightage_config').deleteMany({}),
     ]);
+    globalThis._hasInitialSyncDone = false;
     await syncInitialDatabase(database);
-  } catch (e) {
-    console.error('[MongoDB] Database reset failed:', e);
-    throw e;
-  }
+  } catch (e) { throw e; }
 }

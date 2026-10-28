@@ -198,9 +198,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const [mongoStatus, setMongoStatus] = useState<MongoDbStatus>({
     connected: false,
-    database: 'bit_recruitment_portal',
+    database: 'Checking...',
     error: null,
-    uriMasked: 'mongodb+srv://pratyushm977_db_user:****@bit-recruitment-portal.ze21uvt.mongodb.net/',
+    uriMasked: 'mongodb+srv://****:****@your-cluster.mongodb.net/',
   });
 
   // Server Transaction Toasts State
@@ -358,9 +358,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setMongoStatus((prev) => {
         const next = {
           connected: data.dbStatus?.connected ?? true,
-          database: data.dbStatus?.database || 'bit_recruitment_portal',
+          database: data.dbStatus?.database || 'Checking...',
           error: data.dbStatus?.error || null,
-          uriMasked: data.dbStatus?.uriMasked || 'mongodb+srv://****:****@bit-recruitment-portal.ze21uvt.mongodb.net/',
+          uriMasked: data.dbStatus?.uriMasked || 'mongodb+srv://****:****@cluster.mongodb.net/',
           lastSyncedAt: new Date().toLocaleTimeString(),
           missingUri: data.dbStatus?.missingUri || false,
           ipWhitelistHint: data.dbStatus?.ipWhitelistHint || false,
