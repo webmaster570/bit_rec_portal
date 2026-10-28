@@ -37,7 +37,7 @@ function getMongoUri(): string | undefined {
   return uri || undefined;
 }
 
-const DB_NAME = 'bit_recruitment_portal';
+const DEFAULT_DB_NAME = 'bit_recruitment_portal';
 
 // Global caching for Vercel / AWS Lambda container reuse
 declare global {
@@ -73,7 +73,7 @@ export function getDbStatus() {
   const uri = getMongoUri();
   return {
     connected: isConnected,
-    database: DB_NAME,
+    database: db?.databaseName || DEFAULT_DB_NAME,
     error: connectionError,
     uriMasked: (uri || '').replace(/:\/\/[^:]+:[^@]+@/, '://****:****@'),
     isConnecting,
@@ -147,11 +147,14 @@ export async function tryConnectDb(): Promise<Db | null> {
 
     await Promise.race([connectPromise, timeoutPromise]);
     
-    db = client.db(DB_NAME);
+    // Use the database name from the URI if specified, otherwise fall back to default
+    db = client.db();
+    const activeDbName = db.databaseName || DEFAULT_DB_NAME;
+    
     globalThis._mongoDbInstance = db;
     isConnected = true;
     connectionError = null;
-    console.log(`[MongoDB] Successfully connected to database: "${DB_NAME}"`);
+    console.log(`[MongoDB] Successfully connected to database: "${activeDbName}"`);
 
     // Sync in-memory state to / from MongoDB collections (fast check)
     await syncInitialDatabase(db);
