@@ -68,9 +68,6 @@ const MainAppContent: React.FC = () => {
 
   const renderContent = () => {
     // PUBLIC ROUTES (accessible without login)
-    if (activeTab === 'system_status') {
-      return <SystemStatusPortal />;
-    }
 
     // Unauthenticated visitor guard: restrict access to protected admin/dashboard tabs
     if (!isLoggedIn && activeTab !== 'public_recruitment' && activeTab !== 'applicant_portal') {

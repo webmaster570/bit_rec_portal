@@ -184,25 +184,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'system_status',
       label: 'System API Health',
       icon: Activity,
-      roles: [
-        'super_admin',
-        'recruitment_admin',
-        'recruitment_officer',
-        'department_admin',
-        'screening_committee',
-        'interview_panel',
-        'doc_verifier',
-        'finance_admin',
-        'applicant',
-      ],
+      roles: ['super_admin'],
     },
   ];
 
   // Filter items visible to current active role
   const visibleNavItems = navItems.filter((item) => {
     if (!isLoggedIn) {
-      // Unauthenticated visitor on public page: display public notices, apply portal and system status
-      return item.id === 'public_recruitment' || item.id === 'applicant_portal' || item.id === 'system_status';
+      // Unauthenticated visitor on public page: display public notices and apply portal
+      return item.id === 'public_recruitment' || item.id === 'applicant_portal';
     }
     return item.roles.includes(currentRole);
   });
@@ -296,43 +286,45 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </p>
           </div>
 
-          <div 
-            className={`p-2 rounded-xl border flex items-center justify-between cursor-pointer transition hover:scale-101 ${
-              mongoStatus.connected 
-                ? 'bg-emerald-50/50 border-emerald-200' 
-                : mongoStatus.missingUri 
-                  ? 'bg-rose-50/50 border-rose-200'
-                  : 'bg-amber-50/50 border-amber-200'
-            }`}
-            onClick={() => setActiveTab('system_status')}
-            title={mongoStatus.missingUri ? "System Critical: Config Missing" : "View Detailed System Health"}
-          >
-            <div className="flex items-center space-x-2">
-              <div className={`w-1.5 h-1.5 rounded-full ${
+          {currentRole === 'super_admin' && (
+            <div 
+              className={`p-2 rounded-xl border flex items-center justify-between cursor-pointer transition hover:scale-101 ${
                 mongoStatus.connected 
-                  ? 'bg-emerald-500 animate-pulse' 
+                  ? 'bg-emerald-50/50 border-emerald-200' 
                   : mongoStatus.missingUri 
-                    ? 'bg-rose-500 animate-bounce' 
-                    : 'bg-amber-500 animate-pulse'
+                    ? 'bg-rose-50/50 border-rose-200'
+                    : 'bg-amber-50/50 border-amber-200'
+              }`}
+              onClick={() => setActiveTab('system_status')}
+              title={mongoStatus.missingUri ? "System Critical: Config Missing" : "View Detailed System Health"}
+            >
+              <div className="flex items-center space-x-2">
+                <div className={`w-1.5 h-1.5 rounded-full ${
+                  mongoStatus.connected 
+                    ? 'bg-emerald-500 animate-pulse' 
+                    : mongoStatus.missingUri 
+                      ? 'bg-rose-500 animate-bounce' 
+                      : 'bg-amber-500 animate-pulse'
+                }`} />
+                <span className={`text-[10px] font-black uppercase tracking-tight ${
+                  mongoStatus.connected 
+                    ? 'text-emerald-800' 
+                    : mongoStatus.missingUri 
+                      ? 'text-rose-800' 
+                      : 'text-amber-800'
+                }`}>
+                  System: {mongoStatus.connected ? 'Healthy' : mongoStatus.missingUri ? 'Config Error' : 'Connecting'}
+                </span>
+              </div>
+              <Activity className={`w-3 h-3 ${
+                mongoStatus.connected 
+                  ? 'text-emerald-500' 
+                  : mongoStatus.missingUri 
+                    ? 'text-rose-500' 
+                    : 'text-amber-500'
               }`} />
-              <span className={`text-[10px] font-black uppercase tracking-tight ${
-                mongoStatus.connected 
-                  ? 'text-emerald-800' 
-                  : mongoStatus.missingUri 
-                    ? 'text-rose-800' 
-                    : 'text-amber-800'
-              }`}>
-                System: {mongoStatus.connected ? 'Healthy' : mongoStatus.missingUri ? 'Config Error' : 'Connecting'}
-              </span>
             </div>
-            <Activity className={`w-3 h-3 ${
-              mongoStatus.connected 
-                ? 'text-emerald-500' 
-                : mongoStatus.missingUri 
-                  ? 'text-rose-500' 
-                  : 'text-amber-500'
-            }`} />
-          </div>
+          )}
 
           <div className="text-[10px] text-slate-500 flex items-center justify-between border-t border-indigo-100/80 pt-2">
             <span>Permissions:</span>
