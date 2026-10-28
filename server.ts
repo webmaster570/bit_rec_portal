@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import path from 'path';
-import app from './api/server-app';
-import { tryConnectDb } from './api/server-db';
+import app from './api/server-app.js';
+import { tryConnectDb } from './api/server-db.js';
 
 const PORT = process.env.PORT || 3000;
 

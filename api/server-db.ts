@@ -1,5 +1,5 @@
 import { MongoClient, Db, ServerApiVersion } from 'mongodb';
-import { INITIAL_BRANDING, DEFAULT_WEIGHTAGE_CONFIG } from '../src/constants';
+import { INITIAL_BRANDING, DEFAULT_WEIGHTAGE_CONFIG } from '../src/constants.js';
 import {
   INITIAL_ROLES,
   INITIAL_DEPARTMENTS,
@@ -8,7 +8,7 @@ import {
   INITIAL_AUDIT_LOGS,
   INITIAL_NOTIFICATIONS,
   INITIAL_USERS,
-} from '../src/mockData';
+} from '../src/mockData.js';
 import {
   PortalBranding,
   RoleInfo,
@@ -19,7 +19,7 @@ import {
   SystemNotification,
   WeightageConfig,
   PortalUser,
-} from '../src/types';
+} from '../src/types.js';
 
 function getMongoUri(): string | undefined {
   let uri = process.env.MONGODB_URI;

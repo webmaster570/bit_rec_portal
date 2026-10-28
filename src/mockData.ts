@@ -7,7 +7,7 @@ import {
   RoleInfo,
   UserRole,
   PortalUser,
-} from './types';
+} from './types.js';
 
 export const INITIAL_ROLES: RoleInfo[] = [
   {

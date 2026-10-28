@@ -1,4 +1,4 @@
-import { PortalBranding, WeightageConfig } from './types';
+import { PortalBranding, WeightageConfig } from './types.js';
 
 export const INITIAL_BRANDING: PortalBranding = {
   title: 'Enterprise Recruitment Portal',

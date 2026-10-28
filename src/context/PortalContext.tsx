@@ -13,9 +13,9 @@ import {
   PortalBranding,
   PortalUser,
   ServerTransactionToast,
-} from '../types';
+} from '../types.js';
 
-import { INITIAL_BRANDING, DEFAULT_WEIGHTAGE_CONFIG } from '../constants';
+import { INITIAL_BRANDING, DEFAULT_WEIGHTAGE_CONFIG } from '../constants.js';
 
 import {
   INITIAL_ROLES,
@@ -25,7 +25,7 @@ import {
   INITIAL_AUDIT_LOGS,
   INITIAL_NOTIFICATIONS,
   INITIAL_USERS,
-} from '../mockData';
+} from '../mockData.js';
 
 interface UserSession {
   name: string;

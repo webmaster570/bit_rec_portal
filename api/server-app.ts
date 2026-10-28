@@ -22,7 +22,7 @@ import {
   deleteUserDb,
   resetDatabaseToFactory,
   verifyLoginDb,
-} from './server-db';
+} from './server-db.js';
 
 const app = express();
 
