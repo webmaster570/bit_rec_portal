@@ -328,27 +328,17 @@ apiRouter.post('/login', async (req, res) => {
   }
 });
 
-// Mount at both /api and root to eliminate Vercel rewrite prefix mismatches
+// Mount API router exclusively at /api prefix. 
 app.use('/api', apiRouter);
-app.use(apiRouter);
 
-// Global ping
-app.get('/ping', (req, res) => res.json({ status: 'ok', ping: 'pong' }));
-
-// Global 404 handler for API routes
-app.use((req, res) => {
-  res.status(404).json({
-    error: true,
-    message: `API endpoint ${req.method} ${req.url} not found.`,
-  });
-});
-
-// Global Error Handler - Prevents Vercel 500 crashes
+// Global Error Handler - Prevents Vercel 500 crashes by catching exceptions and returning JSON.
+// This is a 4-argument middleware and will only execute if next(err) is called or an error is thrown.
 app.use((err: any, req: any, res: any, next: any) => {
   console.error('[App Error Handler]', err);
   if (res.headersSent) {
     return next(err);
   }
+  // We return HTTP 200 with error details to prevent Vercel's Lambda from producing a generic 500 crash page.
   res.status(200).json({
     error: true,
     message: err?.message || 'Internal server error occurred.',
