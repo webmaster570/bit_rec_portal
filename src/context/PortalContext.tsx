@@ -179,7 +179,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => loadInitialState('isLoggedIn', false, AUTH_STORAGE_KEY));
   const [currentUser, setCurrentUser] = useState<UserSession | null>(() => loadInitialState('currentUser', null, AUTH_STORAGE_KEY));
   const [activeTab, setActiveTabState] = useState<string>(() => loadInitialState('activeTab', 'public_recruitment', AUTH_STORAGE_KEY));
-  const [allowDevRoleSelector, setAllowDevRoleSelector] = useState<boolean>(true);
+  const [allowDevRoleSelector, setAllowDevRoleSelector] = useState<boolean>(() => loadInitialState('allowDevRoleSelector', true, AUTH_STORAGE_KEY));
   const [currentRole, setCurrentRole] = useState<UserRole>(() => loadInitialState('currentRole', 'super_admin', AUTH_STORAGE_KEY));
   const [roles, setRoles] = useState<RoleInfo[]>(() => loadInitialState('roles', INITIAL_ROLES));
   const [drives, setDrives] = useState<RecruitmentDrive[]>(() => loadInitialState('drives', INITIAL_DRIVES));
@@ -192,6 +192,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   
   const setActiveTab = useCallback((tab: string) => {
     setActiveTabState(tab);
+    
+    // Immediate persistence
+    try {
+      const authData = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || '{}');
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ ...authData, activeTab: tab }));
+    } catch (e) {
+      console.warn('Failed to persist active tab:', e);
+    }
   }, []);
   const [weightageConfig, setWeightageConfigState] = useState<WeightageConfig>(DEFAULT_WEIGHTAGE_CONFIG);
   const [branding, setBranding] = useState<PortalBranding>(() => loadInitialState('branding', INITIAL_BRANDING));
@@ -455,12 +463,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           currentUser,
           currentRole,
           activeTab,
+          allowDevRoleSelector,
         })
       );
     } catch (e) {
       console.warn('Failed to save auth state locally:', e);
     }
-  }, [isLoggedIn, currentUser, currentRole, activeTab]);
+  }, [isLoggedIn, currentUser, currentRole, activeTab, allowDevRoleSelector]);
 
   // Keep data backup in localStorage
   useEffect(() => {
@@ -562,6 +571,20 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setCurrentRole(role);
     if (role === 'applicant') setActiveTabState('applicant_portal');
     else setActiveTabState('overview');
+    
+    // Immediate persistence
+    try {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({
+        isLoggedIn: true,
+        currentUser: session,
+        currentRole: role,
+        activeTab: role === 'applicant' ? 'applicant_portal' : 'overview',
+        allowDevRoleSelector,
+      }));
+    } catch (e) {
+      console.warn('Failed to persist login state:', e);
+    }
+    
     logAudit('USER_LOGIN', 'Security', `User logged in via Quick-Switch as ${role.toUpperCase()} (${session.email})`);
   };
 
@@ -589,6 +612,20 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsLoggedIn(true);
       setCurrentUser(session);
       setCurrentRole(user.role);
+      
+      // Immediate persistence
+      try {
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({
+          isLoggedIn: true,
+          currentUser: session,
+          currentRole: user.role,
+          activeTab: user.role === 'applicant' ? 'applicant_portal' : 'overview',
+          allowDevRoleSelector,
+        }));
+      } catch (e) {
+        console.warn('Failed to persist secure login state:', e);
+      }
+      
       logAudit('SECURE_LOGIN', 'Security', `Successful secure login for ${user.email} (${user.role.toUpperCase()})`);
       return true;
     } catch (err: any) {
@@ -601,6 +638,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     logAudit('USER_LOGOUT', 'Security', `User ${currentUser?.email || ''} logged out.`);
     setIsLoggedIn(false);
     setCurrentUser(null);
+    
+    // Immediate persistence
+    try {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    } catch (e) {
+      console.warn('Failed to clear auth state on logout:', e);
+    }
   };
 
   const registerApplicant = (profile: {
@@ -633,16 +677,48 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setIsLoggedIn(true);
     setCurrentUser(session);
     setCurrentRole('applicant');
+
+    // Immediate persistence
+    try {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({
+        isLoggedIn: true,
+        currentUser: session,
+        currentRole: 'applicant',
+        activeTab: 'applicant_portal',
+        allowDevRoleSelector,
+      }));
+    } catch (e) {
+      console.warn('Failed to persist registration state:', e);
+    }
+
     logAudit('APPLICANT_REGISTERED', 'Security', `New applicant registered: ${profile.fullName} (${regNum})`);
     return { regNumber: regNum };
   };
 
   const toggleDevRoleSelector = (allow?: boolean) => {
-    setAllowDevRoleSelector((prev) => (typeof allow === 'boolean' ? allow : !prev));
+    const next = typeof allow === 'boolean' ? allow : !allowDevRoleSelector;
+    setAllowDevRoleSelector(next);
+    
+    // Immediate persistence
+    try {
+      const authData = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || '{}');
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ ...authData, allowDevRoleSelector: next }));
+    } catch (e) {
+      console.warn('Failed to persist dev role selector state:', e);
+    }
   };
 
   const switchRole = (newRole: UserRole) => {
     setCurrentRole(newRole);
+    
+    // Immediate persistence
+    try {
+      const authData = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || '{}');
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ ...authData, currentRole: newRole }));
+    } catch (e) {
+      console.warn('Failed to persist role switch:', e);
+    }
+    
     logAudit('ROLE_SWITCH', 'Security', `User switched active working role to ${newRole.toUpperCase()}.`);
   };
 

@@ -274,7 +274,33 @@ export const Header: React.FC<HeaderProps> = ({
                       </button>
                     </div>
 
-                    {/* Dev role selector removed for production stability */}
+                    {/* Role Switcher (Active if Dev Selector Enabled) */}
+                    {allowDevRoleSelector && (
+                      <div className="p-1 space-y-1 border-t border-slate-100 mt-1">
+                        <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          Switch Active Role
+                        </div>
+                        <div className="grid grid-cols-1 gap-1">
+                          {roles.map((r) => (
+                            <button
+                              key={r.id}
+                              onClick={() => {
+                                switchRole(r.id);
+                                setShowRoleDropdown(false);
+                              }}
+                              className={`w-full text-left px-3 py-2 rounded-xl text-[11px] font-semibold flex items-center justify-between transition ${
+                                currentRole === r.id
+                                  ? 'bg-indigo-50 text-indigo-700 border border-indigo-100'
+                                  : 'text-slate-600 hover:bg-slate-50'
+                              }`}
+                            >
+                              <span>{r.name}</span>
+                              {currentRole === r.id && <CheckCircle className="w-3 h-3 text-emerald-500" />}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
