@@ -81,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className={`sticky top-0 z-40 ${isNavbarBranded && BRAND_COLORS[branding.navbarColor as any] ? BRAND_COLORS[branding.navbarColor as any].header : theme.headerBase} transition-colors duration-300`}>
+    <header className={`sticky top-0 z-40 ${isNavbarBranded && branding.navbarColor && BRAND_COLORS[branding.navbarColor] ? BRAND_COLORS[branding.navbarColor].header : (theme?.headerBase || 'bg-white border-b border-slate-200')} transition-colors duration-300`}>
       {/* Main Navigation Header */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
         {/* Left Side: Mobile Menu Button & Brand Logo */}
@@ -89,14 +89,14 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Mobile Hamburger Toggle Button (< lg screens) */}
           <button
             onClick={onToggleMobileMenu}
-            className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition shrink-0 active:scale-95 shadow-2xs"
+            className={`lg:hidden p-2 rounded-xl border transition shrink-0 active:scale-95 shadow-2xs ${isNavbarBranded ? 'bg-white/10 text-white border-white/20 hover:bg-white/20' : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-slate-200'}`}
             aria-label={isMobileMenuOpen ? 'Close navigation panel' : 'Open navigation panel'}
             title="Toggle Menu"
           >
             {isMobileMenuOpen ? (
-              <X className={`w-5 h-5 ${isNavbarBranded ? 'text-white' : theme.accentColor}`} />
+              <X className="w-5 h-5" />
             ) : (
-              <Menu className={`w-5 h-5 ${isNavbarBranded ? 'text-white' : theme.accentColor}`} />
+              <Menu className="w-5 h-5" />
             )}
           </button>
 
@@ -115,16 +115,16 @@ export const Header: React.FC<HeaderProps> = ({
                 }}
               />
             ) : (
-              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md ${theme.headingFont} text-lg sm:text-xl group-hover:scale-105 transition-transform shrink-0`}>
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md ${theme?.headingFont || 'font-bold'} text-lg sm:text-xl group-hover:scale-105 transition-transform shrink-0`}>
                 {renderLogoIcon()}
               </div>
             )}
             <div className="min-w-0">
               <div className="flex items-center space-x-1.5">
-                <h1 className={`text-xs sm:text-base lg:text-lg ${theme.headingFont} tracking-tight leading-tight truncate ${isNavbarBranded ? 'text-white' : ''}`}>
+                <h1 className={`text-xs sm:text-base lg:text-lg ${theme?.headingFont || 'font-bold'} tracking-tight leading-tight truncate ${isNavbarBranded ? 'text-white' : ''}`}>
                   {branding.title}
                 </h1>
-                <span className="hidden sm:inline-block text-[9px] sm:text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-300 px-1.5 sm:px-2 py-0.2 rounded-full font-mono font-bold shrink-0">
+                <span className={`hidden sm:inline-block text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.2 rounded-full font-mono font-bold shrink-0 border ${isNavbarBranded ? 'bg-white/10 text-emerald-300 border-white/20' : 'bg-emerald-50 text-emerald-700 border-emerald-300'}`}>
                   Portal
                 </span>
               </div>
@@ -142,7 +142,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => setActiveTab('public_recruitment')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${isNavbarBranded ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
             >
-              <Globe className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white/70' : theme.accentColor}`} />
+              <Globe className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white/70' : (theme?.accentColor || 'text-indigo-600')}`} />
               <span>Public Notices</span>
             </button>
           )}
@@ -159,7 +159,7 @@ export const Header: React.FC<HeaderProps> = ({
                   : (isNavbarBranded ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900')
               }`}
             >
-              <LayoutDashboard className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white/70' : theme.accentColor}`} />
+              <LayoutDashboard className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white/70' : (theme?.accentColor || 'text-indigo-600')}`} />
               <span>My Dashboard</span>
             </button>
           )}
@@ -172,15 +172,15 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex items-center space-x-1.5 sm:space-x-2">
               <button
                 onClick={onOpenLogin}
-                className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 font-bold text-[11px] sm:text-xs transition flex items-center space-x-1 sm:space-x-1.5 shadow-2xs"
+                className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl font-bold text-[11px] sm:text-xs transition flex items-center space-x-1 sm:space-x-1.5 shadow-2xs border ${isNavbarBranded ? 'bg-white/10 text-white border-white/20 hover:bg-white/20' : 'bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200'}`}
               >
-                <LogIn className={`w-3.5 h-3.5 ${theme.accentColor}`} />
+                <LogIn className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white' : (theme?.accentColor || 'text-indigo-600')}`} />
                 <span>Login</span>
               </button>
 
               <button
                 onClick={onOpenRegister}
-                className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl ${theme.primaryButton} font-bold text-[11px] sm:text-xs shadow-md transition flex items-center space-x-1 sm:space-x-1.5`}
+                className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl ${theme?.primaryButton || 'bg-indigo-600 text-white'} font-bold text-[11px] sm:text-xs shadow-md transition flex items-center space-x-1 sm:space-x-1.5`}
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span className="hidden xs:inline">Register</span>
@@ -194,7 +194,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="relative">
                 <button
                   onClick={() => setShowNotifPopover(!showNotifPopover)}
-                  className="relative p-1.5 sm:p-2 rounded-xl bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 border border-slate-200 transition shadow-2xs"
+                  className={`relative p-1.5 sm:p-2 rounded-xl transition shadow-2xs border ${isNavbarBranded ? 'bg-white/10 text-white border-white/20 hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 border-slate-200'}`}
                   title="System Notifications"
                 >
                   <Bell className="w-4 h-4" />
@@ -241,13 +241,13 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="relative">
                 <button
                   onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-                  className="flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 px-2 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-2xs max-w-[140px] sm:max-w-[180px]"
+                  className={`flex items-center space-x-1.5 px-2 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-2xs max-w-[140px] sm:max-w-[180px] border ${isNavbarBranded ? 'bg-white/10 border-white/20 hover:bg-white/20' : 'bg-slate-100 border-slate-200 hover:bg-slate-200'}`}
                 >
-                  <User className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white/70' : 'text-purple-600'} shrink-0`} />
+                  <User className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white' : 'text-purple-600'} shrink-0`} />
                   <span className={`font-bold truncate ${isNavbarBranded ? 'text-white' : 'text-slate-900'}`}>
                     {currentUser?.name?.split(' ')[0] || activeRoleObj?.name}
                   </span>
-                  <ChevronDown className={`w-3 h-3 ${isNavbarBranded ? 'text-white/50' : 'text-slate-500'} shrink-0`} />
+                  <ChevronDown className={`w-3 h-3 ${isNavbarBranded ? 'text-white/70' : 'text-slate-500'} shrink-0`} />
                 </button>
 
                 {showRoleDropdown && (
