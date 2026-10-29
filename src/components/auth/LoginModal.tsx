@@ -263,17 +263,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </button>
             </div>
             <div className="pt-1">
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  setActiveTab('system_status');
-                }}
-                className="text-[10px] text-slate-400 hover:text-indigo-500 transition flex items-center justify-center gap-1 mx-auto font-medium"
-              >
-                <Activity className="w-3 h-3" />
-                <span>Unable to log in? Check System API Health</span>
-              </button>
+              {/* Removed System API Health link for public visitors */}
             </div>
           </div>
         </div>

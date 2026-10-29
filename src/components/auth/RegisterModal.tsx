@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { X, UserPlus, Mail, Phone, Calendar, Lock, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, UserPlus, Mail, Phone, Calendar, Lock, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 
 interface RegisterModalProps {
   isOpen: boolean;

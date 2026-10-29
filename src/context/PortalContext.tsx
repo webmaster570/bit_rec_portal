@@ -29,6 +29,7 @@ import {
 } from '../mockData.js';
 
 interface UserSession {
+  id?: string;
   name: string;
   email: string;
   role: UserRole;
@@ -590,6 +591,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const roleObj = roles.find((r) => r.id === role);
     const userName = name || (role === 'applicant' ? 'Applicant User' : roleObj?.name || 'User');
     const session: UserSession = {
+      id: `usr-${role}`,
       name: userName,
       email: email || `${role}@university.edu.in`,
       role,
@@ -636,6 +638,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       const { user } = data;
       const session: UserSession = {
+        id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -731,18 +734,34 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     updateBranding({ allowDevRoleSelector: next });
   };
 
-  const switchRole = (newRole: UserRole) => {
+  const switchRole = async (newRole: UserRole) => {
     setCurrentRole(newRole);
     
-    // Immediate persistence
+    // Immediate persistence in localStorage
     try {
       const authData = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || '{}');
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ ...authData, currentRole: newRole }));
     } catch (e) {
-      console.warn('Failed to persist role switch:', e);
+      console.warn('Failed to persist role switch locally:', e);
+    }
+
+    // Database persistence if we have a real user ID
+    if (currentUser?.id && !currentUser.id.startsWith('usr-')) {
+      try {
+        await fetch(`/api/users/${currentUser.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: newRole }),
+        });
+        
+        // Also update the currentUser state to reflect the new role
+        setCurrentUser(prev => prev ? { ...prev, role: newRole } : null);
+      } catch (err) {
+        console.error('Failed to persist role switch in database:', err);
+      }
     }
     
-    logAudit('ROLE_SWITCH', 'Security', `User switched active working role to ${newRole.toUpperCase()}.`);
+    logAudit('ROLE_SWITCH', 'Security', `User switched active working role to ${newRole.toUpperCase()} (DB Sync attempted).`);
   };
 
   const sendOtp = async (email: string) => {
