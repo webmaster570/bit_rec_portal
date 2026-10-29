@@ -41,10 +41,10 @@ export const OverviewDashboard: React.FC<{
   // Applicant-tailored Dashboard Overview View
   if (currentRole === 'applicant') {
     const myApplications = applications.filter((app) => {
-      if (!currentUser) return true;
-      if (currentUser.email && app.applicant.email.toLowerCase() === currentUser.email.toLowerCase()) return true;
-      if (currentUser.regNumber && app.applicant.regNumber === currentUser.regNumber) return true;
-      return true; // Fallback in demo mode
+      if (!currentUser) return false;
+      const matchesEmail = currentUser.email && app.applicant.email.toLowerCase() === currentUser.email.toLowerCase();
+      const matchesReg = currentUser.regNumber && app.applicant.regNumber === currentUser.regNumber;
+      return !!(matchesEmail || matchesReg);
     });
 
     const totalVacanciesPosted = drives.reduce(

@@ -43,12 +43,12 @@ interface MyJobsPortalProps {
 export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
   const { applications, currentUser, drives } = usePortal();
 
-  // Filter applications for current applicant (with demo fallback)
+  // Filter applications strictly for current applicant
   const myApplications = applications.filter((app) => {
-    if (!currentUser) return true;
-    if (currentUser.email && app.applicant.email.toLowerCase() === currentUser.email.toLowerCase()) return true;
-    if (currentUser.regNumber && app.applicant.regNumber === currentUser.regNumber) return true;
-    return true; // Default in demo mode so full application data is visible
+    if (!currentUser) return false;
+    const matchesEmail = currentUser.email && app.applicant.email.toLowerCase() === currentUser.email.toLowerCase();
+    const matchesReg = currentUser.regNumber && app.applicant.regNumber === currentUser.regNumber;
+    return !!(matchesEmail || matchesReg);
   });
 
   const [searchTerm, setSearchTerm] = useState('');
