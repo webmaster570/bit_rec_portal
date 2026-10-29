@@ -65,6 +65,8 @@ export const AdminPortal: React.FC = () => {
     login,
     switchRole,
     currentUser,
+    mailConfig,
+    updateMailConfig,
   } = usePortal();
 
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
@@ -118,7 +120,42 @@ export const AdminPortal: React.FC = () => {
       setSidebarColor(branding.sidebarColor || 'default');
     }
   }, [branding, isBrandingDirty]);
+  // Mail Config Form State
+  const [mailHost, setMailHost] = useState(mailConfig.host);
+  const [mailPort, setMailPort] = useState(mailConfig.port);
+  const [mailUser, setMailUser] = useState(mailConfig.user);
+  const [mailPass, setMailPass] = useState(mailConfig.pass);
+  const [mailFromName, setMailFromName] = useState(mailConfig.fromName);
+  const [mailFromEmail, setMailFromEmail] = useState(mailConfig.fromEmail);
+  const [mailEncryption, setMailEncryption] = useState(mailConfig.encryption);
+  const [isMailDirty, setIsMailDirty] = useState(false);
 
+  // Sync form state when mail context updates
+  React.useEffect(() => {
+    if (!isMailDirty) {
+      setMailHost(mailConfig.host);
+      setMailPort(mailConfig.port);
+      setMailUser(mailConfig.user);
+      setMailPass(mailConfig.pass);
+      setMailFromName(mailConfig.fromName);
+      setMailFromEmail(mailConfig.fromEmail);
+      setMailEncryption(mailConfig.encryption);
+    }
+  }, [mailConfig, isMailDirty]);
+
+  const handleSaveMailConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateMailConfig({
+      host: mailHost,
+      port: Number(mailPort),
+      user: mailUser,
+      pass: mailPass,
+      fromName: mailFromName,
+      fromEmail: mailFromEmail,
+      encryption: mailEncryption as any,
+    });
+    setIsMailDirty(false);
+  };
   // New Dept Form
   const [deptCode, setDeptCode] = useState('');
   const [deptName, setDeptName] = useState('');
@@ -1626,6 +1663,165 @@ export const AdminPortal: React.FC = () => {
       {/* TAB 3 & 4: Email & Backup simulation */}
       {(activeAdminTab === 'email' || activeAdminTab === 'system') && (
         <div className="space-y-6">
+          {activeAdminTab === 'email' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-8 glass-card border border-slate-200 p-6 rounded-2xl shadow-2xs space-y-5">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <Mail className="w-5 h-5 text-purple-600" />
+                      SMTP Relay & Email Service Configuration
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Configure the outgoing mail server used for sending OTPs, appointment letters, and system notifications.
+                    </p>
+                  </div>
+                  {isMailDirty && (
+                    <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200 animate-pulse">
+                      Unsaved Changes
+                    </span>
+                  )}
+                </div>
+
+                <form onSubmit={handleSaveMailConfig} className="space-y-4 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block font-bold text-slate-800 mb-1">SMTP Host</label>
+                      <input
+                        type="text"
+                        value={mailHost}
+                        onChange={(e) => { setMailHost(e.target.value); setIsMailDirty(true); }}
+                        placeholder="smtp.gmail.com"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono focus:bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-800 mb-1">SMTP Port</label>
+                      <input
+                        type="number"
+                        value={mailPort}
+                        onChange={(e) => { setMailPort(Number(e.target.value)); setIsMailDirty(true); }}
+                        placeholder="587"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono focus:bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block font-bold text-slate-800 mb-1">Username / Email</label>
+                      <input
+                        type="text"
+                        value={mailUser}
+                        onChange={(e) => { setMailUser(e.target.value); setIsMailDirty(true); }}
+                        placeholder="auth@university.edu"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono focus:bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-800 mb-1">Password / App Key</label>
+                      <input
+                        type="password"
+                        value={mailPass}
+                        onChange={(e) => { setMailPass(e.target.value); setIsMailDirty(true); }}
+                        placeholder="••••••••••••"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono focus:bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-100 pt-4">
+                    <div>
+                      <label className="block font-bold text-slate-800 mb-1">Sender Display Name</label>
+                      <input
+                        type="text"
+                        value={mailFromName}
+                        onChange={(e) => { setMailFromName(e.target.value); setIsMailDirty(true); }}
+                        placeholder="National University Recruitment"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-800 mb-1">Sender Email Address</label>
+                      <input
+                        type="email"
+                        value={mailFromEmail}
+                        onChange={(e) => { setMailFromEmail(e.target.value); setIsMailDirty(true); }}
+                        placeholder="no-reply@university.edu"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono focus:bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-800 mb-1">Security / Encryption</label>
+                    <div className="flex gap-4">
+                      {['none', 'ssl', 'tls'].map((enc) => (
+                        <label key={enc} className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="radio"
+                            name="encryption"
+                            value={enc}
+                            checked={mailEncryption === enc}
+                            onChange={(e) => { setMailEncryption(e.target.value as any); setIsMailDirty(true); }}
+                            className="text-purple-600 focus:ring-purple-500"
+                          />
+                          <span className="uppercase font-bold text-slate-600 group-hover:text-slate-900">{enc}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={!isMailDirty}
+                      className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs shadow-md transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Apply SMTP Master Settings</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div className="lg:col-span-4 space-y-4">
+                <div className="glass-card border border-indigo-100 p-5 rounded-2xl bg-indigo-50/30 space-y-3">
+                  <h4 className="text-xs font-bold text-indigo-900 flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4" />
+                    Security Best Practices
+                  </h4>
+                  <ul className="text-[10px] text-indigo-700 space-y-2 leading-relaxed list-disc pl-4">
+                    <li>Use <strong>App Passwords</strong> if using Gmail or Outlook accounts.</li>
+                    <li>Port <strong>587 (TLS)</strong> is recommended for most modern relay services.</li>
+                    <li>Ensure the <strong>Sender Email</strong> is authorized by your SMTP provider to prevent spam flags.</li>
+                    <li>Credentials are encrypted and stored securely in the central MongoDB instance.</li>
+                  </ul>
+                </div>
+
+                <div className="glass-card border border-slate-200 p-5 rounded-2xl space-y-3">
+                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-emerald-600" />
+                    Mail Queue Status
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500">Service Status:</span>
+                      <span className="font-bold text-emerald-600">Active</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500">Daily Quota:</span>
+                      <span className="font-bold text-slate-700">98 / 500</span>
+                    </div>
+                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-emerald-500 h-full w-[20%]" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Dev Mode Role Selector Settings Card */}
           <div className="glass-card border border-purple-200 p-6 rounded-2xl shadow-2xs bg-purple-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">

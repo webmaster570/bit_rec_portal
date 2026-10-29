@@ -1,5 +1,5 @@
 import { MongoClient, Db, ServerApiVersion } from 'mongodb';
-import { INITIAL_BRANDING, DEFAULT_WEIGHTAGE_CONFIG } from '../src/constants.js';
+import { INITIAL_BRANDING, DEFAULT_WEIGHTAGE_CONFIG, INITIAL_MAIL_CONFIG } from '../src/constants.js';
 import {
   INITIAL_ROLES,
   INITIAL_DEPARTMENTS,
@@ -19,6 +19,7 @@ import {
   SystemNotification,
   WeightageConfig,
   PortalUser,
+  MailConfig,
 } from '../src/types.js';
 
 function getMongoUri(): string | undefined {
@@ -62,6 +63,7 @@ const memoryState = {
   notifications: [...INITIAL_NOTIFICATIONS],
   users: [...INITIAL_USERS],
   weightageConfig: { ...DEFAULT_WEIGHTAGE_CONFIG },
+  mailConfig: { ...INITIAL_MAIL_CONFIG },
 };
 
 export function getDbStatus() {
@@ -217,6 +219,7 @@ async function syncInitialDatabase(database: Db) {
       database.collection('drives').insertMany(memoryState.drives.map((d) => ({ ...d, _id: d.id as any }))).catch(() => {}),
       database.collection('users').insertMany(memoryState.users.map((u) => ({ ...u, _id: u.id as any }))).catch(() => {}),
       database.collection('weightage_config').insertOne({ _id: 'default_config' as any, ...memoryState.weightageConfig }).catch(() => {}),
+      database.collection('mail_config').insertOne({ _id: 'default_config' as any, ...memoryState.mailConfig }).catch(() => {}),
     ]);
 
     globalThis._hasInitialSyncDone = true;
@@ -229,7 +232,7 @@ export async function getFullState() {
   try {
     const database = await tryConnectDb();
     if (database) {
-      const [brandingDoc, rolesDocs, deptsDocs, drivesDocs, appsDocs, auditDocs, notifsDocs, usersDocs, weightDoc] =
+      const [brandingDoc, rolesDocs, deptsDocs, drivesDocs, appsDocs, auditDocs, notifsDocs, usersDocs, weightDoc, mailDoc] =
         await Promise.all([
           database.collection('branding').findOne({ _id: 'portal_branding' as any }).catch(() => null),
           database.collection('roles').find({}).toArray().catch(() => []),
@@ -240,6 +243,7 @@ export async function getFullState() {
           database.collection('notifications').find({}).sort({ timestamp: -1 }).toArray().catch(() => []),
           database.collection('users').find({}).toArray().catch(() => []),
           database.collection('weightage_config').findOne({ _id: 'default_config' as any }).catch(() => null),
+          database.collection('mail_config').findOne({ _id: 'default_config' as any }).catch(() => null),
         ]);
 
       const clean = (doc: any) => {
@@ -257,6 +261,7 @@ export async function getFullState() {
       if (notifsDocs?.length) memoryState.notifications = notifsDocs.map(clean);
       if (usersDocs?.length) memoryState.users = usersDocs.map(clean);
       if (weightDoc) memoryState.weightageConfig = clean(weightDoc);
+      if (mailDoc) memoryState.mailConfig = clean(mailDoc);
     }
   } catch (e) {
     console.warn('[MongoDB] State sync failed, using memory fallback');
@@ -504,6 +509,7 @@ export async function resetDatabaseToFactory() {
   memoryState.notifications = [...INITIAL_NOTIFICATIONS];
   memoryState.users = [...INITIAL_USERS];
   memoryState.weightageConfig = { ...DEFAULT_WEIGHTAGE_CONFIG };
+  memoryState.mailConfig = { ...INITIAL_MAIL_CONFIG };
 
   try {
     const database = await ensureDb();
@@ -517,8 +523,89 @@ export async function resetDatabaseToFactory() {
       database.collection('notifications').deleteMany({}),
       database.collection('users').deleteMany({}),
       database.collection('weightage_config').deleteMany({}),
+      database.collection('mail_config').deleteMany({}),
+      database.collection('otps').deleteMany({}),
+      database.collection('captchas').deleteMany({}),
     ]);
     globalThis._hasInitialSyncDone = false;
     await syncInitialDatabase(database);
   } catch (e) { throw e; }
+}
+
+export async function updateMailConfigDb(config: MailConfig) {
+  memoryState.mailConfig = config;
+  try {
+    const database = await ensureDb();
+    await database.collection('mail_config').updateOne(
+      { _id: 'default_config' as any },
+      { $set: config },
+      { upsert: true }
+    );
+  } catch (e) { throw e; }
+}
+
+// ------------------------------------------------------------------
+// OTP & Captcha Management
+// ------------------------------------------------------------------
+
+export async function createOtpDb(email: string, otp: string) {
+  try {
+    const database = await ensureDb();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    await database.collection('otps').updateOne(
+      { email },
+      { $set: { otp, expiresAt } },
+      { upsert: true }
+    );
+    // Create TTL index if not exists (ideally done on startup)
+    database.collection('otps').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }).catch(() => {});
+    return true;
+  } catch (e) {
+    console.error('[MongoDB] Failed to store OTP:', e);
+    return false;
+  }
+}
+
+export async function verifyOtpDb(email: string, otp: string) {
+  try {
+    const database = await ensureDb();
+    const doc = await database.collection('otps').findOne({ email, otp });
+    if (doc) {
+      if (doc.expiresAt > new Date()) {
+        await database.collection('otps').deleteOne({ email });
+        return true;
+      }
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function createCaptchaDb(id: string, text: string) {
+  try {
+    const database = await ensureDb();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+    await database.collection('captchas').insertOne({ id, text, expiresAt });
+    database.collection('captchas').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }).catch(() => {});
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function verifyCaptchaDb(id: string, text: string) {
+  try {
+    const database = await ensureDb();
+    const doc = await database.collection('captchas').findOne({ id, text: { $regex: new RegExp(`^${text}$`, 'i') } });
+    if (doc) {
+      if (doc.expiresAt > new Date()) {
+        await database.collection('captchas').deleteOne({ id });
+        return true;
+      }
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
 }

@@ -22,9 +22,57 @@ import {
   deleteUserDb,
   resetDatabaseToFactory,
   verifyLoginDb,
+  createOtpDb,
+  verifyOtpDb,
+  createCaptchaDb,
+  verifyCaptchaDb,
+  updateMailConfigDb,
 } from './server-db.js';
+import nodemailer from 'nodemailer';
+import svgCaptcha from 'svg-captcha';
 
 const app = express();
+
+// ----------------------------------------------------
+// EMAIL TRANSPORTER CONFIGURATION
+// ----------------------------------------------------
+async function sendEmail(to: string, subject: string, html: string) {
+  try {
+    const state = await getFullState();
+    const config = state.mailConfig;
+
+    const user = config?.user || process.env.EMAIL_USER;
+    const pass = config?.pass || process.env.EMAIL_PASS;
+    const host = config?.host || process.env.EMAIL_HOST || 'smtp.gmail.com';
+    const port = Number(config?.port || process.env.EMAIL_PORT || 587);
+    const fromName = config?.fromName || 'Portal Auth';
+    const fromEmail = config?.fromEmail || user;
+
+    if (!user || !pass) {
+      console.warn('[Email] SMTP credentials missing. Skipping email send to:', to);
+      console.log('[Email Content]:', html);
+      return true; // Return true to allow development without real SMTP
+    }
+
+    const dynamicTransporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user, pass },
+    });
+
+    await dynamicTransporter.sendMail({
+      from: `"${fromName}" <${fromEmail}>`,
+      to,
+      subject,
+      html,
+    });
+    return true;
+  } catch (err) {
+    console.error('[Email] Failed to send email:', err);
+    return false;
+  }
+}
 
 // 1. CORS Middleware (allows Vercel preview and custom domains)
 app.use((req, res, next) => {
@@ -273,6 +321,15 @@ apiRouter.post('/weightage-config', async (req, res) => {
   }
 });
 
+apiRouter.post('/mail-config', async (req, res) => {
+  try {
+    await updateMailConfigDb(req.body);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(200).json({ success: false, error: err.message });
+  }
+});
+
 // 11. User Management CRUD
 apiRouter.post('/users', async (req, res) => {
   try {
@@ -313,10 +370,87 @@ apiRouter.post('/reset-data', async (req, res) => {
   }
 });
 
+// ----------------------------------------------------
+// AUTH & EMAIL ROUTES
+// ----------------------------------------------------
+
+apiRouter.post('/auth/send-otp', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const stored = await createOtpDb(email, otp);
+    if (!stored) throw new Error('Failed to store OTP');
+
+    const sent = await sendEmail(
+      email,
+      'Portal Registration OTP',
+      `<div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #4f46e5;">Verification Code</h2>
+        <p>Your OTP for portal registration is:</p>
+        <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4f46e5; margin: 20px 0;">${otp}</div>
+        <p style="color: #666; font-size: 12px;">This code will expire in 10 minutes.</p>
+      </div>`
+    );
+
+    if (!sent) return res.status(500).json({ error: 'Failed to send email. Check SMTP settings.' });
+
+    res.json({ success: true, message: 'OTP sent to your email.' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+apiRouter.post('/auth/verify-otp', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const isValid = await verifyOtpDb(email, otp);
+    if (isValid) {
+      res.json({ success: true });
+    } else {
+      res.status(400).json({ error: 'Invalid or expired OTP.' });
+    }
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+apiRouter.get('/auth/captcha', async (req, res) => {
+  try {
+    const captcha = svgCaptcha.create({
+      size: 6,
+      noise: 3,
+      color: true,
+      background: '#f8fafc'
+    });
+    const captchaId = `cap-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    await createCaptchaDb(captchaId, captcha.text);
+    
+    res.json({
+      success: true,
+      captchaId,
+      data: captcha.data
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 13. Login Authentication
 apiRouter.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, captchaId, captchaText } = req.body;
+    
+    // Verify Captcha
+    if (!captchaId || !captchaText) {
+      return res.status(400).json({ success: false, error: 'Captcha is required.' });
+    }
+    const isCaptchaValid = await verifyCaptchaDb(captchaId, captchaText);
+    if (!isCaptchaValid) {
+      return res.status(400).json({ success: false, error: 'Invalid or expired captcha.' });
+    }
+
     const user = await verifyLoginDb(email, password);
     if (user) {
       res.json({ success: true, user });

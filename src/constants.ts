@@ -1,4 +1,4 @@
-import { PortalBranding, WeightageConfig } from './types.js';
+import { PortalBranding, WeightageConfig, MailConfig } from './types.js';
 
 export const INITIAL_BRANDING: PortalBranding = {
   title: 'Enterprise Recruitment Portal',
@@ -17,4 +17,14 @@ export const DEFAULT_WEIGHTAGE_CONFIG: WeightageConfig = {
   interviewWeight: 30,
   academicWeight: 20,
   tieBreakerRule: 'Age',
+};
+
+export const INITIAL_MAIL_CONFIG: MailConfig = {
+  host: 'smtp.gmail.com',
+  port: 587,
+  user: '',
+  pass: '',
+  fromName: 'Recruitment Portal',
+  fromEmail: '',
+  encryption: 'tls',
 };

@@ -23,8 +23,33 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [selectedRole, setSelectedRole] = useState<UserRole>('super_admin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [captchaId, setCaptchaId] = useState('');
+  const [captchaSvg, setCaptchaSvg] = useState('');
+  const [captchaText, setCaptchaText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefreshingCaptcha, setIsRefreshingCaptcha] = useState(false);
   const [error, setError] = useState('');
+
+  const fetchCaptcha = async () => {
+    setIsRefreshingCaptcha(true);
+    try {
+      const res = await fetch('/api/auth/captcha');
+      const data = await res.json();
+      if (data.success) {
+        setCaptchaId(data.captchaId);
+        setCaptchaSvg(data.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch captcha:', e);
+    }
+    setIsRefreshingCaptcha(false);
+  };
+
+  React.useEffect(() => {
+    if (isOpen) {
+      fetchCaptcha();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -34,16 +59,22 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       setError('Please enter your credentials.');
       return;
     }
+    if (!captchaText.trim()) {
+      setError('Please enter the captcha code.');
+      return;
+    }
     setError('');
     setIsSubmitting(true);
 
     // Call secureLogin
-    const success = await secureLogin(email, password);
-    if (success) {
+    const result = await secureLogin(email, password, captchaId, captchaText);
+    if (result.success) {
       onLoginSuccess(selectedRole); 
       onClose();
     } else {
-      setError('Invalid email or password. Please try again.');
+      setError(result.error || 'Invalid email, password, or captcha.');
+      fetchCaptcha(); // Refresh captcha on failure
+      setCaptchaText('');
     }
     setIsSubmitting(false);
   };
@@ -130,6 +161,43 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+            </div>
+
+            {/* Captcha */}
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-slate-700">
+                Human Verification
+              </label>
+              <div className="flex items-center gap-3">
+                <div 
+                  className="flex-1 bg-slate-50 border border-slate-200 rounded-lg overflow-hidden h-10 flex items-center justify-center relative group"
+                  title="Click to refresh captcha"
+                >
+                  {captchaSvg ? (
+                    <div 
+                      dangerouslySetInnerHTML={{ __html: captchaSvg }} 
+                      className="w-full h-full flex items-center justify-center cursor-pointer"
+                      onClick={fetchCaptcha}
+                    />
+                  ) : (
+                    <div className="text-[10px] text-slate-400">Loading...</div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={fetchCaptcha}
+                    className="absolute right-1 top-1 p-1 bg-white/80 rounded-md opacity-0 group-hover:opacity-100 transition shadow-xs"
+                  >
+                    <RefreshCw className={`w-3 h-3 text-slate-600 ${isRefreshingCaptcha ? 'animate-spin' : ''}`} />
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={captchaText}
+                  onChange={(e) => setCaptchaText(e.target.value)}
+                  placeholder="Enter code"
+                  className="w-24 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-center font-mono font-bold tracking-widest text-slate-900 focus:outline-none focus:border-indigo-500 uppercase"
                 />
               </div>
             </div>

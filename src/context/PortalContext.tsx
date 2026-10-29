@@ -13,9 +13,10 @@ import {
   PortalBranding,
   PortalUser,
   ServerTransactionToast,
+  MailConfig,
 } from '../types.js';
 
-import { INITIAL_BRANDING, DEFAULT_WEIGHTAGE_CONFIG } from '../constants.js';
+import { INITIAL_BRANDING, DEFAULT_WEIGHTAGE_CONFIG, INITIAL_MAIL_CONFIG } from '../constants.js';
 
 import {
   INITIAL_ROLES,
@@ -64,6 +65,8 @@ interface PortalContextType {
   setWeightageConfig: (config: WeightageConfig) => void;
   branding: PortalBranding;
   updateBranding: (updates: Partial<PortalBranding>) => void;
+  mailConfig: MailConfig;
+  updateMailConfig: (config: MailConfig) => void;
   mongoStatus: MongoDbStatus;
   refreshFromDatabase: (isManualTrigger?: boolean) => Promise<void>;
   reconnectDb: () => Promise<any>;
@@ -153,6 +156,8 @@ interface PortalContextType {
   markNotificationRead: (id: string) => void;
   resetToDemoData: () => void;
   changePassword: (newPassword: string) => Promise<boolean>;
+  sendOtp: (email: string) => Promise<{ success: boolean; error?: string }>;
+  verifyOtp: (email: string, otp: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 const PortalContext = createContext<PortalContextType | undefined>(undefined);
@@ -201,6 +206,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, []);
   const [weightageConfig, setWeightageConfigState] = useState<WeightageConfig>(DEFAULT_WEIGHTAGE_CONFIG);
+  const [mailConfig, setMailConfigState] = useState<MailConfig>(INITIAL_MAIL_CONFIG);
   const [branding, setBranding] = useState<PortalBranding>(INITIAL_BRANDING);
 
   const [mongoStatus, setMongoStatus] = useState<MongoDbStatus>({
@@ -363,6 +369,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       if (data.weightageConfig) {
         setWeightageConfigState((prev) => (JSON.stringify(prev) !== JSON.stringify(data.weightageConfig) ? data.weightageConfig : prev));
+      }
+      if (data.mailConfig) {
+        setMailConfigState((prev) => (JSON.stringify(prev) !== JSON.stringify(data.mailConfig) ? data.mailConfig : prev));
       }
       
       setMongoStatus((prev) => {
@@ -534,6 +543,26 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     );
   };
 
+  const updateMailConfig = (config: MailConfig) => {
+    setMailConfigState(config);
+    runDbTransaction(
+      'SMTP Email Configuration',
+      'POST /api/mail-config',
+      'Updating SMTP relay credentials and sender profile in database...',
+      'Email settings committed to MongoDB.',
+      async () => {
+        const res = await fetch('/api/mail-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(config),
+        });
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        return await res.json();
+      }
+    );
+    logAudit('MAIL_CONFIG_UPDATED', 'Admin', 'Updated SMTP email relay settings.');
+  };
+
   const logAudit = (action: string, module: AuditLog['module'], details: string) => {
     const roleObj = roles.find((r) => r.id === currentRole);
     const newLog: AuditLog = {
@@ -587,20 +616,25 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     logAudit('USER_LOGIN', 'Security', `User logged in via Quick-Switch as ${role.toUpperCase()} (${session.email})`);
   };
 
-  const secureLogin = async (email: string, password: string): Promise<boolean> => {
+  const secureLogin = async (email: string, password: string, captchaId?: string, captchaText?: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, captchaId, captchaText }),
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || 'Login failed.');
+        return { success: false, error: errorData.error || 'Login failed.' };
       }
 
-      const { user } = await res.json();
+      const data = await res.json();
+      if (!data.success) {
+        return { success: false, error: data.error || 'Login failed.' };
+      }
+
+      const { user } = data;
       const session: UserSession = {
         name: user.name,
         email: user.email,
@@ -625,10 +659,10 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       
       logAudit('SECURE_LOGIN', 'Security', `Successful secure login for ${user.email} (${user.role.toUpperCase()})`);
-      return true;
+      return { success: true };
     } catch (err: any) {
       console.warn('[PortalContext] Secure login failed:', err.message);
-      return false;
+      return { success: false, error: err.message };
     }
   };
 
@@ -709,6 +743,34 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
     
     logAudit('ROLE_SWITCH', 'Security', `User switched active working role to ${newRole.toUpperCase()}.`);
+  };
+
+  const sendOtp = async (email: string) => {
+    try {
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      return { success: res.ok && data.success, error: data.error };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  };
+
+  const verifyOtp = async (email: string, otp: string) => {
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+      });
+      const data = await res.json();
+      return { success: res.ok && data.success, error: data.error };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
   };
 
   const createDrive = (driveData: Omit<RecruitmentDrive, 'id' | 'totalApplicationsCount'>): RecruitmentDrive => {
@@ -1584,6 +1646,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setWeightageConfig,
         branding,
         updateBranding,
+        mailConfig,
+        updateMailConfig,
         mongoStatus,
         refreshFromDatabase,
         reconnectDb,
@@ -1623,6 +1687,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         markNotificationRead,
         resetToDemoData,
         changePassword,
+        sendOtp,
+        verifyOtp,
       }}
     >
       {children}

@@ -300,3 +300,12 @@ export interface ServerTransactionToast {
   errorDetails?: string;
   autoDismissAfter?: number;
 }
+export interface MailConfig {
+  host: string;
+  port: number;
+  user: string;
+  pass: string;
+  fromName: string;
+  fromEmail: string;
+  encryption: 'none' | 'ssl' | 'tls';
+}
