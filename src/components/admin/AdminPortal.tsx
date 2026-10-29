@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
 import { INITIAL_BRANDING } from '../../constants';
 import { UserRole, PortalUser } from '../../types';
-import { THEME_CONFIGS } from '../../themeStyles';
+import { THEME_CONFIGS, BRAND_COLORS } from '../../themeStyles';
 import {
   Settings,
   ShieldCheck,
@@ -100,6 +100,8 @@ export const AdminPortal: React.FC = () => {
   const [logoIconName, setLogoIconName] = useState(branding.logoIconName || 'Building2');
   const [logoImageUrl, setLogoImageUrl] = useState(branding.logoImageUrl || '');
   const [selectedTheme, setSelectedTheme] = useState(branding.theme || 'classic');
+  const [navbarColor, setNavbarColor] = useState(branding.navbarColor || 'default');
+  const [sidebarColor, setSidebarColor] = useState(branding.sidebarColor || 'default');
   const [brandingSavedNotice, setBrandingSavedNotice] = useState(false);
   const [isBrandingDirty, setIsBrandingDirty] = useState(false);
 
@@ -112,6 +114,8 @@ export const AdminPortal: React.FC = () => {
       setLogoIconName(branding.logoIconName || 'Building2');
       setLogoImageUrl(branding.logoImageUrl || '');
       setSelectedTheme(branding.theme || 'classic');
+      setNavbarColor(branding.navbarColor || 'default');
+      setSidebarColor(branding.sidebarColor || 'default');
     }
   }, [branding, isBrandingDirty]);
 
@@ -147,6 +151,8 @@ export const AdminPortal: React.FC = () => {
       logoIconName,
       logoImageUrl,
       theme: selectedTheme as any,
+      navbarColor: navbarColor as any,
+      sidebarColor: sidebarColor as any,
     });
     setIsBrandingDirty(false);
     setBrandingSavedNotice(true);
@@ -162,6 +168,8 @@ export const AdminPortal: React.FC = () => {
       setLogoIconName(INITIAL_BRANDING.logoIconName);
       setLogoImageUrl(INITIAL_BRANDING.logoImageUrl);
       setSelectedTheme(INITIAL_BRANDING.theme || 'classic');
+      setNavbarColor(INITIAL_BRANDING.navbarColor || 'default');
+      setSidebarColor(INITIAL_BRANDING.sidebarColor || 'default');
       setIsBrandingDirty(false);
       setBrandingSavedNotice(true);
       setTimeout(() => setBrandingSavedNotice(false), 4000);
@@ -1281,13 +1289,87 @@ export const AdminPortal: React.FC = () => {
                 </div>
               </div>
 
+              {/* Navbar Color Selector */}
+              <div className="space-y-3 pt-2 border-t border-slate-200 mt-4">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1 flex items-center gap-1.5">
+                  <Palette className="w-3.5 h-3.5 text-blue-600" />
+                  Navbar Header Brand Color
+                </label>
+                <div className="grid grid-cols-5 gap-2">
+                  {[
+                    { id: 'default', label: 'Theme Default', color: 'bg-slate-100 border-slate-300' },
+                    { id: 'green', label: 'Green', color: 'bg-emerald-600' },
+                    { id: 'blue', label: 'Blue', color: 'bg-blue-600' },
+                    { id: 'purple', label: 'Purple', color: 'bg-purple-600' },
+                    { id: 'maroon', label: 'Maroon', color: 'bg-[#800000]' },
+                  ].map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => {
+                        setNavbarColor(c.id as any);
+                        setIsBrandingDirty(true);
+                      }}
+                      className={`group relative p-1 rounded-xl border-2 transition-all ${
+                        navbarColor === c.id ? 'border-purple-600 ring-2 ring-purple-100' : 'border-transparent hover:border-slate-300'
+                      }`}
+                      title={c.label}
+                    >
+                      <div className={`w-full aspect-square rounded-lg ${c.color} shadow-inner`} />
+                      {navbarColor === c.id && (
+                        <div className="absolute -top-1 -right-1 bg-purple-600 text-white rounded-full p-0.5">
+                          <CheckCircle className="w-2.5 h-2.5" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sidebar Color Selector */}
+              <div className="space-y-3 pt-2 border-t border-slate-200">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1 flex items-center gap-1.5">
+                  <Palette className="w-3.5 h-3.5 text-indigo-600" />
+                  Sidebar Navigation Brand Color
+                </label>
+                <div className="grid grid-cols-5 gap-2">
+                  {[
+                    { id: 'default', label: 'Theme Default', color: 'bg-slate-100 border-slate-300' },
+                    { id: 'green', label: 'Green', color: 'bg-emerald-900' },
+                    { id: 'blue', label: 'Blue', color: 'bg-blue-900' },
+                    { id: 'purple', label: 'Purple', color: 'bg-purple-900' },
+                    { id: 'maroon', label: 'Maroon', color: 'bg-[#500000]' },
+                  ].map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => {
+                        setSidebarColor(c.id as any);
+                        setIsBrandingDirty(true);
+                      }}
+                      className={`group relative p-1 rounded-xl border-2 transition-all ${
+                        sidebarColor === c.id ? 'border-purple-600 ring-2 ring-purple-100' : 'border-transparent hover:border-slate-300'
+                      }`}
+                      title={c.label}
+                    >
+                      <div className={`w-full aspect-square rounded-lg ${c.color} shadow-inner`} />
+                      {sidebarColor === c.id && (
+                        <div className="absolute -top-1 -right-1 bg-purple-600 text-white rounded-full p-0.5">
+                          <CheckCircle className="w-2.5 h-2.5" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="pt-3 flex items-center gap-3">
                 <button
                   type="submit"
                   className="flex-1 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs shadow-md transition flex items-center justify-center space-x-2"
                 >
                   <Save className="w-4 h-4" />
-                  <span>Update and Save Navbar Settings</span>
+                  <span>Update and Save Portal Branding</span>
                 </button>
 
                 <button
@@ -1314,8 +1396,8 @@ export const AdminPortal: React.FC = () => {
               This preview shows how public visitors and candidates will see the navigation bar at the top of the portal.
             </p>
 
-            <div className="bg-white border border-slate-300 rounded-2xl p-4 shadow-md space-y-3">
-              <div className="text-[10px] uppercase font-mono font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full inline-block">
+            <div className={`${(navbarColor && navbarColor !== 'default' && BRAND_COLORS[navbarColor as any]) ? BRAND_COLORS[navbarColor as any].header : 'bg-white'} border border-slate-300 rounded-2xl p-4 shadow-md space-y-3 transition-colors duration-300`}>
+              <div className={`text-[10px] uppercase font-mono font-bold ${(navbarColor && navbarColor !== 'default' && BRAND_COLORS[navbarColor as any]) ? 'text-white/50 bg-white/10 border-white/20' : 'text-indigo-600 bg-indigo-50 border border-indigo-200'} px-2.5 py-0.5 rounded-full inline-block border`}>
                 Simulated Header
               </div>
 
@@ -1340,16 +1422,31 @@ export const AdminPortal: React.FC = () => {
                 )}
                 <div>
                   <div className="flex items-center space-x-2">
-                    <h4 className="text-sm font-extrabold text-slate-900 leading-tight">
+                    <h4 className={`text-sm font-extrabold leading-tight ${(navbarColor && navbarColor !== 'default' && BRAND_COLORS[navbarColor as any]) ? 'text-white' : 'text-slate-900'}`}>
                       {navTitle || 'National University Recruitment Portal'}
                     </h4>
-                    <span className="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-300 px-1.5 py-0.5 rounded-full font-mono font-bold">
+                    <span className={`text-[9px] border px-1.5 py-0.5 rounded-full font-mono font-bold ${(navbarColor && navbarColor !== 'default' && BRAND_COLORS[navbarColor as any]) ? 'bg-white/10 text-white border-white/20' : 'bg-emerald-50 text-emerald-700 border-emerald-300'}`}>
                       Official
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className={`text-[11px] mt-0.5 ${(navbarColor && navbarColor !== 'default' && BRAND_COLORS[navbarColor as any]) ? 'text-white/60' : 'text-slate-500'}`}>
                     {navSubtitle || 'Centralized Public Job Advertisements & Merit Application System'}
                   </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar Preview */}
+            <div className="space-y-2 mt-4">
+              <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sidebar Menu Preview</h4>
+              <div className={`${(sidebarColor && sidebarColor !== 'default' && BRAND_COLORS[sidebarColor as any]) ? BRAND_COLORS[sidebarColor as any].sidebar : 'bg-white'} border border-slate-300 rounded-2xl p-4 shadow-sm h-32 flex flex-col justify-between transition-colors duration-300`}>
+                <div className="space-y-2">
+                  <div className={`h-2 rounded-full w-24 ${(sidebarColor && sidebarColor !== 'default' && BRAND_COLORS[sidebarColor as any]) ? 'bg-white/20' : 'bg-slate-200'}`} />
+                  <div className={`h-2 rounded-full w-32 ${(sidebarColor && sidebarColor !== 'default' && BRAND_COLORS[sidebarColor as any]) ? 'bg-white/40' : 'bg-slate-100'}`} />
+                  <div className={`h-2 rounded-full w-20 ${(sidebarColor && sidebarColor !== 'default' && BRAND_COLORS[sidebarColor as any]) ? 'bg-white/20' : 'bg-slate-200'}`} />
+                </div>
+                <div className={`p-2 rounded-lg border ${(sidebarColor && sidebarColor !== 'default' && BRAND_COLORS[sidebarColor as any]) ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-100'}`}>
+                  <div className={`h-1.5 rounded-full w-full ${(sidebarColor && sidebarColor !== 'default' && BRAND_COLORS[sidebarColor as any]) ? 'bg-emerald-400/40' : 'bg-emerald-100'}`} />
                 </div>
               </div>
             </div>

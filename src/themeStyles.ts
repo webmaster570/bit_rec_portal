@@ -1,4 +1,28 @@
-import { PortalTheme } from './types';
+import { PortalTheme, BrandColor } from './types';
+
+export const BRAND_COLORS: Record<BrandColor, { sidebar: string; header: string; isDark: boolean }> = {
+  default: { sidebar: '', header: '', isDark: false },
+  green: { 
+    sidebar: 'bg-emerald-900 border-emerald-800', 
+    header: 'bg-emerald-800 border-emerald-700',
+    isDark: true
+  },
+  blue: { 
+    sidebar: 'bg-blue-900 border-blue-800', 
+    header: 'bg-blue-800 border-blue-700',
+    isDark: true
+  },
+  purple: { 
+    sidebar: 'bg-purple-900 border-purple-800', 
+    header: 'bg-purple-800 border-purple-700',
+    isDark: true
+  },
+  maroon: { 
+    sidebar: 'bg-[#4a0404] border-[#3a0303]', 
+    header: 'bg-[#5c0505] border-[#4a0404]',
+    isDark: true
+  },
+};
 
 export interface ThemeConfig {
   rootContainer: string;

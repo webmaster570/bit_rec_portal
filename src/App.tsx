@@ -145,7 +145,15 @@ const MainAppContent: React.FC = () => {
       case 'admin':
         return <AdminPortal />;
       case 'system_status':
-        return <SystemStatusPortal />;
+        return currentRole === 'super_admin' ? (
+          <SystemStatusPortal />
+        ) : (
+          <PublicRecruitmentPortal
+            onApplyForPost={handleApplyClick}
+            onRequestLogin={() => setIsLoginModalOpen(true)}
+            onRequestRegister={() => setIsRegisterModalOpen(true)}
+          />
+        );
       default:
         return (
           <PublicRecruitmentPortal

@@ -201,7 +201,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, []);
   const [weightageConfig, setWeightageConfigState] = useState<WeightageConfig>(DEFAULT_WEIGHTAGE_CONFIG);
-  const [branding, setBranding] = useState<PortalBranding>(() => loadInitialState('branding', INITIAL_BRANDING));
+  const [branding, setBranding] = useState<PortalBranding>(INITIAL_BRANDING);
 
   const [mongoStatus, setMongoStatus] = useState<MongoDbStatus>({
     connected: false,
@@ -335,7 +335,10 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const data = await res.json();
 
       if (data.branding) {
-        setBranding((prev) => (JSON.stringify(prev) !== JSON.stringify(data.branding) ? data.branding : prev));
+        setBranding((prev) => {
+          const merged = { ...INITIAL_BRANDING, ...data.branding };
+          return JSON.stringify(prev) !== JSON.stringify(merged) ? merged : prev;
+        });
       }
       if (data.roles && Array.isArray(data.roles)) {
         setRoles((prev) => (JSON.stringify(prev) !== JSON.stringify(data.roles) ? data.roles : prev));
@@ -480,7 +483,6 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           departments,
           auditLogs,
           roles,
-          branding,
           users,
           selectedDriveId,
         })
@@ -488,7 +490,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch (e) {
       console.warn('Failed to save data state locally:', e);
     }
-  }, [drives, applications, departments, auditLogs, roles, branding, users, selectedDriveId]);
+  }, [drives, applications, departments, auditLogs, roles, users, selectedDriveId]);
 
   const updateBranding = (updates: Partial<PortalBranding>) => {
     const next = { ...branding, ...updates };

@@ -18,6 +18,7 @@ export interface RoleInfo {
 }
 
 export type PortalTheme = 'classic' | 'modern' | 'crimson' | 'academic' | 'nature' | 'sapphire';
+export type BrandColor = 'default' | 'green' | 'blue' | 'purple' | 'maroon';
 
 export interface PortalBranding {
   title: string;
@@ -27,6 +28,8 @@ export interface PortalBranding {
   logoImageUrl: string;
   theme: PortalTheme;
   allowDevRoleSelector: boolean;
+  navbarColor: BrandColor;
+  sidebarColor: BrandColor;
 }
 
 export interface PortalUser {

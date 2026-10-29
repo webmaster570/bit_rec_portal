@@ -8,6 +8,8 @@ export const INITIAL_BRANDING: PortalBranding = {
   logoImageUrl: '',
   theme: 'classic',
   allowDevRoleSelector: true,
+  navbarColor: 'default',
+  sidebarColor: 'default',
 };
 
 export const DEFAULT_WEIGHTAGE_CONFIG: WeightageConfig = {
