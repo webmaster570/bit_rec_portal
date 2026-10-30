@@ -1,5 +1,6 @@
 export type UserRole =
   | 'super_admin'
+  | 'admin'
   | 'recruitment_admin'
   | 'recruitment_officer'
   | 'department_admin'
@@ -17,8 +18,8 @@ export interface RoleInfo {
   permissions: string[];
 }
 
-export type PortalTheme = 'classic' | 'modern' | 'crimson' | 'academic' | 'nature' | 'sapphire';
-export type BrandColor = 'default' | 'green' | 'blue' | 'purple' | 'maroon';
+export type PortalTheme = 'classic' | 'modern' | 'crimson' | 'academic' | 'nature' | 'sapphire' | 'bit_mesra' | 'tech_startup' | 'corporate_pro' | 'creative_studio' | 'industrial_heavy' | 'portal_vibrant' | 'portal_minimal' | 'portal_dark_knight' | 'portal_enterprise';
+export type BrandColor = 'default' | 'green' | 'blue' | 'purple' | 'maroon' | 'bit_mesra';
 
 export interface PortalBranding {
   title: string;
@@ -30,6 +31,9 @@ export interface PortalBranding {
   allowDevRoleSelector: boolean;
   navbarColor: BrandColor;
   sidebarColor: BrandColor;
+  showNavbarShadow: boolean;
+  showSidebarShadow: boolean;
+  showCardShadow: boolean;
 }
 
 export interface PortalUser {

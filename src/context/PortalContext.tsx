@@ -62,6 +62,8 @@ interface PortalContextType {
   setActiveTab: (tab: string) => void;
   selectedDriveId: string | null;
   setSelectedDriveId: (id: string | null) => void;
+  selectedPostId: string | null;
+  setSelectedPostId: (id: string | null) => void;
   weightageConfig: WeightageConfig;
   setWeightageConfig: (config: WeightageConfig) => void;
   branding: PortalBranding;
@@ -194,6 +196,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => loadInitialState('auditLogs', INITIAL_AUDIT_LOGS));
   const [notifications, setNotifications] = useState<SystemNotification[]>(INITIAL_NOTIFICATIONS);
   const [selectedDriveId, setSelectedDriveId] = useState<string | null>(() => loadInitialState('selectedDriveId', 'drive-2026-01'));
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(() => loadInitialState('selectedPostId', null));
   
   const setActiveTab = useCallback((tab: string) => {
     setActiveTabState(tab);
@@ -355,6 +358,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       if (data.users && Array.isArray(data.users)) {
         setUsers((prev) => (JSON.stringify(prev) !== JSON.stringify(data.users) ? data.users : prev));
+        
+        // Sync current user's role from DB if they are logged in
+        if (currentUser) {
+          const myDbUser = data.users.find((u: any) => u.id === currentUser.id || u.email === currentUser.email);
+          if (myDbUser && myDbUser.role !== currentRole) {
+            setCurrentRole(myDbUser.role);
+          }
+        }
       }
       if (data.drives && Array.isArray(data.drives)) {
         setDrives((prev) => (JSON.stringify(prev) !== JSON.stringify(data.drives) ? data.drives : prev));
@@ -495,12 +506,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           roles,
           users,
           selectedDriveId,
+          selectedPostId,
         })
       );
     } catch (e) {
       console.warn('Failed to save data state locally:', e);
     }
-  }, [drives, applications, departments, auditLogs, roles, users, selectedDriveId]);
+  }, [drives, applications, departments, auditLogs, roles, users, selectedDriveId, selectedPostId]);
 
   const updateBranding = (updates: Partial<PortalBranding>) => {
     const next = { ...branding, ...updates };
@@ -618,7 +630,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     logAudit('USER_LOGIN', 'Security', `User logged in via Quick-Switch as ${role.toUpperCase()} (${session.email})`);
   };
 
-  const secureLogin = async (email: string, password: string, captchaId?: string, captchaText?: string): Promise<{ success: boolean; error?: string }> => {
+  const secureLogin = async (email: string, password: string, captchaId?: string, captchaText?: string): Promise<{ success: boolean; error?: string; user?: any }> => {
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
@@ -662,7 +674,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       
       logAudit('SECURE_LOGIN', 'Security', `Successful secure login for ${user.email} (${user.role.toUpperCase()})`);
-      return { success: true };
+      return { success: true, user };
     } catch (err: any) {
       console.warn('[PortalContext] Secure login failed:', err.message);
       return { success: false, error: err.message };
@@ -1661,6 +1673,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         notifications,
         selectedDriveId,
         setSelectedDriveId,
+        selectedPostId,
+        setSelectedPostId,
         weightageConfig,
         setWeightageConfig,
         branding,

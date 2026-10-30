@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
+import { THEME_CONFIGS } from '../../themeStyles';
 import { UserRole } from '../../types';
 import { X, LogIn, Shield, Sparkles, User, Lock, Mail, AlertCircle, RefreshCw, Activity } from 'lucide-react';
 
@@ -18,7 +19,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onLoginSuccess,
   targetPostTitle,
 }) => {
-  const { roles, allowDevRoleSelector, secureLogin, login, setActiveTab } = usePortal();
+  const { roles, allowDevRoleSelector, secureLogin, login, branding } = usePortal();
+  const theme = THEME_CONFIGS[branding.theme || 'classic'];
 
   const [selectedRole, setSelectedRole] = useState<UserRole>('super_admin');
   const [email, setEmail] = useState('');
@@ -68,8 +70,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
     // Call secureLogin
     const result = await secureLogin(email, password, captchaId, captchaText);
-    if (result.success) {
-      onLoginSuccess(selectedRole); 
+    if (result.success && result.user) {
+      onLoginSuccess(result.user.role); 
       onClose();
     } else {
       setError(result.error || 'Invalid email, password, or captcha.');
@@ -91,17 +93,17 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
-      <div className="bg-white border border-slate-200 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden relative text-slate-800 my-8">
+    <div className={`fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn ${theme.rootContainer}`}>
+      <div className={`${theme.cardBase} w-full max-w-md overflow-hidden relative text-slate-800 my-8 shadow-2xl`}>
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-700 via-indigo-600 to-purple-700 p-5 text-white flex items-center justify-between">
+        <div className={`p-5 text-white flex items-center justify-between ${branding.theme === 'industrial_heavy' ? 'bg-slate-900' : 'bg-slate-900'}`}>
           <div className="flex items-center space-x-2.5">
             <div className="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-              <LogIn className="w-5 h-5 text-indigo-100" />
+              <LogIn className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold">Portal Sign In</h3>
-              <p className="text-xs text-indigo-100">National University Recruitment Portal</p>
+              <h3 className={`text-base font-bold ${theme.headingFont}`}>Portal Sign In</h3>
+              <p className="text-xs opacity-70 truncate">{branding.title}</p>
             </div>
           </div>
           <button
@@ -115,8 +117,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         {/* Content Body */}
         <div className="p-6 space-y-4">
           {targetPostTitle && (
-            <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-800 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
+            <div className={`p-3 bg-slate-50 border border-slate-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} text-xs flex items-center gap-2`}>
+              <Sparkles className={`w-4 h-4 ${theme.accentColor} shrink-0`} />
               <span>
                 Log in to continue your application for <strong>{targetPostTitle}</strong>.
               </span>
@@ -143,7 +145,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="superadmin@univ.edu"
-                  className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+                  className={`w-full bg-white border border-slate-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-lg'} pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none ${theme.focusColor}`}
                 />
               </div>
             </div>
@@ -160,7 +162,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+                  className={`w-full bg-white border border-slate-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-lg'} pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none ${theme.focusColor}`}
                 />
               </div>
             </div>
@@ -168,36 +170,36 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             {/* Captcha */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-slate-700">
-                Human Verification
+                Security Verification
               </label>
               <div className="flex items-center gap-3">
                 <div 
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-lg overflow-hidden h-10 flex items-center justify-center relative group"
+                  className={`flex-1 bg-slate-50 border-2 border-slate-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} overflow-hidden h-14 flex items-center justify-center relative group shadow-inner`}
                   title="Click to refresh captcha"
                 >
                   {captchaSvg ? (
                     <div 
                       dangerouslySetInnerHTML={{ __html: captchaSvg }} 
-                      className="w-full h-full flex items-center justify-center cursor-pointer"
+                      className="w-full h-full flex items-center justify-center cursor-pointer scale-[1.35] brightness-[0.8] contrast-[1.2]"
                       onClick={fetchCaptcha}
                     />
                   ) : (
-                    <div className="text-[10px] text-slate-400">Loading...</div>
+                    <div className="text-[10px] opacity-40 font-bold uppercase tracking-widest">Generating...</div>
                   )}
                   <button
                     type="button"
                     onClick={fetchCaptcha}
-                    className="absolute right-1 top-1 p-1 bg-white/80 rounded-md opacity-0 group-hover:opacity-100 transition shadow-xs"
+                    className="absolute right-1.5 top-1.5 p-1.5 bg-white rounded-lg opacity-0 group-hover:opacity-100 transition shadow-sm border border-slate-100"
                   >
-                    <RefreshCw className={`w-3 h-3 text-slate-600 ${isRefreshingCaptcha ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`w-3.5 h-3.5 text-indigo-600 ${isRefreshingCaptcha ? 'animate-spin' : ''}`} />
                   </button>
                 </div>
                 <input
                   type="text"
                   value={captchaText}
                   onChange={(e) => setCaptchaText(e.target.value)}
-                  placeholder="Enter code"
-                  className="w-24 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-center font-mono font-bold tracking-widest text-slate-900 focus:outline-none focus:border-indigo-500 uppercase"
+                  placeholder="CODE"
+                  className={`w-24 bg-white border-2 border-slate-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} px-3 h-14 text-sm text-center font-mono font-black tracking-widest text-slate-900 focus:outline-none ${theme.focusColor} uppercase shadow-sm placeholder:text-slate-300`}
                 />
               </div>
             </div>
@@ -205,7 +207,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-2 disabled:opacity-50"
+              className={`w-full py-2.5 ${theme.primaryButton} font-bold text-xs shadow-md transition flex items-center justify-center space-x-2 disabled:opacity-50`}
             >
               {isSubmitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
               <span>{isSubmitting ? 'Verifying...' : 'Secure Database Login'}</span>
@@ -215,7 +217,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           {/* Role Selector (Dev Mode Bypass) */}
           {allowDevRoleSelector && (
             <div className="pt-2">
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-3 shadow-xs">
+              <div className={`bg-amber-50 border border-amber-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-2xl'} p-4 space-y-3 shadow-xs`}>
                 <div className="flex items-center gap-2 text-amber-800 font-bold text-[10px] uppercase tracking-wider">
                   <Shield className="w-3.5 h-3.5" />
                   <span>Temporary Bypass (No Database Required)</span>
@@ -226,7 +228,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   <select
                     value={selectedRole}
                     onChange={(e) => setSelectedRole(e.target.value as UserRole)}
-                    className="w-full bg-white border border-amber-200 rounded-lg pl-9 pr-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 appearance-none"
+                    className={`w-full bg-white border border-amber-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-lg'} pl-9 pr-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 appearance-none`}
                   >
                     {roles.map((r) => (
                       <option key={r.id} value={r.id}>
@@ -239,7 +241,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 <button
                   type="button"
                   onClick={handleBypassLogin}
-                  className="w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs shadow-sm transition transform active:scale-98"
+                  className={`w-full py-2 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} bg-amber-500 hover:bg-amber-600 text-white font-black text-xs shadow-sm transition transform active:scale-98`}
                 >
                   Quick Bypass Login as {roles.find(r => r.id === selectedRole)?.name}
                 </button>
@@ -257,13 +259,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   onClose();
                   onSwitchToRegister();
                 }}
-                className="text-indigo-600 font-bold hover:underline"
+                className={`${theme.accentColor} font-bold hover:underline`}
               >
                 Register here
               </button>
-            </div>
-            <div className="pt-1">
-              {/* Removed System API Health link for public visitors */}
             </div>
           </div>
         </div>

@@ -152,7 +152,7 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
   return (
     <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
       {/* Title & Banner (Responsive Mobile Stack) */}
-      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 border border-indigo-500/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 border border-indigo-500/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 relative overflow-hidden">
         <div className="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 space-y-1.5 sm:space-y-2">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-white/20 text-white border border-white/30 text-[11px] sm:text-xs font-bold backdrop-blur-xs">
@@ -171,7 +171,7 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
           {onNavigate && (
             <button
               onClick={() => onNavigate('applicant_portal')}
-              className="w-full sm:w-auto justify-center px-4 sm:px-5 py-2.5 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 text-indigo-900 font-extrabold text-xs shadow-lg transition flex items-center space-x-2"
+              className="w-full sm:w-auto justify-center px-4 sm:px-5 py-2.5 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 text-indigo-900 font-extrabold text-xs shadow-sm transition flex items-center space-x-2"
             >
               <Send className="w-3.5 h-3.5 text-indigo-600" />
               <span>Apply for New Post</span>

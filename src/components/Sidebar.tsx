@@ -84,6 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: LayoutDashboard,
       roles: [
         'super_admin',
+        'admin',
         'recruitment_admin',
         'recruitment_officer',
         'department_admin',
@@ -106,6 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Globe,
       roles: [
         'super_admin',
+        'admin',
         'recruitment_admin',
         'recruitment_officer',
         'department_admin',
@@ -120,61 +122,61 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'drives',
       label: 'Recruitment Drives',
       icon: Megaphone,
-      roles: ['super_admin', 'recruitment_admin', 'recruitment_officer', 'department_admin'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'recruitment_officer', 'department_admin'],
     },
     {
       id: 'applicant_portal',
       label: 'Online Apply Portal',
       icon: Send,
-      roles: ['super_admin', 'recruitment_admin', 'recruitment_officer', 'applicant'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'recruitment_officer', 'applicant'],
     },
     {
       id: 'applications',
       label: 'Application Master List',
       icon: FileText,
-      roles: ['super_admin', 'recruitment_admin', 'recruitment_officer', 'department_admin', 'finance_admin'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'recruitment_officer', 'department_admin', 'finance_admin'],
     },
     {
       id: 'screening',
       label: 'Applicant Screening',
       icon: CheckSquare,
-      roles: ['super_admin', 'recruitment_admin', 'screening_committee', 'department_admin'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'screening_committee', 'department_admin'],
     },
     {
       id: 'doc_verification',
       label: 'Document Verification',
       icon: FileSearch,
-      roles: ['super_admin', 'recruitment_admin', 'doc_verifier'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'doc_verifier'],
     },
     {
       id: 'interviews',
       label: 'Test & Interview Grading',
       icon: Award,
-      roles: ['super_admin', 'recruitment_admin', 'interview_panel', 'department_admin'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'interview_panel', 'department_admin'],
     },
     {
       id: 'merit',
       label: 'Merit List & Offer Letters',
       icon: Trophy,
-      roles: ['super_admin', 'recruitment_admin', 'recruitment_officer'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'recruitment_officer'],
     },
     {
       id: 'finance',
       label: 'Payment & Reconciliation',
       icon: CreditCard,
-      roles: ['super_admin', 'recruitment_admin', 'finance_admin'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'finance_admin'],
     },
     {
       id: 'analytics',
       label: 'Recruitment Analytics',
       icon: BarChart2,
-      roles: ['super_admin', 'recruitment_admin', 'department_admin'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'department_admin'],
     },
     {
       id: 'admin',
       label: 'RBAC & Master Settings',
       icon: Settings,
-      roles: ['super_admin'],
+      roles: ['super_admin', 'admin'],
     },
     {
       id: 'audit',
@@ -378,7 +380,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* DESKTOP SIDEBAR (Large screens: lg and above) */}
-      <aside className={`hidden lg:flex w-64 ${isSidebarBranded && BRAND_COLORS[branding.sidebarColor as any] ? BRAND_COLORS[branding.sidebarColor as any].sidebar : theme.sidebarBase} min-h-[calc(100vh-65px)] flex-col justify-between shrink-0 shadow-2xs transition-colors duration-300`}>
+      <aside className={`hidden lg:flex w-64 ${isSidebarBranded && BRAND_COLORS[branding.sidebarColor as any] ? BRAND_COLORS[branding.sidebarColor as any].sidebar : theme.sidebarBase} min-h-[calc(100vh-65px)] flex-col justify-between shrink-0 ${branding.showSidebarShadow ? 'shadow-xl' : 'shadow-none'} transition-all duration-300`}>
         {navContent}
       </aside>
 

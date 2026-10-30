@@ -3,7 +3,7 @@ import path from 'path';
 import app from './api/server-app.js';
 import { tryConnectDb } from './api/server-db.js';
 
-const PORT = process.env.PORT || 3000;
+const PORT = 3000; // Dev server must run on port 3000 as per environment constraints
 
 // Non-blocking database connection attempt on startup
 if (!process.env.VERCEL) {
@@ -20,7 +20,10 @@ if (!process.env.VERCEL) {
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   import('vite').then(async ({ createServer }) => {
     const vite = await createServer({
-      server: { middlewareMode: true },
+      server: { 
+        middlewareMode: true,
+        hmr: false,
+      },
       appType: 'spa',
     });
     app.use(vite.middlewares);

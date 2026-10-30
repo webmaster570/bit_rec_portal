@@ -22,11 +22,11 @@ import {
 } from 'lucide-react';
 
 export const ApplicantPortal: React.FC = () => {
-  const { drives, submitApplication, applications } = usePortal();
+  const { drives, submitApplication, applications, selectedDriveId: ctxDriveId, selectedPostId: ctxPostId } = usePortal();
 
   const [activeStep, setActiveStep] = useState<number>(1);
-  const [selectedDriveId, setSelectedDriveId] = useState<string>(drives[0]?.id || 'drive-2026-01');
-  const [selectedPostId, setSelectedPostId] = useState<string>(drives[0]?.posts[0]?.id || 'post-101');
+  const [selectedDriveId, setSelectedDriveId] = useState<string>(ctxDriveId || drives[0]?.id || 'drive-2026-01');
+  const [selectedPostId, setSelectedPostId] = useState<string>(ctxPostId || drives[0]?.posts[0]?.id || 'post-101');
   const [submittedApp, setSubmittedApp] = useState<Application | null>(null);
   const [showAdmitCard, setShowAdmitCard] = useState<Application | null>(null);
 

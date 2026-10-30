@@ -1,15 +1,18 @@
 import { PortalBranding, WeightageConfig, MailConfig } from './types.js';
 
 export const INITIAL_BRANDING: PortalBranding = {
-  title: 'Enterprise Recruitment Portal',
-  subtitle: 'Centralized Public Job Advertisements & Merit Application System',
+  title: 'Birla Institute of Technology',
+  subtitle: 'Online Recruitment & Merit Application System',
   logoType: 'icon',
   logoIconName: 'Building2',
   logoImageUrl: '',
-  theme: 'classic',
+  theme: 'bit_mesra',
   allowDevRoleSelector: true,
-  navbarColor: 'default',
-  sidebarColor: 'default',
+  navbarColor: 'bit_mesra',
+  sidebarColor: 'bit_mesra',
+  showNavbarShadow: true,
+  showSidebarShadow: false,
+  showCardShadow: true,
 };
 
 export const DEFAULT_WEIGHTAGE_CONFIG: WeightageConfig = {

@@ -419,10 +419,14 @@ apiRouter.post('/auth/verify-otp', async (req, res) => {
 apiRouter.get('/auth/captcha', async (req, res) => {
   try {
     const captcha = svgCaptcha.create({
-      size: 6,
-      noise: 3,
-      color: true,
-      background: '#f8fafc'
+      size: 4, // Slightly fewer chars for clarity
+      noise: 1,
+      color: true, // Use some color for better contrast
+      background: '#f8fafc',
+      width: 160,
+      height: 60,
+      fontSize: 55, // Increased from 45
+      ignoreChars: '0o1iLl' 
     });
     const captchaId = `cap-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     await createCaptchaDb(captchaId, captcha.text);

@@ -23,6 +23,7 @@ import { ServerTransactionToastContainer } from './components/common/ServerTrans
 import { THEME_CONFIGS } from './themeStyles';
 
 import { SystemStatusPortal } from './components/public/SystemStatusPortal';
+import { PublicNoticeDetail } from './components/public/PublicNoticeDetail';
 
 const MainAppContent: React.FC = () => {
   const { currentRole, isLoggedIn, branding, activeTab, setActiveTab } = usePortal();
@@ -52,9 +53,19 @@ const MainAppContent: React.FC = () => {
     }
   };
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (role: string) => {
     // Once applicant/user logs in, land them on their appropriate dashboard
-    if (currentRole === 'applicant') {
+    // unless they were looking at a specific job notice detail
+    if (activeTab === 'notice_detail') {
+      // If it's an applicant, take them to the portal to finish applying
+      if (role === 'applicant') {
+        handleTabChange('applicant_portal');
+      }
+      // Otherwise stay on the detail page
+      return;
+    }
+
+    if (role === 'applicant') {
       handleTabChange('applicant_portal');
     } else {
       handleTabChange('overview');
@@ -70,7 +81,7 @@ const MainAppContent: React.FC = () => {
     // PUBLIC ROUTES (accessible without login)
 
     // Unauthenticated visitor guard: restrict access to protected admin/dashboard tabs
-    if (!isLoggedIn && activeTab !== 'public_recruitment' && activeTab !== 'applicant_portal') {
+    if (!isLoggedIn && activeTab !== 'public_recruitment' && activeTab !== 'applicant_portal' && activeTab !== 'notice_detail') {
       return (
         <PublicRecruitmentPortal
           onApplyForPost={handleApplyClick}
@@ -89,6 +100,13 @@ const MainAppContent: React.FC = () => {
             onRequestRegister={() => setIsRegisterModalOpen(true)}
           />
         );
+      case 'notice_detail':
+        return (
+          <PublicNoticeDetail
+            onRequestLogin={() => setIsLoginModalOpen(true)}
+            onRequestRegister={() => setIsRegisterModalOpen(true)}
+          />
+        );
       case 'overview':
       case 'dashboard':
         return <OverviewDashboard setActiveTab={handleTabChange} onNavigate={(tab) => handleTabChange(tab)} />;
@@ -102,7 +120,7 @@ const MainAppContent: React.FC = () => {
         if (!isLoggedIn) {
           return (
             <div className="text-center p-6 sm:p-12 bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm space-y-4 my-4 sm:my-8 max-w-2xl mx-auto">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center mx-auto text-indigo-600">
+              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto ${theme.accentColor}`}>
                 <LogIn className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
               <h3 className="text-base sm:text-lg font-bold text-slate-900">Applicant Portal Authentication Required</h3>
@@ -112,13 +130,13 @@ const MainAppContent: React.FC = () => {
               <div className="flex flex-col sm:flex-row justify-center gap-2.5 pt-2">
                 <button
                   onClick={() => setIsLoginModalOpen(true)}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition"
+                  className={`px-5 py-2.5 rounded-xl ${theme.primaryButton} font-bold text-xs shadow-md transition`}
                 >
                   Sign In / Login
                 </button>
                 <button
                   onClick={() => setIsRegisterModalOpen(true)}
-                  className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md transition"
+                  className={`px-5 py-2.5 rounded-xl ${theme.secondaryButton} font-bold text-xs shadow-md transition`}
                 >
                   New Applicant Registration
                 </button>
@@ -180,14 +198,16 @@ const MainAppContent: React.FC = () => {
       {/* Main Layout Area */}
       <div className="flex flex-1 overflow-hidden relative">
         {/* Navigation Sidebar (Desktop + Mobile Slide-Over Drawer) */}
-        <Sidebar
-          activeTab={activeTab}
-          setActiveTab={handleTabChange}
-          isMobileMenuOpen={isMobileMenuOpen}
-          setIsMobileMenuOpen={setIsMobileMenuOpen}
-          onOpenLogin={() => setIsLoginModalOpen(true)}
-          onOpenRegister={() => setIsRegisterModalOpen(true)}
-        />
+        {isLoggedIn && (
+          <Sidebar
+            activeTab={activeTab}
+            setActiveTab={handleTabChange}
+            isMobileMenuOpen={isMobileMenuOpen}
+            setIsMobileMenuOpen={setIsMobileMenuOpen}
+            onOpenLogin={() => setIsLoginModalOpen(true)}
+            onOpenRegister={() => setIsRegisterModalOpen(true)}
+          />
+        )}
 
         {/* Dynamic View Panel */}
         <main className={`flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8 ${theme.mainBg} min-w-0 max-w-full`}>

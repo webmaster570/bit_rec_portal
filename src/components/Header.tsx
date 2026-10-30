@@ -19,6 +19,7 @@ import {
   Menu,
   X,
   Lock,
+  Send,
 } from 'lucide-react';
 import { THEME_CONFIGS, BRAND_COLORS } from '../themeStyles';
 import { ChangePasswordModal } from './auth/ChangePasswordModal';
@@ -81,24 +82,26 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className={`sticky top-0 z-40 ${isNavbarBranded && branding.navbarColor && BRAND_COLORS[branding.navbarColor] ? BRAND_COLORS[branding.navbarColor].header : (theme?.headerBase || 'bg-white border-b border-slate-200')} transition-colors duration-300`}>
+    <header className={`sticky top-0 z-40 ${isNavbarBranded && branding.navbarColor && BRAND_COLORS[branding.navbarColor] ? BRAND_COLORS[branding.navbarColor].header : (theme?.headerBase || 'bg-white border-b border-slate-200')} ${branding.showNavbarShadow ? 'shadow-md' : 'shadow-none'} transition-all duration-300`}>
       {/* Main Navigation Header */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
         {/* Left Side: Mobile Menu Button & Brand Logo */}
         <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
           {/* Mobile Hamburger Toggle Button (< lg screens) */}
-          <button
-            onClick={onToggleMobileMenu}
-            className={`lg:hidden p-2 rounded-xl border transition shrink-0 active:scale-95 shadow-2xs ${isNavbarBranded ? 'bg-white/10 text-white border-white/20 hover:bg-white/20' : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-slate-200'}`}
-            aria-label={isMobileMenuOpen ? 'Close navigation panel' : 'Open navigation panel'}
-            title="Toggle Menu"
-          >
-            {isMobileMenuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </button>
+          {isLoggedIn && (
+            <button
+              onClick={onToggleMobileMenu}
+              className={`lg:hidden p-2 rounded-xl border transition shrink-0 active:scale-95 shadow-2xs ${isNavbarBranded ? 'bg-white/10 text-white border-white/20 hover:bg-white/20' : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-slate-200'}`}
+              aria-label={isMobileMenuOpen ? 'Close navigation panel' : 'Open navigation panel'}
+              title="Toggle Menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </button>
+          )}
 
           {/* Brand & Organization Title */}
           <div
@@ -137,13 +140,29 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Center / Navigation Quick Links (Desktop only) */}
         <div className="hidden lg:flex items-center space-x-2">
-          {activeTab !== 'public_recruitment' && (
+          <button
+            onClick={() => setActiveTab('public_recruitment')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+              activeTab === 'public_recruitment'
+                ? (isNavbarBranded ? 'bg-white/10 text-white border border-white/20 shadow-2xs' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs')
+                : (isNavbarBranded ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900')
+            }`}
+          >
+            <Globe className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white/70' : (theme?.accentColor || 'text-indigo-600')}`} />
+            <span>Public Notices</span>
+          </button>
+
+          {!isLoggedIn && (
             <button
-              onClick={() => setActiveTab('public_recruitment')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${isNavbarBranded ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              onClick={() => setActiveTab('applicant_portal')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+                activeTab === 'applicant_portal'
+                  ? (isNavbarBranded ? 'bg-white/10 text-white border border-white/20 shadow-2xs' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs')
+                  : (isNavbarBranded ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900')
+              }`}
             >
-              <Globe className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white/70' : (theme?.accentColor || 'text-indigo-600')}`} />
-              <span>Public Notices</span>
+              <Send className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white/70' : (theme?.accentColor || 'text-indigo-600')}`} />
+              <span>Apply Online</span>
             </button>
           )}
 
@@ -154,7 +173,7 @@ export const Header: React.FC<HeaderProps> = ({
                 else setActiveTab('overview');
               }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
-                activeTab !== 'public_recruitment'
+                activeTab !== 'public_recruitment' && activeTab !== 'applicant_portal'
                   ? (isNavbarBranded ? 'bg-white/10 text-white border border-white/20 shadow-2xs' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs')
                   : (isNavbarBranded ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900')
               }`}

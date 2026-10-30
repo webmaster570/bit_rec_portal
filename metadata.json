@@ -1,6 +1,6 @@
 {
-  "name": "Enterprise Recruitment Portal",
-  "description": "Comprehensive recruitment lifecycle management system with role-based access control, applicant workflows, screening, interviews, document verification, merit list generation, and analytics.",
+  "name": "BIT Mesra Recruitment Portal",
+  "description": "Official online recruitment and merit application system for Birla Institute of Technology, Mesra.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

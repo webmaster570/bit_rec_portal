@@ -67,6 +67,7 @@ export const AdminPortal: React.FC = () => {
     currentUser,
     mailConfig,
     updateMailConfig,
+    currentRole,
   } = usePortal();
 
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
@@ -104,6 +105,9 @@ export const AdminPortal: React.FC = () => {
   const [selectedTheme, setSelectedTheme] = useState(branding.theme || 'classic');
   const [navbarColor, setNavbarColor] = useState(branding.navbarColor || 'default');
   const [sidebarColor, setSidebarColor] = useState(branding.sidebarColor || 'default');
+  const [showNavbarShadow, setShowNavbarShadow] = useState(branding.showNavbarShadow ?? true);
+  const [showSidebarShadow, setShowSidebarShadow] = useState(branding.showSidebarShadow ?? false);
+  const [showCardShadow, setShowCardShadow] = useState(branding.showCardShadow ?? true);
   const [brandingSavedNotice, setBrandingSavedNotice] = useState(false);
   const [isBrandingDirty, setIsBrandingDirty] = useState(false);
 
@@ -118,6 +122,9 @@ export const AdminPortal: React.FC = () => {
       setSelectedTheme(branding.theme || 'classic');
       setNavbarColor(branding.navbarColor || 'default');
       setSidebarColor(branding.sidebarColor || 'default');
+      setShowNavbarShadow(branding.showNavbarShadow ?? true);
+      setShowSidebarShadow(branding.showSidebarShadow ?? false);
+      setShowCardShadow(branding.showCardShadow ?? true);
     }
   }, [branding, isBrandingDirty]);
   // Mail Config Form State
@@ -190,6 +197,9 @@ export const AdminPortal: React.FC = () => {
       theme: selectedTheme as any,
       navbarColor: navbarColor as any,
       sidebarColor: sidebarColor as any,
+      showNavbarShadow,
+      showSidebarShadow,
+      showCardShadow,
     });
     setIsBrandingDirty(false);
     setBrandingSavedNotice(true);
@@ -207,6 +217,9 @@ export const AdminPortal: React.FC = () => {
       setSelectedTheme(INITIAL_BRANDING.theme || 'classic');
       setNavbarColor(INITIAL_BRANDING.navbarColor || 'default');
       setSidebarColor(INITIAL_BRANDING.sidebarColor || 'default');
+      setShowNavbarShadow(INITIAL_BRANDING.showNavbarShadow);
+      setShowSidebarShadow(INITIAL_BRANDING.showSidebarShadow);
+      setShowCardShadow(INITIAL_BRANDING.showCardShadow);
       setIsBrandingDirty(false);
       setBrandingSavedNotice(true);
       setTimeout(() => setBrandingSavedNotice(false), 4000);
@@ -334,6 +347,11 @@ export const AdminPortal: React.FC = () => {
     const matchesRole = selectedRoleFilter === 'all' || u.role === selectedRoleFilter;
     const matchesStatus = selectedStatusFilter === 'all' || u.status === selectedStatusFilter;
 
+    // Filter out super_admin details for Admin role
+    if (currentRole === 'admin' && u.role === 'super_admin') {
+      return false;
+    }
+
     return matchesSearch && matchesRole && matchesStatus;
   });
 
@@ -360,7 +378,7 @@ export const AdminPortal: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Title Bar & System Governance Round Icon Navigation Tabs */}
-      <div className="glass-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-md border border-slate-200 space-y-4">
+      <div className="glass-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
           <div>
             <div className="flex items-center space-x-2.5">
@@ -382,13 +400,13 @@ export const AdminPortal: React.FC = () => {
         {/* Round Icon Tabs Grid (No Horizontal Scrollbar, auto wraps cleanly on all screens) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3.5 pt-1">
           {[
-            { id: 'users', label: 'User Directory', icon: Users, count: users.length, color: 'from-purple-600 to-indigo-600' },
-            { id: 'branding', label: 'Portal Branding', icon: Palette, count: undefined, color: 'from-pink-500 to-rose-600' },
-            { id: 'rbac', label: 'RBAC Roles', icon: Key, count: roles.length, color: 'from-amber-500 to-orange-600' },
-            { id: 'departments', label: 'Departments', icon: Building2, count: departments.length, color: 'from-blue-500 to-cyan-600' },
-            { id: 'email', label: 'Email / SMS', icon: Mail, count: undefined, color: 'from-emerald-500 to-teal-600' },
-            { id: 'system', label: 'System Status', icon: Database, count: undefined, color: 'from-indigo-600 to-purple-800' },
-          ].map((t) => {
+            { id: 'users', label: 'User Directory', icon: Users, count: users.filter(u => !(currentRole === 'admin' && u.role === 'super_admin')).length, color: 'from-purple-600 to-indigo-600', roles: ['super_admin', 'admin'] },
+            { id: 'branding', label: 'Portal Branding', icon: Palette, count: undefined, color: 'from-pink-500 to-rose-600', roles: ['super_admin'] },
+            { id: 'rbac', label: 'RBAC Roles', icon: Key, count: roles.length, color: 'from-amber-500 to-orange-600', roles: ['super_admin', 'admin'] },
+            { id: 'departments', label: 'Departments', icon: Building2, count: departments.length, color: 'from-blue-500 to-cyan-600', roles: ['super_admin', 'admin'] },
+            { id: 'email', label: 'Email / SMS', icon: Mail, count: undefined, color: 'from-emerald-500 to-teal-600', roles: ['super_admin', 'admin'] },
+            { id: 'system', label: 'System Status', icon: Database, count: undefined, color: 'from-indigo-600 to-purple-800', roles: ['super_admin'] },
+          ].filter(t => !t.roles || t.roles.includes(currentRole)).map((t) => {
             const Icon = t.icon;
             const isActive = activeAdminTab === t.id;
             return (
@@ -406,7 +424,7 @@ export const AdminPortal: React.FC = () => {
                 <div
                   className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-xs ${
                     isActive
-                      ? `bg-gradient-to-tr ${t.color} text-white shadow-md ring-2 ring-white`
+                      ? `bg-gradient-to-tr ${t.color} text-white shadow-sm ring-2 ring-white`
                       : 'bg-slate-100 text-slate-600 group-hover:bg-purple-100 group-hover:text-purple-700'
                   }`}
                 >
@@ -467,7 +485,9 @@ export const AdminPortal: React.FC = () => {
                 </div>
               </div>
               <div className="mt-2 flex items-baseline space-x-2">
-                <span className="text-2xl font-black text-slate-900">{users.length}</span>
+                <span className="text-2xl font-black text-slate-900">
+                  {users.filter(u => !(currentRole === 'admin' && u.role === 'super_admin')).length}
+                </span>
                 <span className="text-[11px] text-slate-500">accounts</span>
               </div>
             </div>
@@ -481,7 +501,7 @@ export const AdminPortal: React.FC = () => {
               </div>
               <div className="mt-2 flex items-baseline space-x-2">
                 <span className="text-2xl font-black text-emerald-700">
-                  {users.filter((u) => u.status === 'active' && u.role !== 'applicant').length}
+                  {users.filter((u) => u.status === 'active' && u.role !== 'applicant' && !(currentRole === 'admin' && u.role === 'super_admin')).length}
                 </span>
                 <span className="text-[11px] text-slate-500">officers & admin</span>
               </div>
@@ -561,6 +581,7 @@ export const AdminPortal: React.FC = () => {
                 >
                   <option value="all">All Roles ({users.length})</option>
                   <option value="super_admin">Super Admin</option>
+                  <option value="admin">Admin</option>
                   <option value="recruitment_admin">Recruitment Admin</option>
                   <option value="recruitment_officer">Recruitment Officer</option>
                   <option value="dept_admin">Department Admin</option>
@@ -836,7 +857,7 @@ export const AdminPortal: React.FC = () => {
           {/* User Creation / Edit Modal Dialog */}
           {isUserModalOpen && (
             <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-xl overflow-hidden animate-fade-in my-8">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm w-full max-w-xl overflow-hidden animate-fade-in my-8">
                 <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-purple-50 via-indigo-50 to-white flex items-center justify-between">
                   <div>
                     <h3 className="text-lg font-black text-slate-900 flex items-center space-x-2">
@@ -907,6 +928,7 @@ export const AdminPortal: React.FC = () => {
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                       >
                         <option value="super_admin">Super Admin (Full Governance)</option>
+                        <option value="admin">Admin (Restricted Management)</option>
                         <option value="recruitment_admin">Recruitment Admin (Drives & Posts)</option>
                         <option value="recruitment_officer">Recruitment Officer (Operations)</option>
                         <option value="dept_admin">Department Admin (Dept Vacancies)</option>
@@ -1046,7 +1068,7 @@ export const AdminPortal: React.FC = () => {
           {/* Delete User Confirmation Modal */}
           {deletingUser && (
             <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-fade-in">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm w-full max-w-md overflow-hidden animate-fade-in">
                 <div className="p-6 text-center space-y-4">
                   <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
                     <Trash2 className="w-6 h-6" />
@@ -1291,12 +1313,21 @@ export const AdminPortal: React.FC = () => {
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { id: 'classic', label: 'Classic University', desc: 'Indigo & Slate, Standard Grid', color: 'bg-indigo-600' },
-                    { id: 'modern', label: 'Modern Aesthetic', desc: 'Vibrant Accents, Soft Shadows', color: 'bg-violet-600' },
-                    { id: 'crimson', label: 'Crimson Tech', desc: 'Deep Red Sidebar, Tech Focused', color: 'bg-rose-600' },
-                    { id: 'academic', label: 'Academic Gold', desc: 'Navy Sidebar, Serifs, Prestigious', color: 'bg-[#1a365d]' },
-                    { id: 'nature', label: 'Nature Mint', desc: 'Forest Green Sidebar, Organic', color: 'bg-emerald-800' },
-                    { id: 'sapphire', label: 'Sapphire Ocean', desc: 'Slate Sidebar, Professional Blue', color: 'bg-slate-900' },
+                    { id: 'classic', label: 'Classic University', desc: 'Indigo & Slate, Standard Grid', color: 'bg-indigo-600', preset: { title: 'University Recruitment Portal', subtitle: 'Centralized Public Job Advertisements & Merit Application System', icon: 'Building2' } },
+                    { id: 'modern', label: 'Modern Aesthetic', desc: 'Vibrant Accents, Soft Shadows', color: 'bg-violet-600', preset: { title: 'Modern Talent Gateway', subtitle: 'Connecting top tier professionals with leading opportunities', icon: 'Sparkles' } },
+                    { id: 'tech_startup', label: 'Tech Startup (Dark)', desc: 'Neon Indigo, Futuristic Dark Mode', color: 'bg-indigo-500', preset: { title: 'NextGen Talent Hub', subtitle: 'Scaling Innovation through elite technical talent acquisition', icon: 'Globe' } },
+                    { id: 'corporate_pro', label: 'Corporate Pro', desc: 'Deep Navy, Minimalist, Sharp', color: 'bg-[#0f172a]', preset: { title: 'Executive Placement Group', subtitle: 'Strategic human capital solutions for global enterprises', icon: 'ShieldCheck' } },
+                    { id: 'creative_studio', label: 'Creative Studio', desc: 'Playful Gradients, Soft Corners', color: 'bg-gradient-to-r from-purple-600 to-indigo-600', preset: { title: 'The Creative Canvas', subtitle: 'Where visionaries find their next collaborative masterpiece', icon: 'Award' } },
+                    { id: 'industrial_heavy', label: 'Industrial Heavy', desc: 'Rugged Gray, Mono Fonts, Boxy', color: 'bg-slate-800', preset: { title: 'TITAN INDUSTRIAL RECRUITMENT', subtitle: 'STRENGTH AND PRECISION IN WORKFORCE PROVISIONING', icon: 'Building2' } },
+                    { id: 'portal_vibrant', label: 'Job Portal: Vibrant', desc: 'Pink & Indigo, Smooth Gradients', color: 'bg-gradient-to-r from-indigo-600 to-pink-500', preset: { title: 'Vibrant Talent Connect', subtitle: 'Dynamic opportunities for forward-thinking professionals', icon: 'Sparkles' } },
+                    { id: 'portal_minimal', label: 'Job Portal: Minimal', desc: 'Black & White, Ultra-Clean', color: 'bg-slate-900', preset: { title: 'MINIMAL CAREERS', subtitle: 'PURE OPPORTUNITY. ZERO NOISE.', icon: 'Building2' } },
+                    { id: 'portal_dark_knight', label: 'Job Portal: Dark Knight', desc: 'Gold & Black, Elegant Night', color: 'bg-amber-600', preset: { title: 'The Prestige Gateway', subtitle: 'Exclusive recruitment for elite senior leadership roles', icon: 'Award' } },
+                    { id: 'portal_enterprise', label: 'Job Portal: Enterprise', desc: 'Steel Blue & Slate, Serious Business', color: 'bg-[#0f172a]', preset: { title: 'Enterprise Workforce Solutions', subtitle: 'Global human resource management and strategic staffing', icon: 'ShieldCheck' } },
+                    { id: 'crimson', label: 'Crimson Tech', desc: 'Deep Red Sidebar, Tech Focused', color: 'bg-rose-600', preset: { title: 'Crimson Talent Portal', subtitle: 'High-performance recruitment for the technical age', icon: 'ShieldCheck' } },
+                    { id: 'academic', label: 'Academic Gold', desc: 'Navy Sidebar, Serifs, Prestigious', color: 'bg-[#1a365d]', preset: { title: 'Institute of Excellence', subtitle: 'Official Faculty and Research Staff Appointment System', icon: 'GraduationCap' } },
+                    { id: 'nature', label: 'Nature Mint', desc: 'Forest Green Sidebar, Organic', color: 'bg-emerald-800', preset: { title: 'EcoRecruit Portal', subtitle: 'Sustainable career paths in environmental and social impact', icon: 'Globe' } },
+                    { id: 'sapphire', label: 'Sapphire Ocean', desc: 'Slate Sidebar, Professional Blue', color: 'bg-slate-900', preset: { title: 'Sapphire Professional Search', subtitle: 'Transparent and efficient merit-based recruitment', icon: 'ShieldCheck' } },
+                    { id: 'bit_mesra', label: 'Institutional (BIT)', desc: 'Maroon & Gold, Formal University', color: 'bg-[#800000]', preset: { title: 'BIT Recruitment Portal', subtitle: 'Official Career Opportunities at Birla Institute of Technology', icon: 'Building2' } },
                   ].map((themeOption) => {
                     const isSelected = selectedTheme === themeOption.id;
                     return (
@@ -1305,6 +1336,9 @@ export const AdminPortal: React.FC = () => {
                         type="button"
                         onClick={() => {
                           setSelectedTheme(themeOption.id as any);
+                          setNavTitle(themeOption.preset.title);
+                          setNavSubtitle(themeOption.preset.subtitle);
+                          setLogoIconName(themeOption.preset.icon);
                           setIsBrandingDirty(true);
                         }}
                         className={`p-3.5 rounded-2xl border text-left transition flex items-start space-x-3 ${
@@ -1324,6 +1358,9 @@ export const AdminPortal: React.FC = () => {
                     );
                   })}
                 </div>
+                <p className="text-[10px] text-slate-400 italic">
+                  Note: Selecting a template will automatically apply recommended industry presets for the title and icon.
+                </p>
               </div>
 
               {/* Navbar Color Selector */}
@@ -1332,13 +1369,14 @@ export const AdminPortal: React.FC = () => {
                   <Palette className="w-3.5 h-3.5 text-blue-600" />
                   Navbar Header Brand Color
                 </label>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-6 gap-2">
                   {[
                     { id: 'default', label: 'Theme Default', color: 'bg-slate-100 border-slate-300' },
                     { id: 'green', label: 'Green', color: 'bg-emerald-600' },
                     { id: 'blue', label: 'Blue', color: 'bg-blue-600' },
                     { id: 'purple', label: 'Purple', color: 'bg-purple-600' },
                     { id: 'maroon', label: 'Maroon', color: 'bg-[#800000]' },
+                    { id: 'bit_mesra', label: 'BIT Maroon', color: 'bg-[#800000]' },
                   ].map((c) => (
                     <button
                       key={c.id}
@@ -1369,13 +1407,14 @@ export const AdminPortal: React.FC = () => {
                   <Palette className="w-3.5 h-3.5 text-indigo-600" />
                   Sidebar Navigation Brand Color
                 </label>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-6 gap-2">
                   {[
                     { id: 'default', label: 'Theme Default', color: 'bg-slate-100 border-slate-300' },
                     { id: 'green', label: 'Green', color: 'bg-emerald-900' },
                     { id: 'blue', label: 'Blue', color: 'bg-blue-900' },
                     { id: 'purple', label: 'Purple', color: 'bg-purple-900' },
                     { id: 'maroon', label: 'Maroon', color: 'bg-[#500000]' },
+                    { id: 'bit_mesra', label: 'BIT Maroon', color: 'bg-[#800000]' },
                   ].map((c) => (
                     <button
                       key={c.id}
@@ -1397,6 +1436,57 @@ export const AdminPortal: React.FC = () => {
                       )}
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Shadow Controls */}
+              <div className="space-y-4 pt-2 border-t border-slate-200">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-1 flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5 text-purple-600" />
+                  Surface Elevation & Shadows
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div className="space-y-0.5">
+                      <div className="text-xs font-bold text-slate-900">Navbar Shadow</div>
+                      <div className="text-[10px] text-slate-500">Elevated header</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setShowNavbarShadow(!showNavbarShadow); setIsBrandingDirty(true); }}
+                      className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${showNavbarShadow ? 'bg-purple-600' : 'bg-slate-300'}`}
+                    >
+                      <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${showNavbarShadow ? 'translate-x-5' : 'translate-x-0'}`} />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div className="space-y-0.5">
+                      <div className="text-xs font-bold text-slate-900">Sidebar Shadow</div>
+                      <div className="text-[10px] text-slate-500">Raised menu panel</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setShowSidebarShadow(!showSidebarShadow); setIsBrandingDirty(true); }}
+                      className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${showSidebarShadow ? 'bg-purple-600' : 'bg-slate-300'}`}
+                    >
+                      <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${showSidebarShadow ? 'translate-x-5' : 'translate-x-0'}`} />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div className="space-y-0.5">
+                      <div className="text-xs font-bold text-slate-900">Card Shadows</div>
+                      <div className="text-[10px] text-slate-500">Depth for job listings</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setShowCardShadow(!showCardShadow); setIsBrandingDirty(true); }}
+                      className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${showCardShadow ? 'bg-purple-600' : 'bg-slate-300'}`}
+                    >
+                      <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${showCardShadow ? 'translate-x-5' : 'translate-x-0'}`} />
+                    </button>
+                  </div>
                 </div>
               </div>
 

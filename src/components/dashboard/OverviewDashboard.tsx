@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
 import { Application } from '../../types';
+import { THEME_CONFIGS } from '../../themeStyles';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import {
   Megaphone,
@@ -34,7 +35,8 @@ export const OverviewDashboard: React.FC<{
     }
   };
 
-  const { currentRole, currentUser, drives, applications, auditLogs, roles } = usePortal();
+  const { currentRole, currentUser, drives, applications, auditLogs, roles, branding } = usePortal();
+  const theme = THEME_CONFIGS[branding.theme || 'classic'];
 
   const [selectedAdmitCardApp, setSelectedAdmitCardApp] = useState<Application | null>(null);
 
@@ -60,20 +62,22 @@ export const OverviewDashboard: React.FC<{
       (a) => a.admitCardIssued || (a.screeningStatus === 'Eligible' && a.rollNumber)
     ).length;
 
+    const isBitTheme = branding.theme === 'bit_mesra';
+
     return (
       <div className="space-y-6">
         {/* Welcome Banner for Applicant */}
-        <div className="bg-gradient-to-r from-blue-800 via-indigo-700 to-purple-800 border border-indigo-500/30 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+        <div className={`${isBitTheme ? 'bg-white border-2 border-stone-200 ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none') : 'bg-gradient-to-r from-blue-800 via-indigo-700 to-purple-800 border border-indigo-500/30 ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none')} rounded-3xl p-6 md:p-8 text-white relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
+          {!isBitTheme && <div className="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none" />}
           <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white border border-white/30 text-xs font-bold mb-3 shadow-xs backdrop-blur-xs">
-              <Sparkles className="w-3.5 h-3.5 text-pink-200" />
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-none ${isBitTheme ? 'bg-stone-50 border border-stone-200 text-[#800000]' : 'bg-white/20 border border-white/30 text-white'} text-[10px] font-black uppercase tracking-[0.2em] mb-3 shadow-xs backdrop-blur-xs`}>
+              <Sparkles className={`w-3.5 h-3.5 ${isBitTheme ? 'text-[#800000]' : 'text-pink-200'}`} />
               Candidate Dashboard & Application Hub
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            <h2 className={`text-2xl sm:text-4xl ${theme.headingFont} ${isBitTheme ? 'text-stone-900' : 'text-white'}`}>
               Welcome, {currentUser?.name || 'Dr. Rohan Deshmukh'}
             </h2>
-            <p className="text-sm text-indigo-100 mt-1 max-w-2xl leading-relaxed">
+            <p className={`text-sm ${isBitTheme ? 'text-stone-500' : 'text-indigo-100'} mt-1 max-w-2xl leading-relaxed font-serif italic`}>
               Track your submitted recruitment applications, download examination admit cards, check document verification status, and apply for newly advertised vacancies.
             </p>
           </div>
@@ -81,16 +85,16 @@ export const OverviewDashboard: React.FC<{
           <div className="flex flex-wrap items-center gap-3 shrink-0 relative z-10">
             <button
               onClick={() => navigate('applicant_portal')}
-              className="px-5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-indigo-900 font-extrabold text-xs shadow-lg transition flex items-center space-x-2"
+              className={`${theme.primaryButton} px-6 py-3 flex items-center space-x-2`}
             >
-              <Send className="w-4 h-4 text-indigo-600" />
-              <span>Apply for New Vacancies</span>
+              <Send className="w-4 h-4" />
+              <span>Submit New Application</span>
             </button>
             <button
               onClick={() => navigate('public_recruitment')}
-              className="px-5 py-2.5 rounded-2xl bg-indigo-900/60 hover:bg-indigo-950/80 text-white border border-white/30 font-bold text-xs transition flex items-center space-x-2 backdrop-blur-sm shadow-md"
+              className={`${theme.secondaryButton} px-6 py-3 border-2 flex items-center space-x-2 shadow-sm`}
             >
-              <Megaphone className="w-4 h-4 text-emerald-300" />
+              <Megaphone className="w-4 h-4" />
               <span>Browse Job Notices</span>
             </button>
           </div>
@@ -98,117 +102,112 @@ export const OverviewDashboard: React.FC<{
 
         {/* Applicant Primary KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="glass-card glass-card-hover rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-indigo-600">
+          <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
             <div>
-              <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block mb-1">
+              <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
                 Vacancies Posted
               </span>
-              <div className="text-2xl font-black text-slate-900">{totalVacanciesPosted} Positions</div>
-              <span className="text-xs text-indigo-600 font-semibold flex items-center gap-1 mt-1">
-                <Building2 className="w-3.5 h-3.5" /> Across {drives.length} Active Drives
+              <div className={`text-2xl font-black ${isBitTheme ? 'text-stone-900' : 'text-slate-900'}`}>{totalVacanciesPosted} Positions</div>
+              <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-indigo-600'} font-bold uppercase mt-1 flex items-center gap-1`}>
+                <Building2 className="w-3 h-3" /> Across {drives.length} Active Drives
               </span>
             </div>
-            <div className="p-3.5 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-2xl shadow-xs">
+            <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-indigo-50 text-indigo-600'} border border-stone-100 rounded-none shadow-sm`}>
               <Megaphone className="w-6 h-6" />
             </div>
           </div>
 
-          <div
-            onClick={() => navigate('my_jobs')}
-            className="glass-card glass-card-hover rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-purple-600 cursor-pointer"
-          >
-            <div>
-              <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block mb-1">
-                My Jobs / Applications
-              </span>
-              <div className="text-2xl font-black text-slate-900">{myApplications.length} Applied</div>
-              <span className="text-xs text-purple-600 font-semibold flex items-center gap-1 mt-1">
-                <Briefcase className="w-3.5 h-3.5" /> View All in Table &rarr;
-              </span>
-            </div>
-            <div className="p-3.5 bg-purple-50 text-purple-600 border border-purple-200 rounded-2xl shadow-xs">
-              <Briefcase className="w-6 h-6" />
-            </div>
-          </div>
+              {myApplications.length > 0 && (
+                <div
+                  onClick={() => navigate('my_jobs')}
+                  className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000] cursor-pointer hover:bg-stone-50 transition-colors`}
+                >
+                  <div>
+                    <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
+                      My Applied Jobs
+                    </span>
+                    <div className={`text-2xl font-black ${isBitTheme ? 'text-stone-900' : 'text-slate-900'}`}>{myApplications.length} Positions</div>
+                    <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-purple-600'} font-bold uppercase mt-1 flex items-center gap-1`}>
+                      <Briefcase className="w-3.5 h-3.5" /> View Status &rarr;
+                    </span>
+                  </div>
+                  <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-purple-50 text-purple-600'} border border-stone-100 rounded-none shadow-sm`}>
+                    <Briefcase className="w-6 h-6" />
+                  </div>
+                </div>
+              )}
 
-          <div className="glass-card glass-card-hover rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-emerald-600">
-            <div>
-              <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block mb-1">
-                Screened / Shortlisted
-              </span>
-              <div className="text-2xl font-black text-emerald-600">{eligibleCount}</div>
-              <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1 mt-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Eligible for Next Stage
-              </span>
-            </div>
-            <div className="p-3.5 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-2xl shadow-xs">
-              <CheckCircle2 className="w-6 h-6" />
-            </div>
-          </div>
+              <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
+                <div>
+                  <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
+                    Screened / Shortlisted
+                  </span>
+                  <div className={`text-2xl font-black ${isBitTheme ? 'text-emerald-700' : 'text-emerald-600'}`}>{eligibleCount}</div>
+                  <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-emerald-600'} font-bold uppercase mt-1 flex items-center gap-1`}>
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Eligible Candidates
+                  </span>
+                </div>
+                <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-emerald-50 text-emerald-600'} border border-stone-100 rounded-none shadow-sm`}>
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+              </div>
 
-          <div className="glass-card glass-card-hover rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-pink-600">
-            <div>
-              <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block mb-1">
-                Admit Cards Ready
-              </span>
-              <div className="text-2xl font-black text-pink-600">{admitCardsReadyCount}</div>
-              <span className="text-xs text-pink-600 font-semibold flex items-center gap-1 mt-1">
-                <Download className="w-3.5 h-3.5" /> Hall Tickets Available
-              </span>
+              <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
+                <div>
+                  <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
+                    Admit Cards Ready
+                  </span>
+                  <div className={`text-2xl font-black ${isBitTheme ? 'text-stone-900' : 'text-pink-600'}`}>{admitCardsReadyCount}</div>
+                  <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-pink-600'} font-bold uppercase mt-1 flex items-center gap-1`}>
+                    <Download className="w-3.5 h-3.5" /> Hall Tickets
+                  </span>
+                </div>
+                <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-pink-50 text-pink-600'} border border-stone-100 rounded-none shadow-sm`}>
+                  <Download className="w-6 h-6" />
+                </div>
+              </div>
             </div>
-            <div className="p-3.5 bg-pink-50 text-pink-600 border border-pink-200 rounded-2xl shadow-xs">
-              <CreditCard className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
 
-        {/* My Jobs & Application Status Panel */}
-        <div className="glass-card rounded-3xl p-6 shadow-md border border-slate-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-2 mb-4">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-indigo-600" />
-                My Applied Jobs & Application Status Tracker
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Real-time recruitment processing status, hall tickets, and official receipts for your applications.
-              </p>
-            </div>
-            <div className="flex items-center gap-2 self-start sm:self-auto">
-              <button
-                onClick={() => navigate('my_jobs')}
-                className="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs border border-indigo-200 shadow-2xs transition flex items-center space-x-1.5"
-              >
-                <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
-                <span>My Jobs Table</span>
-              </button>
-              <button
-                onClick={() => navigate('applicant_portal')}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition flex items-center space-x-1.5"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>Submit New Application</span>
-              </button>
-            </div>
-          </div>
+            {/* My Jobs & Application Status Panel */}
+            <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-8 border-t-4 border-t-[#800000]`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-stone-100 gap-6 mb-8">
+                <div className="space-y-1">
+                  <h3 className={`text-xl ${theme.headingFont} flex items-center gap-3`}>
+                    <Briefcase className="w-6 h-6" />
+                    My Job Applications
+                  </h3>
+                  <p className="text-sm text-stone-500 font-serif italic">
+                    Real-time tracking of your submitted recruitment applications.
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => navigate('my_jobs')}
+                    className={`${theme.secondaryButton} px-4 py-2 text-[10px] flex items-center gap-2`}
+                  >
+                    <Briefcase className="w-3.5 h-3.5" />
+                    <span>View Full Ledger</span>
+                  </button>
+                </div>
+              </div>
 
-          {myApplications.length === 0 ? (
-            <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-              <Briefcase className="w-10 h-10 text-slate-400 mx-auto mb-2" />
-              <h4 className="text-sm font-bold text-slate-800">No Job Applications Submitted Yet</h4>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-4">
-                Browse current recruitment drives and submit your online application to view status tracking here.
-              </p>
-              <button
-                onClick={() => navigate('applicant_portal')}
-                className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md"
-              >
-                Apply Online Now
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {myApplications.map((app) => (
+              {myApplications.length === 0 ? (
+                <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                  <Briefcase className="w-10 h-10 text-slate-400 mx-auto mb-2" />
+                  <h4 className="text-sm font-bold text-slate-800">No Job Applications Submitted Yet</h4>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-4">
+                    Browse current recruitment drives and submit your online application to view status tracking here.
+                  </p>
+                  <button
+                    onClick={() => navigate('applicant_portal')}
+                    className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md"
+                  >
+                    Apply Online Now
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {myApplications.map((app) => (
                 <div
                   key={app.id}
                   className="bg-slate-50 border border-slate-200 rounded-2xl p-5 hover:border-indigo-300 transition shadow-2xs space-y-4"
@@ -280,7 +279,7 @@ export const OverviewDashboard: React.FC<{
                       {(app.admitCardIssued || (app.screeningStatus === 'Eligible' && app.rollNumber)) && (
                         <button
                           onClick={() => setSelectedAdmitCardApp(app)}
-                          className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-md transition flex items-center space-x-1.5"
+                          className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-sm transition flex items-center space-x-1.5"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>Download Hall Ticket</span>
@@ -303,7 +302,7 @@ export const OverviewDashboard: React.FC<{
         </div>
 
         {/* Vacancies Posted Section */}
-        <div className="glass-card rounded-3xl p-6 shadow-md border border-slate-200">
+        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6`}>
           <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
             <div>
               <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
@@ -397,137 +396,139 @@ export const OverviewDashboard: React.FC<{
     { title: 'Offer / Appointment', desc: 'Issue formal offer letters', tab: 'merit', count: selectedCount },
   ];
 
+  const isBitTheme = branding.theme === 'bit_mesra';
+
   return (
     <div className="space-y-6">
       {/* Welcome & Role Banner */}
-      <div className="bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 border border-indigo-400/30 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+      <div className={`${isBitTheme ? 'bg-white border-2 border-stone-200 ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none') : 'bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 border border-indigo-400/30 ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none')} rounded-3xl p-6 md:p-8 text-white relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
+        {!isBitTheme && <div className="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none" />}
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white border border-white/30 text-xs font-bold mb-3 shadow-xs backdrop-blur-xs">
-            <Sparkles className="w-3.5 h-3.5 text-pink-200" />
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-none ${isBitTheme ? 'bg-stone-50 border border-stone-200 text-[#800000]' : 'bg-white/20 border border-white/30 text-white'} text-[10px] font-black uppercase tracking-[0.2em] mb-3 shadow-xs backdrop-blur-xs`}>
+            <Sparkles className={`w-3.5 h-3.5 ${isBitTheme ? 'text-[#800000]' : 'text-pink-200'}`} />
             Centralized Recruitment Command Center
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+          <h2 className={`text-2xl sm:text-4xl ${theme.headingFont} ${isBitTheme ? 'text-stone-900' : 'text-white'}`}>
             Welcome, {activeRoleObj?.name}
           </h2>
-          <p className="text-sm text-indigo-100 mt-1 max-w-2xl leading-relaxed">
-            You are operating with <span className="font-bold text-white underline decoration-pink-300 underline-offset-2">{activeRoleObj?.name}</span> privileges. Select any workflow module from the left menu or click directly on any recruitment lifecycle phase below.
+          <p className={`text-sm ${isBitTheme ? 'text-stone-500' : 'text-indigo-100'} mt-1 max-w-2xl leading-relaxed font-serif italic`}>
+            You are operating with <span className={`font-bold ${isBitTheme ? 'text-[#800000]' : 'text-white underline decoration-pink-300'} underline-offset-2`}>{activeRoleObj?.name}</span> privileges. Select any workflow module from the left menu.
           </p>
         </div>
 
         <div className="flex items-center space-x-3 shrink-0 relative z-10">
           <button
             onClick={() => navigate('drives')}
-            className="px-5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-indigo-900 font-extrabold text-xs shadow-lg transition flex items-center space-x-2"
+            className={`${theme.primaryButton} px-6 py-3 flex items-center space-x-2`}
           >
-            <Megaphone className="w-4 h-4 text-indigo-600" />
+            <Megaphone className="w-4 h-4" />
             <span>Manage Drives</span>
           </button>
           <button
             onClick={() => navigate('applicant_portal')}
-            className="px-5 py-2.5 rounded-2xl bg-indigo-900/60 hover:bg-indigo-950/80 text-white border border-white/30 font-bold text-xs transition flex items-center space-x-2 backdrop-blur-sm shadow-md"
+            className={`${theme.secondaryButton} px-6 py-3 border-2 flex items-center space-x-2 shadow-sm`}
           >
-            <Users className="w-4 h-4 text-emerald-300" />
-            <span>Apply Online</span>
+            <Users className="w-4 h-4" />
+            <span>Submit Application</span>
           </button>
         </div>
       </div>
 
       {/* Primary KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="glass-card glass-card-hover rounded-2xl p-5 flex items-center justify-between">
+        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
           <div>
-            <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block mb-1">
+            <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
               Active Drives
             </span>
-            <div className="text-2xl font-black text-slate-900">{activeDrives.length} / {totalDrives}</div>
-            <span className="text-xs text-emerald-600 flex items-center gap-1 mt-1 font-semibold">
-              <TrendingUp className="w-3 h-3 text-emerald-600" /> Applications Open
+            <div className={`text-2xl font-black ${isBitTheme ? 'text-stone-900' : 'text-slate-900'}`}>{activeDrives.length} / {totalDrives}</div>
+            <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-emerald-600'} font-bold uppercase mt-1 flex items-center gap-1`}>
+              <TrendingUp className="w-3 h-3" /> Live Notifications
             </span>
           </div>
-          <div className="p-3.5 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-2xl shadow-xs">
+          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-indigo-50 text-indigo-600'} border border-stone-100 rounded-none shadow-sm`}>
             <Megaphone className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="glass-card glass-card-hover rounded-2xl p-5 flex items-center justify-between">
+        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
           <div>
-            <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block mb-1">
+            <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
               Applications Received
             </span>
-            <div className="text-2xl font-black text-slate-900">{totalApps}</div>
-            <span className="text-xs text-purple-600 font-semibold"> Across All Positions</span>
+            <div className={`text-2xl font-black ${isBitTheme ? 'text-stone-900' : 'text-slate-900'}`}>{totalApps}</div>
+            <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-purple-600'} font-bold uppercase mt-1`}> Total Responses</span>
           </div>
-          <div className="p-3.5 bg-purple-50 text-purple-600 border border-purple-200 rounded-2xl shadow-xs">
+          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-purple-50 text-purple-600'} border border-stone-100 rounded-none shadow-sm`}>
             <Users className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="glass-card glass-card-hover rounded-2xl p-5 flex items-center justify-between">
+        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
           <div>
-            <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block mb-1">
+            <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
               Pending Screening
             </span>
-            <div className="text-2xl font-black text-amber-600">{pendingScreening}</div>
-            <span className="text-xs text-slate-500 font-semibold">Awaiting Review</span>
+            <div className={`text-2xl font-black ${isBitTheme ? 'text-amber-700' : 'text-amber-600'}`}>{pendingScreening}</div>
+            <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-slate-500'} font-bold uppercase mt-1`}>Awaiting Review</span>
           </div>
-          <div className="p-3.5 bg-amber-50 text-amber-600 border border-amber-200 rounded-2xl shadow-xs">
+          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-amber-50 text-amber-600'} border border-stone-100 rounded-none shadow-sm`}>
             <Clock className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="glass-card glass-card-hover rounded-2xl p-5 flex items-center justify-between">
+        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
           <div>
-            <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block mb-1">
+            <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
               Fee Collections
             </span>
-            <div className="text-2xl font-black text-emerald-600">₹{totalFeeCollected.toLocaleString('en-IN')}</div>
-            <span className="text-xs text-teal-600 font-semibold">Reconciled Payments</span>
+            <div className={`text-2xl font-black ${isBitTheme ? 'text-emerald-700' : 'text-emerald-600'}`}>₹{totalFeeCollected.toLocaleString('en-IN')}</div>
+            <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-teal-600'} font-bold uppercase mt-1`}>Reconciled gateway</span>
           </div>
-          <div className="p-3.5 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-2xl shadow-xs">
+          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-emerald-50 text-emerald-600'} border border-stone-100 rounded-none shadow-sm`}>
             <CreditCard className="w-6 h-6" />
           </div>
         </div>
       </div>
 
       {/* Recruitment Lifecycle Phase Navigation Grid */}
-      <div className="glass-card rounded-3xl p-6 shadow-md">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
+      <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-8 border-t-4 border-t-[#800000]`}>
+        <div className="flex items-center justify-between pb-6 border-b border-stone-100 mb-8">
           <div>
-            <h3 className="text-base font-extrabold text-slate-900">Complete Recruitment Lifecycle Workflow</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Click on any stage to jump directly to its dedicated operational interface.
+            <h3 className={`text-xl ${theme.headingFont}`}>Complete Recruitment Lifecycle Workflow</h3>
+            <p className="text-sm text-stone-500 font-serif italic mt-1">
+              Select an operational phase to manage the specific recruitment stage.
             </p>
           </div>
-          <span className="text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full shadow-2xs">
+          <span className={`text-[10px] font-black px-4 py-1.5 ${isBitTheme ? 'bg-stone-50 text-[#800000] border border-stone-200' : 'bg-indigo-50 text-indigo-700 border border-indigo-200'} rounded-none uppercase tracking-widest shadow-sm`}>
             8 Integrated Stages
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {lifecycleStages.map((stage, idx) => (
             <div
               key={idx}
               onClick={() => navigate(stage.tab)}
-              className="group bg-slate-50 hover:bg-white border border-slate-200 hover:border-indigo-400 rounded-2xl p-4 cursor-pointer transition-all duration-200 relative shadow-2xs hover:shadow-md"
+              className={`group ${isBitTheme ? 'bg-[#FBF9F5] border-stone-200 hover:border-[#800000]' : 'bg-slate-50 border-slate-200 hover:border-indigo-400'} border rounded-none p-5 cursor-pointer transition-all duration-300 relative ${branding.showCardShadow ? 'shadow-sm hover:shadow-lg' : 'shadow-none'}`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="w-6 h-6 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-extrabold text-xs flex items-center justify-center shadow-2xs">
+              <div className="flex items-center justify-between mb-3">
+                <span className={`w-8 h-8 rounded-none ${isBitTheme ? 'bg-[#800000]' : 'bg-gradient-to-r from-indigo-600 to-purple-600'} text-white font-black text-sm flex items-center justify-center shadow-sm`}>
                   {idx + 1}
                 </span>
                 {stage.alert && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-2xs animate-pulse">
-                    Action Needed
+                  <span className="px-2 py-0.5 rounded-none text-[9px] font-black bg-rose-600 text-white uppercase tracking-widest shadow-sm animate-pulse">
+                    Action Required
                   </span>
                 )}
               </div>
-              <h4 className="text-sm font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors">
+              <h4 className={`text-sm font-black uppercase tracking-tight ${isBitTheme ? 'text-stone-900 group-hover:text-[#800000]' : 'text-slate-900 group-hover:text-indigo-600'} transition-colors`}>
                 {stage.title}
               </h4>
-              <p className="text-[11px] text-slate-500 mt-1 leading-snug">{stage.desc}</p>
-              <div className="mt-3 flex items-center justify-between text-xs font-bold text-indigo-600 pt-2 border-t border-slate-200">
+              <p className="text-[11px] text-stone-500 mt-1.5 leading-relaxed font-serif italic">{stage.desc}</p>
+              <div className={`mt-4 flex items-center justify-between text-[10px] font-black uppercase tracking-widest ${isBitTheme ? 'text-[#800000]' : 'text-indigo-600'} pt-3 border-t border-stone-100`}>
                 <span>{stage.count} Records</span>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           ))}
@@ -537,7 +538,7 @@ export const OverviewDashboard: React.FC<{
       {/* Two Column Layout: Active Drives & Recent Audit Trail */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Active Recruitment Drives Summary */}
-        <div className="lg:col-span-2 glass-card rounded-3xl p-6 shadow-md">
+        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} lg:col-span-2 p-6`}>
           <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
             <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-indigo-600" />
@@ -612,7 +613,7 @@ export const OverviewDashboard: React.FC<{
         </div>
 
         {/* Live System Audit Trail Panel */}
-        <div className="glass-card rounded-3xl p-6 shadow-md flex flex-col justify-between">
+        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex flex-col justify-between`}>
           <div>
             <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
               <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
