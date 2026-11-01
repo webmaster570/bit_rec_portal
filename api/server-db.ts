@@ -201,9 +201,14 @@ async function syncInitialDatabase(database: Db) {
   if (globalThis._hasInitialSyncDone) return;
   try {
     const brandingCol = database.collection('branding');
-    const existingBranding = await brandingCol.findOne({ _id: 'portal_branding' as any }).catch(() => null);
+    const usersCol = database.collection('users');
+    
+    const [existingBranding, existingUser] = await Promise.all([
+      brandingCol.findOne({ _id: 'portal_branding' as any }).catch(() => null),
+      usersCol.findOne({}).catch(() => null)
+    ]);
 
-    if (existingBranding) {
+    if (existingBranding || existingUser) {
       globalThis._hasInitialSyncDone = true;
       console.log('[MongoDB] Existing database detected. Sync complete.');
       return;

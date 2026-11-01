@@ -188,12 +188,12 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [currentUser, setCurrentUser] = useState<UserSession | null>(() => loadInitialState('currentUser', null, AUTH_STORAGE_KEY));
   const [activeTab, setActiveTabState] = useState<string>(() => loadInitialState('activeTab', 'public_recruitment', AUTH_STORAGE_KEY));
   const [currentRole, setCurrentRole] = useState<UserRole>(() => loadInitialState('currentRole', 'super_admin', AUTH_STORAGE_KEY));
-  const [roles, setRoles] = useState<RoleInfo[]>(() => loadInitialState('roles', INITIAL_ROLES));
-  const [drives, setDrives] = useState<RecruitmentDrive[]>(() => loadInitialState('drives', INITIAL_DRIVES));
-  const [applications, setApplications] = useState<Application[]>(() => loadInitialState('applications', INITIAL_APPLICATIONS));
-  const [departments, setDepartments] = useState<Department[]>(() => loadInitialState('departments', INITIAL_DEPARTMENTS));
-  const [users, setUsers] = useState<PortalUser[]>(() => loadInitialState('users', INITIAL_USERS));
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => loadInitialState('auditLogs', INITIAL_AUDIT_LOGS));
+  const [roles, setRoles] = useState<RoleInfo[]>(INITIAL_ROLES);
+  const [drives, setDrives] = useState<RecruitmentDrive[]>(INITIAL_DRIVES);
+  const [applications, setApplications] = useState<Application[]>(INITIAL_APPLICATIONS);
+  const [departments, setDepartments] = useState<Department[]>(INITIAL_DEPARTMENTS);
+  const [users, setUsers] = useState<PortalUser[]>(INITIAL_USERS);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
   const [notifications, setNotifications] = useState<SystemNotification[]>(INITIAL_NOTIFICATIONS);
   const [selectedDriveId, setSelectedDriveId] = useState<string | null>(() => loadInitialState('selectedDriveId', 'drive-2026-01'));
   const [selectedPostId, setSelectedPostId] = useState<string | null>(() => loadInitialState('selectedPostId', null));
@@ -476,7 +476,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return () => clearInterval(interval);
   }, [refreshFromDatabase]);
 
-  // Keep auth session in dedicated storage
+  // Keep session state in dedicated storage
   useEffect(() => {
     try {
       localStorage.setItem(
@@ -493,26 +493,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [isLoggedIn, currentUser, currentRole, activeTab]);
 
-  // Keep data backup in localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem(
-        LOCAL_STORAGE_KEY,
-        JSON.stringify({
-          drives,
-          applications,
-          departments,
-          auditLogs,
-          roles,
-          users,
-          selectedDriveId,
-          selectedPostId,
-        })
-      );
-    } catch (e) {
-      console.warn('Failed to save data state locally:', e);
-    }
-  }, [drives, applications, departments, auditLogs, roles, users, selectedDriveId, selectedPostId]);
+  // We no longer save data collections to localStorage to ensure MongoDB is the sole source of truth.
+  // This prevents mock or stale data from appearing on refresh.
 
   const updateBranding = (updates: Partial<PortalBranding>) => {
     const next = { ...branding, ...updates };
@@ -1622,10 +1604,10 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const resetToDemoData = () => {
     localStorage.removeItem(LOCAL_STORAGE_KEY);
     runDbTransaction(
-      'Database Factory Reset',
+      'System Factory Reset',
       'POST /api/reset-data',
-      'Flushing collections and seeding MongoDB with fresh university recruitment demo datasets...',
-      'Database collections reset and seeded successfully.',
+      'Flushing collections and initializing fresh system state in MongoDB...',
+      'Database collections reset to factory state successfully.',
       async () => {
         const res = await fetch('/api/reset-data', { method: 'POST' });
         if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
@@ -1635,8 +1617,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     );
 
     setCurrentRole('super_admin');
-    setSelectedDriveId('drive-2026-01');
-    logAudit('SYSTEM_RESET', 'Admin', 'Reset recruitment database state to factory demo state.');
+    setSelectedDriveId(null);
+    logAudit('SYSTEM_RESET', 'Admin', 'Reset recruitment database state to clean factory state.');
   };
 
   const changePassword = async (newPassword: string): Promise<boolean> => {

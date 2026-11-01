@@ -72,6 +72,7 @@ export const AdminPortal: React.FC = () => {
 
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
   const [activeAdminTab, setActiveAdminTab] = useState<'users' | 'branding' | 'rbac' | 'departments' | 'email' | 'system'>('users');
+  const [userDirectorySubTab, setUserDirectorySubTab] = useState<'staff' | 'applicants'>('staff');
   const [isRefreshingDb, setIsRefreshingDb] = useState(false);
   const [dbNotice, setDbNotice] = useState<string | null>(null);
 
@@ -342,7 +343,12 @@ export const AdminPortal: React.FC = () => {
       u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
       u.email.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
       (u.designation && u.designation.toLowerCase().includes(userSearchQuery.toLowerCase())) ||
-      (u.departmentId && departments.find((d) => d.id === u.departmentId)?.name.toLowerCase().includes(userSearchQuery.toLowerCase()));
+      (u.departmentId && departments.find((d) => d.id === u.departmentId)?.name.toLowerCase().includes(userSearchQuery.toLowerCase())) ||
+      (u.regNumber && u.regNumber.toLowerCase().includes(userSearchQuery.toLowerCase()));
+
+    // Sub-tab filtering
+    if (userDirectorySubTab === 'staff' && u.role === 'applicant') return false;
+    if (userDirectorySubTab === 'applicants' && u.role !== 'applicant') return false;
 
     const matchesRole = selectedRoleFilter === 'all' || u.role === selectedRoleFilter;
     const matchesStatus = selectedStatusFilter === 'all' || u.status === selectedStatusFilter;
@@ -524,18 +530,56 @@ export const AdminPortal: React.FC = () => {
 
             <div className="glass-card p-4 rounded-2xl border border-slate-200 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Inactive / Suspended</span>
-                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                  <UserX className="w-4 h-4" />
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Public Applicants</span>
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <GraduationCap className="w-4 h-4" />
                 </div>
               </div>
               <div className="mt-2 flex items-baseline space-x-2">
-                <span className="text-2xl font-black text-amber-700">
-                  {users.filter((u) => u.status !== 'active').length}
+                <span className="text-2xl font-black text-indigo-700">
+                  {users.filter((u) => u.role === 'applicant').length}
                 </span>
-                <span className="text-[11px] text-slate-500">restricted</span>
+                <span className="text-[11px] text-slate-500">candidates</span>
               </div>
             </div>
+          </div>
+
+          {/* User Directory Sub-Tabs */}
+          <div className="flex items-center p-1 bg-slate-100/80 rounded-2xl w-fit border border-slate-200 shadow-xs">
+            <button
+              onClick={() => {
+                setUserDirectorySubTab('staff');
+                setSelectedRoleFilter('all');
+              }}
+              className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center space-x-2 ${
+                userDirectorySubTab === 'staff'
+                  ? 'bg-white text-purple-700 shadow-sm border border-slate-200'
+                  : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Admins & Staff</span>
+              <span className={`px-1.5 py-0.2 rounded-md text-[10px] ${userDirectorySubTab === 'staff' ? 'bg-purple-100' : 'bg-slate-200'}`}>
+                {users.filter(u => u.role !== 'applicant' && !(currentRole === 'admin' && u.role === 'super_admin')).length}
+              </span>
+            </button>
+            <button
+              onClick={() => {
+                setUserDirectorySubTab('applicants');
+                setSelectedRoleFilter('applicant');
+              }}
+              className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center space-x-2 ${
+                userDirectorySubTab === 'applicants'
+                  ? 'bg-white text-indigo-700 shadow-sm border border-slate-200'
+                  : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              <span>Public Applicants</span>
+              <span className={`px-1.5 py-0.2 rounded-md text-[10px] ${userDirectorySubTab === 'applicants' ? 'bg-indigo-100' : 'bg-slate-200'}`}>
+                {users.filter(u => u.role === 'applicant').length}
+              </span>
+            </button>
           </div>
 
           {/* User List Table Card */}
@@ -608,10 +652,10 @@ export const AdminPortal: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleOpenCreateUser}
-                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center space-x-1.5 shrink-0"
+                  className={`px-4 py-2 bg-gradient-to-r ${userDirectorySubTab === 'applicants' ? 'from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700' : 'from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700'} text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center space-x-1.5 shrink-0`}
                 >
                   <UserPlus className="w-4 h-4" />
-                  <span>Add New User</span>
+                  <span>{userDirectorySubTab === 'applicants' ? 'Register New Applicant' : 'Add New User'}</span>
                 </button>
               </div>
             </div>
@@ -706,7 +750,9 @@ export const AdminPortal: React.FC = () => {
                                   )}
                                 </div>
                                 <div className="text-[11px] text-slate-500 truncate">
-                                  {user.designation || 'Staff Member'}
+                                  {user.role === 'applicant' 
+                                    ? `Candidate Profile [${user.regNumber || 'No REG'}]` 
+                                    : (user.designation || 'Staff Member')}
                                 </div>
                               </div>
                             </div>
@@ -2127,15 +2173,15 @@ export const AdminPortal: React.FC = () => {
 
               <button
                 onClick={() => {
-                  if (confirm('Are you sure you want to reset the MongoDB database to factory default data?')) {
+                  if (confirm('Are you sure you want to reset the MongoDB database to clean factory default state? All current drives and applications will be permanently deleted.')) {
                     resetToDemoData();
-                    setDbNotice('MongoDB database reset to factory demo state.');
+                    setDbNotice('MongoDB database reset to clean factory state.');
                     setTimeout(() => setDbNotice(null), 3500);
                   }
                 }}
                 className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-slate-200 hover:border-rose-200 text-xs font-semibold"
               >
-                Reset Database to Factory Data
+                Reset Database to Factory State
               </button>
             </div>
           </div>
