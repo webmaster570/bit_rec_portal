@@ -74,10 +74,10 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
   return (
     <div className={`space-y-8 animate-fadeIn ${theme.rootContainer}`}>
       {/* Top Hero Banner */}
-      <div className={`relative overflow-hidden ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-3xl'} bg-gradient-to-r ${theme.heroGradient} text-white p-6 sm:p-8 ${branding.showCardShadow ? 'shadow-xl' : 'shadow-none'} border border-white/10`}>
+      <div className={`relative overflow-hidden ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-3xl'} bg-gradient-to-r ${theme.heroGradient} text-white p-6 sm:p-8 ${branding.showCardShadow ? 'shadow-xl' : 'shadow-none'} `}>
         <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
         <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-white/80">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md  text-xs font-semibold text-white/80">
             <Building2 className="w-3.5 h-3.5 text-amber-400" />
             <span>{branding.title}</span>
           </div>
@@ -111,15 +111,15 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
 
           {/* Quick Metrics Banner */}
           <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-semibold">
-            <div className="px-3.5 py-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-2">
+            <div className="px-3.5 py-2 rounded-2xl bg-white/10 backdrop-blur-md  flex items-center gap-2">
               <FileText className="w-4 h-4 text-amber-300" />
               <span>{publishedDrives.length} Active Advertisements</span>
             </div>
-            <div className="px-3.5 py-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-2">
+            <div className="px-3.5 py-2 rounded-2xl bg-white/10 backdrop-blur-md  flex items-center gap-2">
               <Briefcase className="w-4 h-4 text-emerald-300" />
               <span>{totalPostsCount} Configured Positions</span>
             </div>
-            <div className="px-3.5 py-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-2">
+            <div className="px-3.5 py-2 rounded-2xl bg-white/10 backdrop-blur-md  flex items-center gap-2">
               <Users className="w-4 h-4 text-pink-300" />
               <span>{totalVacanciesAll} Total Sanctioned Vacancies</span>
             </div>
@@ -138,7 +138,7 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
               placeholder="Search by post title, department name, qualification or keyword..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none ${theme.focusColor} shadow-2xs`}
+              className={`w-full bg-white  rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none ${theme.focusColor} shadow-2xs`}
             />
           </div>
 
@@ -147,7 +147,7 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
             <select
               value={selectedDept}
               onChange={(e) => setSelectedDept(e.target.value)}
-              className={`w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none ${theme.focusColor} shadow-2xs`}
+              className={`w-full bg-white  rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none ${theme.focusColor} shadow-2xs`}
             >
               <option value="all">All Departments ({departments.length})</option>
               {departments.map((dept) => (
@@ -178,7 +178,7 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
             return (
               <div
                 key={drive.id}
-                className={`${theme.cardBase} ${branding.showCardShadow ? 'shadow-lg hover:shadow-xl' : 'shadow-none'} overflow-hidden transition border border-slate-100/50`}
+                className={`${theme.cardBase} ${branding.showCardShadow ? 'shadow-lg hover:shadow-xl' : 'shadow-none'} overflow-hidden transition `}
               >
                 {/* Drive Header Bar */}
                 <div className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b ${branding.theme === 'industrial_heavy' ? 'bg-slate-900 text-white' : 'bg-slate-900 text-white'}`}>
@@ -251,7 +251,7 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
                     return (
                       <div 
                         key={post.id} 
-                        className={`group relative p-6 transition-all duration-300 border-l-4 border-l-blue-600 bg-white/40 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-2xl'} shadow-none border border-slate-100/30`}
+                        className={`group relative p-6 transition-all duration-300 border-l-4 border-l-blue-600 bg-white/40 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-2xl'} shadow-none /30`}
                       >
                         {/* 1. Header: Title & Status Badge */}
                         <div className="flex justify-between items-start mb-1">
@@ -307,7 +307,7 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
                                       { label: 'EWS', count: post.vacanciesBreakdown.EWS },
                                       { label: 'PwD', count: post.vacanciesBreakdown.PwD }
                                    ].map(v => (
-                                      <div key={v.label} className={`flex flex-col items-center justify-center border border-slate-100 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} px-3 py-1.5 min-w-[55px] bg-slate-50/50`}>
+                                      <div key={v.label} className={`flex flex-col items-center justify-center  ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} px-3 py-1.5 min-w-[55px] bg-slate-50/50`}>
                                          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">{v.label}</span>
                                          <span className="text-xs font-black text-slate-800 tabular-nums">{v.count}</span>
                                       </div>
@@ -407,20 +407,20 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
                             </div>
                             
                             {drive.syllabusContent ? (
-                              <div className={`text-[11px] whitespace-pre-wrap font-mono leading-relaxed bg-white/50 p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} border border-slate-100`}>
+                              <div className={`text-[11px] whitespace-pre-wrap font-mono leading-relaxed bg-white/50 p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} `}>
                                 {drive.syllabusContent}
                               </div>
                             ) : (
                               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                 <div className="bg-white p-3 rounded-xl border border-slate-100">
+                                 <div className="bg-white p-3 rounded-xl ">
                                     <div className={`font-black ${theme.accentColor} text-[10px] mb-1 uppercase`}>Screening</div>
                                     <div className="text-[10px] text-slate-500">Initial academic audit.</div>
                                  </div>
-                                 <div className="bg-white p-3 rounded-xl border border-slate-100">
+                                 <div className="bg-white p-3 rounded-xl ">
                                     <div className={`font-black ${theme.accentColor} text-[10px] mb-1 uppercase`}>Written</div>
                                     <div className="text-[10px] text-slate-500">Domain competency test.</div>
                                  </div>
-                                 <div className="bg-white p-3 rounded-xl border border-slate-100">
+                                 <div className="bg-white p-3 rounded-xl ">
                                     <div className={`font-black ${theme.accentColor} text-[10px] mb-1 uppercase`}>Interview</div>
                                     <div className="text-[10px] text-slate-500">Final board evaluation.</div>
                                  </div>
@@ -441,7 +441,7 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
       {activePdfModalDrive && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} w-full max-w-2xl p-6 space-y-4`}>
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div className="flex items-center justify-between  pb-3">
               <div>
                 <h3 className={`font-bold text-sm ${theme.headingFont}`}>Official Advertisement Gazette Document</h3>
                 <p className="text-xs opacity-60">{activePdfModalDrive.advtNumber} — {activePdfModalDrive.title}</p>
@@ -454,7 +454,7 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
               </button>
             </div>
 
-            <div className={`p-6 bg-slate-50 border border-slate-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} text-center space-y-4 max-h-[60vh] overflow-y-auto`}>
+            <div className={`p-6 bg-slate-50  ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} text-center space-y-4 max-h-[60vh] overflow-y-auto`}>
               <FileText className={`w-12 h-12 ${theme.accentColor} mx-auto`} />
               <div className="space-y-1">
                 <h4 className="font-bold text-sm">{activePdfModalDrive.title}</h4>
@@ -480,15 +480,15 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
           <span>General Applicant Helpdesk & Registration Guidelines</span>
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className={`p-4 bg-white/50 border border-slate-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} space-y-1`}>
+          <div className={`p-4 bg-white/50  ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} space-y-1`}>
              <span className="font-bold block">1. Online Account Creation</span>
              <p className="opacity-70 leading-snug text-[11px]">Applicants must register using their active email and mobile number.</p>
           </div>
-          <div className={`p-4 bg-white/50 border border-slate-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} space-y-1`}>
+          <div className={`p-4 bg-white/50  ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} space-y-1`}>
              <span className="font-bold block">2. Document Formats</span>
              <p className="opacity-70 leading-snug text-[11px]">Upload JPG/PNG photo (200KB) and signature (100KB). Certificates in PDF.</p>
           </div>
-          <div className={`p-4 bg-white/50 border border-slate-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} space-y-1`}>
+          <div className={`p-4 bg-white/50  ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} space-y-1`}>
              <span className="font-bold block">3. Payment & Exemption</span>
              <p className="opacity-70 leading-snug text-[11px]">Integrated gateway. SC/ST/PwD/Women are exempted from payment.</p>
           </div>

@@ -405,7 +405,7 @@ export const AdminPortal: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Title Bar & System Governance Round Icon Navigation Tabs */}
-      <div className="glass-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 space-y-4">
+      <div className="glass-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm  space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
           <div>
             <div className="flex items-center space-x-2.5">
@@ -488,7 +488,7 @@ export const AdminPortal: React.FC = () => {
       </div>
 
       {userActionNotice && (
-        <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl text-xs text-emerald-800 flex items-center justify-between shadow-2xs animate-fade-in">
+        <div className="p-3.5 bg-emerald-50  rounded-xl text-xs text-emerald-800 flex items-center justify-between shadow-2xs animate-fade-in">
           <div className="flex items-center space-x-2">
             <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
             <span className="font-semibold">{userActionNotice}</span>
@@ -549,7 +549,7 @@ export const AdminPortal: React.FC = () => {
               </div>
             </div>
 
-            <div className="glass-card p-4 rounded-2xl border border-slate-200 shadow-2xs">
+            <div className="glass-card p-4 rounded-2xl  shadow-2xs">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Public Applicants</span>
                 <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -566,7 +566,7 @@ export const AdminPortal: React.FC = () => {
           </div>
 
           {/* User Directory Sub-Tabs */}
-          <div className="flex items-center p-1 bg-slate-100/80 rounded-2xl w-fit border border-slate-200 shadow-xs">
+          <div className="flex items-center p-1 bg-slate-100/80 rounded-2xl w-fit  shadow-xs">
             <button
               onClick={() => {
                 setUserDirectorySubTab('staff');
@@ -574,7 +574,7 @@ export const AdminPortal: React.FC = () => {
               }}
               className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center space-x-2 ${
                 userDirectorySubTab === 'staff'
-                  ? 'bg-white text-purple-700 shadow-sm border border-slate-200'
+                  ? 'bg-white text-purple-700 shadow-sm '
                   : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
               }`}
             >
@@ -591,7 +591,7 @@ export const AdminPortal: React.FC = () => {
               }}
               className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center space-x-2 ${
                 userDirectorySubTab === 'applicants'
-                  ? 'bg-white text-indigo-700 shadow-sm border border-slate-200'
+                  ? 'bg-white text-indigo-700 shadow-sm '
                   : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
               }`}
             >
@@ -604,7 +604,7 @@ export const AdminPortal: React.FC = () => {
           </div>
 
           {/* User List Table Card */}
-          <div className="glass-card border border-slate-200 rounded-2xl shadow-2xs overflow-hidden">
+          <div className="glass-card  rounded-2xl shadow-2xs overflow-hidden">
             {/* Toolbar */}
             <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
@@ -626,7 +626,7 @@ export const AdminPortal: React.FC = () => {
                     value={userSearchQuery}
                     onChange={(e) => setUserSearchQuery(e.target.value)}
                     placeholder="Search by name, email, role..."
-                    className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
+                    className="w-full pl-8 pr-3 py-2 bg-white  rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                   />
                   {userSearchQuery && (
                     <button
@@ -642,7 +642,7 @@ export const AdminPortal: React.FC = () => {
                 <select
                   value={selectedRoleFilter}
                   onChange={(e) => setSelectedRoleFilter(e.target.value)}
-                  className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500"
+                  className="bg-white  rounded-xl px-3 py-2 text-xs text-slate-700 font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="all">All Roles ({users.length})</option>
                   <option value="super_admin">Super Admin</option>
@@ -661,7 +661,7 @@ export const AdminPortal: React.FC = () => {
                 <select
                   value={selectedStatusFilter}
                   onChange={(e) => setSelectedStatusFilter(e.target.value)}
-                  className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500"
+                  className="bg-white  rounded-xl px-3 py-2 text-xs text-slate-700 font-semibold focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="all">All Statuses</option>
                   <option value="active">Active Only</option>
@@ -838,7 +838,7 @@ export const AdminPortal: React.FC = () => {
                                 Suspended
                               </span>
                             ) : (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 ">
                                 <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5" />
                                 Inactive
                               </span>
@@ -924,7 +924,7 @@ export const AdminPortal: React.FC = () => {
           {/* User Creation / Edit Modal Dialog */}
           {isUserModalOpen && (
             <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm w-full max-w-xl overflow-hidden animate-fade-in my-8">
+              <div className="bg-white rounded-3xl  shadow-sm w-full max-w-xl overflow-hidden animate-fade-in my-8">
                 <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-purple-50 via-indigo-50 to-white flex items-center justify-between">
                   <div>
                     <h3 className="text-lg font-black text-slate-900 flex items-center space-x-2">
@@ -937,7 +937,7 @@ export const AdminPortal: React.FC = () => {
                   </div>
                   <button
                     onClick={() => setIsUserModalOpen(false)}
-                    className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center transition"
+                    className="w-8 h-8 rounded-full bg-white hover:bg-slate-100  text-slate-500 flex items-center justify-center transition"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -963,7 +963,7 @@ export const AdminPortal: React.FC = () => {
                         value={userFormName}
                         onChange={(e) => setUserFormName(e.target.value)}
                         placeholder="e.g. Dr. Ramesh Gupta"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                       />
                     </div>
 
@@ -978,7 +978,7 @@ export const AdminPortal: React.FC = () => {
                         value={userFormEmail}
                         onChange={(e) => setUserFormEmail(e.target.value)}
                         placeholder="e.g. ramesh.gupta@univ.edu"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                       />
                     </div>
                   </div>
@@ -992,7 +992,7 @@ export const AdminPortal: React.FC = () => {
                       <select
                         value={userFormRole}
                         onChange={(e) => setUserFormRole(e.target.value as UserRole)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                       >
                         {currentRole === 'super_admin' && (
                           <>
@@ -1021,7 +1021,7 @@ export const AdminPortal: React.FC = () => {
                         value={userFormDesignation}
                         onChange={(e) => setUserFormDesignation(e.target.value)}
                         placeholder="e.g. Professor & Screening Chairperson"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                       />
                     </div>
                   </div>
@@ -1035,7 +1035,7 @@ export const AdminPortal: React.FC = () => {
                       <select
                         value={userFormDeptId}
                         onChange={(e) => setUserFormDeptId(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                       >
                         <option value="">Institution-Wide (All Departments)</option>
                         {departments.map((dept) => (
@@ -1056,7 +1056,7 @@ export const AdminPortal: React.FC = () => {
                         value={userFormMobile}
                         onChange={(e) => setUserFormMobile(e.target.value)}
                         placeholder="+91 98765 43210"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                       />
                     </div>
                   </div>
@@ -1072,7 +1072,7 @@ export const AdminPortal: React.FC = () => {
                         onChange={(e) =>
                           setUserFormStatus(e.target.value as 'active' | 'inactive' | 'suspended')
                         }
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                       >
                         <option value="active">Active (Can Login & Access RBAC Views)</option>
                         <option value="inactive">Inactive (Pending Onboarding)</option>
@@ -1093,7 +1093,7 @@ export const AdminPortal: React.FC = () => {
                           value={userFormPassword}
                           onChange={(e) => setUserFormPassword(e.target.value)}
                           placeholder="Set user password"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
+                          className="w-full bg-slate-50  rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 font-mono focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                         />
                       </div>
                     </div>
@@ -1110,7 +1110,7 @@ export const AdminPortal: React.FC = () => {
                         value={userFormNotes}
                         onChange={(e) => setUserFormNotes(e.target.value)}
                         placeholder="e.g. Appointed via Executive Order #42"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                       />
                     </div>
                   </div>
@@ -1119,7 +1119,7 @@ export const AdminPortal: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsUserModalOpen(false)}
-                      className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
+                      className="px-4 py-2.5 rounded-xl  text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
                     >
                       Cancel
                     </button>
@@ -1139,7 +1139,7 @@ export const AdminPortal: React.FC = () => {
           {/* Delete User Confirmation Modal */}
           {deletingUser && (
             <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm w-full max-w-md overflow-hidden animate-fade-in">
+              <div className="bg-white rounded-3xl  shadow-sm w-full max-w-md overflow-hidden animate-fade-in">
                 <div className="p-6 text-center space-y-4">
                   <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
                     <Trash2 className="w-6 h-6" />
@@ -1159,7 +1159,7 @@ export const AdminPortal: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setDeletingUser(null)}
-                      className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
+                      className="px-4 py-2 rounded-xl  text-xs font-bold text-slate-600 hover:bg-slate-100 transition"
                     >
                       Cancel
                     </button>
@@ -1181,7 +1181,7 @@ export const AdminPortal: React.FC = () => {
       {/* TAB 0: Portal Branding & Website Navigation Settings */}
       {activeAdminTab === 'branding' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-7 glass-card border border-slate-200 p-6 rounded-2xl shadow-2xs space-y-5">
+          <div className="lg:col-span-7 glass-card  p-6 rounded-2xl shadow-2xs space-y-5">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div>
                 <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -1207,7 +1207,7 @@ export const AdminPortal: React.FC = () => {
               </div>
 
               {brandingSavedNotice && (
-                <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-300 px-3 py-1 rounded-full animate-bounce shadow-2xs">
+                <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50  px-3 py-1 rounded-full animate-bounce shadow-2xs">
                   ✓ Saved to Database
                 </span>
               )}
@@ -1228,7 +1228,7 @@ export const AdminPortal: React.FC = () => {
                     setIsBrandingDirty(true);
                   }}
                   placeholder="E.g., National University Recruitment Portal"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold focus:bg-white focus:ring-2 focus:ring-purple-500 transition"
+                  className="w-full bg-slate-50  rounded-xl p-3 text-slate-900 font-bold focus:bg-white focus:ring-2 focus:ring-purple-500 transition"
                 />
                 <span className="text-[11px] text-slate-400 mt-1 block">
                   This title appears prominently at the top left of the navigation header.
@@ -1249,7 +1249,7 @@ export const AdminPortal: React.FC = () => {
                     setIsBrandingDirty(true);
                   }}
                   placeholder="E.g., Centralized Public Job Advertisements & Merit Application System"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-purple-500 transition"
+                  className="w-full bg-slate-50  rounded-xl p-3 text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-purple-500 transition"
                 />
                 <span className="text-[11px] text-slate-400 mt-1 block">
                   A concise secondary description displayed under the main portal title.
@@ -1345,7 +1345,7 @@ export const AdminPortal: React.FC = () => {
                           setIsBrandingDirty(true);
                         }}
                         placeholder="https://example.com/logo.png"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono text-xs text-slate-900 focus:bg-white"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 font-mono text-xs text-slate-900 focus:bg-white"
                       />
                     </div>
 
@@ -1418,7 +1418,7 @@ export const AdminPortal: React.FC = () => {
                             : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                         }`}
                       >
-                        <div className={`w-10 h-10 rounded-xl ${themeOption.color} shrink-0 shadow-xs border border-white/20`} />
+                        <div className={`w-10 h-10 rounded-xl ${themeOption.color} shrink-0 shadow-xs `} />
                         <div>
                           <div className={`text-xs font-bold ${isSelected ? 'text-purple-900' : 'text-slate-900'}`}>
                             {themeOption.label}
@@ -1521,7 +1521,7 @@ export const AdminPortal: React.FC = () => {
                   Surface Elevation & Shadows
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  <div className="flex items-center justify-between p-3 bg-slate-50  rounded-xl">
                     <div className="space-y-0.5">
                       <div className="text-xs font-bold text-slate-900">Navbar Shadow</div>
                       <div className="text-[10px] text-slate-500">Elevated header</div>
@@ -1535,7 +1535,7 @@ export const AdminPortal: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  <div className="flex items-center justify-between p-3 bg-slate-50  rounded-xl">
                     <div className="space-y-0.5">
                       <div className="text-xs font-bold text-slate-900">Sidebar Shadow</div>
                       <div className="text-[10px] text-slate-500">Raised menu panel</div>
@@ -1549,7 +1549,7 @@ export const AdminPortal: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  <div className="flex items-center justify-between p-3 bg-slate-50  rounded-xl">
                     <div className="space-y-0.5">
                       <div className="text-xs font-bold text-slate-900">Card Shadows</div>
                       <div className="text-[10px] text-slate-500">Depth for job listings</div>
@@ -1564,7 +1564,7 @@ export const AdminPortal: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                <div className="p-4 bg-slate-50  rounded-xl space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
@@ -1621,7 +1621,7 @@ export const AdminPortal: React.FC = () => {
           </div>
 
           {/* Live Preview Card */}
-          <div className="lg:col-span-5 glass-card border border-slate-200 p-6 rounded-2xl shadow-2xs space-y-4">
+          <div className="lg:col-span-5 glass-card  p-6 rounded-2xl shadow-2xs space-y-4">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-200 pb-2 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               Live Header Navbar Preview
@@ -1635,7 +1635,7 @@ export const AdminPortal: React.FC = () => {
               className={`${(navbarColor && navbarColor !== 'default' && BRAND_COLORS[navbarColor as any]) ? BRAND_COLORS[navbarColor as any].header : 'bg-white'} border border-slate-300 rounded-2xl p-4 shadow-md space-y-3 transition-colors duration-300`}
               style={{ '--shadow-intensity': shadowIntensity.toString() } as React.CSSProperties}
             >
-              <div className={`text-[10px] uppercase font-mono font-bold ${(navbarColor && navbarColor !== 'default' && BRAND_COLORS[navbarColor as any]) ? 'text-white/50 bg-white/10 border-white/20' : 'text-indigo-600 bg-indigo-50 border border-indigo-200'} px-2.5 py-0.5 rounded-full inline-block border`}>
+              <div className={`text-[10px] uppercase font-mono font-bold ${(navbarColor && navbarColor !== 'default' && BRAND_COLORS[navbarColor as any]) ? 'text-white/50 bg-white/10 border-white/20' : 'text-indigo-600 bg-indigo-50 '} px-2.5 py-0.5 rounded-full inline-block border`}>
                 Simulated Header
               </div>
 
@@ -1644,7 +1644,7 @@ export const AdminPortal: React.FC = () => {
                   <img
                     src={logoImageUrl}
                     alt="Logo Preview"
-                    className="w-10 h-10 rounded-xl object-contain bg-white border border-slate-200 p-0.5 shadow-md"
+                    className="w-10 h-10 rounded-xl object-contain bg-white  p-0.5 shadow-md"
                     onError={(e) => {
                       (e.target as HTMLElement).style.display = 'none';
                     }}
@@ -1692,7 +1692,7 @@ export const AdminPortal: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-600 space-y-1">
+            <div className="p-3.5 bg-slate-50  rounded-xl text-[11px] text-slate-600 space-y-1">
               <div className="font-bold text-slate-800">Persistent Storage Status</div>
               <p className="text-[10px] text-slate-500 leading-snug">
                 Settings are saved to the persistent system state database (`PortalContext` & `localStorage`). Any changes will immediately reflect across all user tabs and sessions.
@@ -1705,7 +1705,7 @@ export const AdminPortal: React.FC = () => {
       {/* TAB 1: Granular RBAC Permission Matrix */}
       {activeAdminTab === 'rbac' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-4 glass-card border border-slate-200 p-4 rounded-2xl shadow-2xs space-y-2">
+          <div className="lg:col-span-4 glass-card  p-4 rounded-2xl shadow-2xs space-y-2">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-200 pb-2">
               System Roles ({roles.length})
             </h3>
@@ -1721,7 +1721,7 @@ export const AdminPortal: React.FC = () => {
                   className={`w-full text-left p-3 rounded-xl transition flex items-center justify-between ${
                     selectedRole === r.id
                       ? 'bg-purple-600 text-white font-bold shadow-xs'
-                      : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100'
+                      : 'bg-slate-50  text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   <div>
@@ -1734,7 +1734,7 @@ export const AdminPortal: React.FC = () => {
             </div>
           </div>
 
-          <div className="lg:col-span-8 glass-card border border-slate-200 p-6 rounded-2xl shadow-2xs space-y-5">
+          <div className="lg:col-span-8 glass-card  p-6 rounded-2xl shadow-2xs space-y-5">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div>
                 <h3 className="text-base font-bold text-slate-900">
@@ -1788,7 +1788,7 @@ export const AdminPortal: React.FC = () => {
       {/* TAB 2: Department Master Data */}
       {activeAdminTab === 'departments' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-5 glass-card border border-slate-200 p-5 rounded-2xl shadow-2xs space-y-4">
+          <div className="lg:col-span-5 glass-card  p-5 rounded-2xl shadow-2xs space-y-4">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-200 pb-2">
               Add Master Department
             </h3>
@@ -1802,7 +1802,7 @@ export const AdminPortal: React.FC = () => {
                   placeholder="E.g., CSE, MECH, CIVIL, FIN"
                   value={deptCode}
                   onChange={(e) => setDeptCode(e.target.value.toUpperCase())}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-slate-900 font-mono"
+                  className="w-full bg-slate-50  rounded-lg p-2 text-slate-900 font-mono"
                 />
               </div>
 
@@ -1814,7 +1814,7 @@ export const AdminPortal: React.FC = () => {
                   placeholder="E.g., Department of Civil Engineering"
                   value={deptName}
                   onChange={(e) => setDeptName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-slate-900"
+                  className="w-full bg-slate-50  rounded-lg p-2 text-slate-900"
                 />
               </div>
 
@@ -1825,7 +1825,7 @@ export const AdminPortal: React.FC = () => {
                   placeholder="hod@univ.edu"
                   value={deptHeadEmail}
                   onChange={(e) => setDeptHeadEmail(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-slate-900 font-mono"
+                  className="w-full bg-slate-50  rounded-lg p-2 text-slate-900 font-mono"
                 />
               </div>
 
@@ -1839,7 +1839,7 @@ export const AdminPortal: React.FC = () => {
             </form>
           </div>
 
-          <div className="lg:col-span-7 glass-card border border-slate-200 p-5 rounded-2xl shadow-2xs space-y-3">
+          <div className="lg:col-span-7 glass-card  p-5 rounded-2xl shadow-2xs space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-200 pb-2">
               Active University Departments ({departments.length})
             </h3>
@@ -1848,7 +1848,7 @@ export const AdminPortal: React.FC = () => {
               {departments.map((d) => (
                 <div
                   key={d.id}
-                  className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs"
+                  className="p-3 bg-slate-50  rounded-xl flex items-center justify-between text-xs"
                 >
                   <div>
                     <span className="font-bold text-slate-900 block">{d.name}</span>
@@ -1869,7 +1869,7 @@ export const AdminPortal: React.FC = () => {
         <div className="space-y-6">
           {activeAdminTab === 'email' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-8 glass-card border border-slate-200 p-6 rounded-2xl shadow-2xs space-y-5">
+              <div className="lg:col-span-8 glass-card  p-6 rounded-2xl shadow-2xs space-y-5">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                   <div>
                     <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -1896,7 +1896,7 @@ export const AdminPortal: React.FC = () => {
                         value={mailHost}
                         onChange={(e) => { setMailHost(e.target.value); setIsMailDirty(true); }}
                         placeholder="smtp.gmail.com"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono focus:bg-white"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 font-mono focus:bg-white"
                       />
                     </div>
                     <div>
@@ -1906,7 +1906,7 @@ export const AdminPortal: React.FC = () => {
                         value={mailPort}
                         onChange={(e) => { setMailPort(Number(e.target.value)); setIsMailDirty(true); }}
                         placeholder="587"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono focus:bg-white"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 font-mono focus:bg-white"
                       />
                     </div>
                   </div>
@@ -1919,7 +1919,7 @@ export const AdminPortal: React.FC = () => {
                         value={mailUser}
                         onChange={(e) => { setMailUser(e.target.value); setIsMailDirty(true); }}
                         placeholder="auth@university.edu"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono focus:bg-white"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 font-mono focus:bg-white"
                       />
                     </div>
                     <div>
@@ -1929,7 +1929,7 @@ export const AdminPortal: React.FC = () => {
                         value={mailPass}
                         onChange={(e) => { setMailPass(e.target.value); setIsMailDirty(true); }}
                         placeholder="••••••••••••"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono focus:bg-white"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 font-mono focus:bg-white"
                       />
                     </div>
                   </div>
@@ -1942,7 +1942,7 @@ export const AdminPortal: React.FC = () => {
                         value={mailFromName}
                         onChange={(e) => { setMailFromName(e.target.value); setIsMailDirty(true); }}
                         placeholder="National University Recruitment"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:bg-white"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 focus:bg-white"
                       />
                     </div>
                     <div>
@@ -1952,7 +1952,7 @@ export const AdminPortal: React.FC = () => {
                         value={mailFromEmail}
                         onChange={(e) => { setMailFromEmail(e.target.value); setIsMailDirty(true); }}
                         placeholder="no-reply@university.edu"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono focus:bg-white"
+                        className="w-full bg-slate-50  rounded-xl p-2.5 font-mono focus:bg-white"
                       />
                     </div>
                   </div>
@@ -2003,7 +2003,7 @@ export const AdminPortal: React.FC = () => {
                   </ul>
                 </div>
 
-                <div className="glass-card border border-slate-200 p-5 rounded-2xl space-y-3">
+                <div className="glass-card  p-5 rounded-2xl space-y-3">
                   <h4 className="text-xs font-bold text-slate-800 flex items-center gap-2">
                     <Activity className="w-4 h-4 text-emerald-600" />
                     Mail Queue Status
@@ -2074,15 +2074,15 @@ export const AdminPortal: React.FC = () => {
                   <div className="flex items-center space-x-2">
                     <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                       <span>MongoDB Atlas Database</span>
-                      <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 text-[10px] font-mono border border-slate-200">Production Engine</span>
+                      <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 text-[10px] font-mono ">Production Engine</span>
                     </h3>
                     {mongoStatus.connected ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 ">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>
                         Connected & Synchronized
                       </span>
                     ) : (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 ">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1 animate-pulse"></span>
                         Connecting / IP Access Pending
                       </span>
@@ -2160,7 +2160,7 @@ export const AdminPortal: React.FC = () => {
             )}
 
             {dbNotice && (
-              <div className="p-2.5 bg-emerald-100/90 border border-emerald-300 rounded-xl text-emerald-900 text-xs font-semibold flex items-center space-x-2">
+              <div className="p-2.5 bg-emerald-100/90  rounded-xl text-emerald-900 text-xs font-semibold flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-emerald-700 shrink-0" />
                 <span>{dbNotice}</span>
               </div>
@@ -2222,7 +2222,7 @@ export const AdminPortal: React.FC = () => {
             </div>
           </div>
 
-          <div className="glass-card border border-slate-200 p-8 rounded-2xl shadow-xs text-center space-y-4">
+          <div className="glass-card  p-8 rounded-2xl shadow-xs text-center space-y-4">
             <Database className="w-12 h-12 text-purple-600 mx-auto" />
             <h3 className="text-base font-bold text-slate-900">System Automated Backup & Notification Engine</h3>
             <p className="text-xs text-slate-500 max-w-md mx-auto">
@@ -2247,7 +2247,7 @@ export const AdminPortal: React.FC = () => {
                     setTimeout(() => setDbNotice(null), 3500);
                   }
                 }}
-                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-slate-200 hover:border-rose-200 text-xs font-semibold"
+                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700  hover:border-rose-200 text-xs font-semibold"
               >
                 Reset Database to Factory State
               </button>

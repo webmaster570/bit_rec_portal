@@ -46,7 +46,7 @@ export const AdmitCardModal: React.FC<AdmitCardModalProps> = ({ application, onC
             <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">
               Centralized Recruitment Examination Admit Card — 2026
             </p>
-            <span className="inline-block bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded font-mono text-[10px] font-bold">
+            <span className="inline-block bg-indigo-50 text-indigo-700  px-2 py-0.5 rounded font-mono text-[10px] font-bold">
               {application.advtNumber}
             </span>
           </div>

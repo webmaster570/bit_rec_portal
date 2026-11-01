@@ -161,7 +161,7 @@ export const DriveManagement: React.FC = () => {
 
         <div className="flex items-center space-x-2.5 shrink-0 self-start md:self-auto">
           {/* View Toggle */}
-          <div className="bg-slate-100 p-1 rounded-xl border border-slate-200 flex items-center">
+          <div className="bg-slate-100 p-1 rounded-xl  flex items-center">
             <button
               onClick={() => setViewMode('table')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
@@ -201,7 +201,7 @@ export const DriveManagement: React.FC = () => {
 
       {/* Top Metric Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
-        <div className="glass-card p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
+        <div className="glass-card p-4 rounded-2xl  shadow-xs flex items-center space-x-3.5">
           <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shrink-0">
             <Megaphone className="w-5 h-5" />
           </div>
@@ -211,7 +211,7 @@ export const DriveManagement: React.FC = () => {
           </div>
         </div>
 
-        <div className="glass-card p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
+        <div className="glass-card p-4 rounded-2xl  shadow-xs flex items-center space-x-3.5">
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
             <CheckCircle className="w-5 h-5" />
           </div>
@@ -221,7 +221,7 @@ export const DriveManagement: React.FC = () => {
           </div>
         </div>
 
-        <div className="glass-card p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
+        <div className="glass-card p-4 rounded-2xl  shadow-xs flex items-center space-x-3.5">
           <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center shrink-0">
             <Layers className="w-5 h-5" />
           </div>
@@ -231,7 +231,7 @@ export const DriveManagement: React.FC = () => {
           </div>
         </div>
 
-        <div className="glass-card p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
+        <div className="glass-card p-4 rounded-2xl  shadow-xs flex items-center space-x-3.5">
           <div className="w-10 h-10 rounded-xl bg-pink-50 text-pink-600 border border-pink-100 flex items-center justify-center shrink-0">
             <Briefcase className="w-5 h-5" />
           </div>
@@ -241,7 +241,7 @@ export const DriveManagement: React.FC = () => {
           </div>
         </div>
 
-        <div className="glass-card p-4 rounded-2xl border border-slate-200 shadow-xs col-span-2 sm:col-span-1 flex items-center space-x-3.5">
+        <div className="glass-card p-4 rounded-2xl  shadow-xs col-span-2 sm:col-span-1 flex items-center space-x-3.5">
           <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
             <Users className="w-5 h-5" />
           </div>
@@ -253,7 +253,7 @@ export const DriveManagement: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="glass-card p-3.5 sm:p-4 rounded-2xl shadow-2xs border border-slate-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="glass-card p-3.5 sm:p-4 rounded-2xl shadow-2xs  flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-lg">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           <input
@@ -261,7 +261,7 @@ export const DriveManagement: React.FC = () => {
             placeholder="Search by Title, Advt No, Drive Code, Position, or Dept..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition"
+            className="w-full bg-slate-50  rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition"
           />
         </div>
 
@@ -293,7 +293,7 @@ export const DriveManagement: React.FC = () => {
 
       {/* TABULAR RECRUITMENT DRIVES VIEW (Default primary layout) */}
       {viewMode === 'table' ? (
-        <div className="glass-card rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="glass-card rounded-2xl sm:rounded-3xl shadow-sm  overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -348,10 +348,10 @@ export const DriveManagement: React.FC = () => {
                           <td className="py-3.5 px-4">
                             <div className="space-y-1">
                               <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="px-2 py-0.5 rounded font-mono text-[11px] bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold">
+                                <span className="px-2 py-0.5 rounded font-mono text-[11px] bg-indigo-50 text-indigo-700  font-bold">
                                   {drive.advtNumber}
                                 </span>
-                                <span className="font-mono text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">
+                                <span className="font-mono text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded ">
                                   {drive.driveCode}
                                 </span>
                               </div>
@@ -375,7 +375,7 @@ export const DriveManagement: React.FC = () => {
                               <select
                                 value={drive.status}
                                 onChange={(e) => handleStatusChange(drive.id, e.target.value as DriveStatus)}
-                                className="block w-full text-[10px] bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-2 py-1 text-slate-700 font-semibold focus:outline-none focus:border-indigo-500"
+                                className="block w-full text-[10px] bg-slate-50 hover:bg-slate-100  rounded-lg px-2 py-1 text-slate-700 font-semibold focus:outline-none focus:border-indigo-500"
                                 title="Quick change lifecycle status"
                               >
                                 <option value="draft">Draft</option>
@@ -436,7 +436,7 @@ export const DriveManagement: React.FC = () => {
                               {/* Edit Drive Button */}
                               <button
                                 onClick={() => setEditingDrive(drive)}
-                                className="p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition shadow-2xs"
+                                className="p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700  transition shadow-2xs"
                                 title="Edit Recruitment Drive"
                               >
                                 <Edit className="w-3.5 h-3.5" />
@@ -454,7 +454,7 @@ export const DriveManagement: React.FC = () => {
                               {/* Add Position Button */}
                               <button
                                 onClick={() => setSelectedDriveForPost(drive.id)}
-                                className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 text-[11px] font-bold transition flex items-center space-x-1 shadow-2xs"
+                                className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800  text-[11px] font-bold transition flex items-center space-x-1 shadow-2xs"
                                 title="Add New Vacancy Position"
                               >
                                 <Plus className="w-3.5 h-3.5 text-indigo-600" />
@@ -470,7 +470,7 @@ export const DriveManagement: React.FC = () => {
                                     syllabus: drive.syllabusContent
                                   })
                                 }
-                                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition shadow-2xs"
+                                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700  transition shadow-2xs"
                                 title="View Advertisement Notification PDF"
                               >
                                 <FileText className="w-3.5 h-3.5 text-indigo-600" />
@@ -507,7 +507,7 @@ export const DriveManagement: React.FC = () => {
                                 </div>
 
                                 {drive.posts.length === 0 ? (
-                                  <div className="p-6 text-center bg-white rounded-xl border border-slate-200 text-slate-500 text-xs">
+                                  <div className="p-6 text-center bg-white rounded-xl  text-slate-500 text-xs">
                                     No vacancy positions configured under this drive yet.
                                     <button
                                       onClick={() => setSelectedDriveForPost(drive.id)}
@@ -517,7 +517,7 @@ export const DriveManagement: React.FC = () => {
                                     </button>
                                   </div>
                                 ) : (
-                                  <div className="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-2xs">
+                                  <div className="overflow-x-auto bg-white rounded-xl  shadow-2xs">
                                     <table className="w-full text-left border-collapse text-xs">
                                       <thead>
                                         <tr className="bg-slate-100/90 border-b border-slate-200 text-[10px] font-extrabold uppercase tracking-wider text-slate-600">
@@ -556,22 +556,22 @@ export const DriveManagement: React.FC = () => {
                                             {drive.showCategoryRow !== false && (
                                               <td className="py-2.5 px-3 text-center">
                                                 <div className="inline-flex items-center gap-1 font-mono text-[10px]">
-                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 border border-slate-200" title="Unreserved">
+                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 " title="Unreserved">
                                                     UR:{post.vacanciesBreakdown.UR}
                                                   </span>
-                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 border border-slate-200" title="Other Backward Classes">
+                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 " title="Other Backward Classes">
                                                     OBC:{post.vacanciesBreakdown.OBC}
                                                   </span>
-                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 border border-slate-200" title="Scheduled Castes">
+                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 " title="Scheduled Castes">
                                                     SC:{post.vacanciesBreakdown.SC}
                                                   </span>
-                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 border border-slate-200" title="Scheduled Tribes">
+                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 " title="Scheduled Tribes">
                                                     ST:{post.vacanciesBreakdown.ST}
                                                   </span>
-                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 border border-slate-200" title="Economically Weaker Sections">
+                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 " title="Economically Weaker Sections">
                                                     EWS:{post.vacanciesBreakdown.EWS}
                                                   </span>
-                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 border border-slate-200" title="Persons with Benchmark Disabilities">
+                                                  <span className="px-1.5 py-0.2 rounded bg-slate-100 " title="Persons with Benchmark Disabilities">
                                                     PwD:{post.vacanciesBreakdown.PwD}
                                                   </span>
                                                 </div>
@@ -587,7 +587,7 @@ export const DriveManagement: React.FC = () => {
                                               <div className="flex items-center justify-end space-x-1">
                                                 <button
                                                   onClick={() => setEditingPostData({ driveId: drive.id, post })}
-                                                  className="p-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition"
+                                                  className="p-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700  transition"
                                                   title="Edit position"
                                                 >
                                                   <Edit className="w-3.5 h-3.5" />
@@ -642,7 +642,7 @@ export const DriveManagement: React.FC = () => {
                 <div className="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white">
                   <div className="space-y-1.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded font-mono text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold">
+                      <span className="px-2.5 py-0.5 rounded font-mono text-xs bg-indigo-50 text-indigo-700  font-bold">
                         {drive.advtNumber}
                       </span>
                       <span
@@ -668,7 +668,7 @@ export const DriveManagement: React.FC = () => {
                     {/* Edit Drive */}
                     <button
                       onClick={() => setEditingDrive(drive)}
-                      className="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold transition flex items-center space-x-1 shadow-2xs"
+                      className="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700  text-xs font-bold transition flex items-center space-x-1 shadow-2xs"
                     >
                       <Edit className="w-3.5 h-3.5" />
                       <span>Edit</span>
@@ -686,7 +686,7 @@ export const DriveManagement: React.FC = () => {
                     {/* Add Position */}
                     <button
                       onClick={() => setSelectedDriveForPost(drive.id)}
-                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-200 transition flex items-center space-x-1"
+                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold  transition flex items-center space-x-1"
                     >
                       <Plus className="w-3.5 h-3.5 text-indigo-600" />
                       <span>Add Post</span>
@@ -701,7 +701,7 @@ export const DriveManagement: React.FC = () => {
                           syllabus: drive.syllabusContent
                         })
                       }
-                      className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold transition"
+                      className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700  text-xs font-bold transition"
                       title="View PDF"
                     >
                       <FileText className="w-3.5 h-3.5 text-indigo-600" />
@@ -766,11 +766,11 @@ export const DriveManagement: React.FC = () => {
                       {drive.posts.map((post) => (
                         <div
                           key={post.id}
-                          className="bg-white border border-slate-200 rounded-xl p-4 hover:border-indigo-300 transition shadow-2xs relative"
+                          className="bg-white  rounded-xl p-4 hover:border-indigo-300 transition shadow-2xs relative"
                         >
                           <div className="flex items-start justify-between">
                             <div>
-                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 font-bold">
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700  font-bold">
                                 {post.postCode}
                               </span>
                               <h5 className="text-sm font-bold text-slate-900 mt-1">{post.title}</h5>
@@ -780,7 +780,7 @@ export const DriveManagement: React.FC = () => {
                             </div>
 
                             <div className="flex items-center space-x-1.5">
-                              <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-300 text-xs font-bold">
+                              <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700  text-xs font-bold">
                                 {post.vacanciesTotal} Vacancies
                               </span>
                               <button
@@ -808,7 +808,7 @@ export const DriveManagement: React.FC = () => {
 
                           {/* Reservation Quotas */}
                           {drive.showCategoryRow !== false && (
-                            <div className="mt-3 grid grid-cols-6 gap-1 text-center bg-slate-50 p-2 rounded-lg border border-slate-200 text-[11px]">
+                            <div className="mt-3 grid grid-cols-6 gap-1 text-center bg-slate-50 p-2 rounded-lg  text-[11px]">
                               <div>
                                 <span className="block text-[9px] text-slate-500 font-bold">UR</span>
                                 <span className="font-semibold text-slate-800">{post.vacanciesBreakdown.UR}</span>
@@ -939,7 +939,7 @@ export const DriveManagement: React.FC = () => {
       {/* PDF Notification Viewer Modal */}
       {previewPdfModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="bg-white  rounded-2xl max-w-2xl w-full p-6 shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
               <div className="flex items-center space-x-2">
                 <FileText className="w-5 h-5 text-indigo-600" />
@@ -953,12 +953,12 @@ export const DriveManagement: React.FC = () => {
               </button>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center space-y-4 max-h-[60vh] overflow-y-auto">
+            <div className="bg-slate-50  rounded-xl p-6 text-center space-y-4 max-h-[60vh] overflow-y-auto">
               <Building2 className="w-12 h-12 text-indigo-600 mx-auto" />
               <h4 className="text-lg font-bold text-slate-900">{previewPdfModal.title}</h4>
               
               {previewPdfModal.syllabus ? (
-                <div className="text-left bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <div className="text-left bg-white p-5 rounded-xl  shadow-sm">
                   <h5 className="text-xs font-bold text-indigo-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
                     Detailed Syllabus & Exam Pattern

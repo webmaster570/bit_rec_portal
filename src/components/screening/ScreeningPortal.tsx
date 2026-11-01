@@ -69,7 +69,7 @@ export const ScreeningPortal: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Title Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 rounded-2xl shadow-md border border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 rounded-2xl shadow-md ">
         <div>
           <div className="flex items-center space-x-2">
             <CheckSquare className="w-6 h-6 text-amber-600" />
@@ -90,7 +90,7 @@ export const ScreeningPortal: React.FC = () => {
       {/* Main Workspace Layout: List on Left, Active Evaluation Panel on Right */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Candidate List */}
-        <div className="lg:col-span-5 glass-card border border-slate-200 rounded-2xl p-4 shadow-2xs space-y-3">
+        <div className="lg:col-span-5 glass-card  rounded-2xl p-4 shadow-2xs space-y-3">
           <div className="space-y-2">
             <div className="relative">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -99,7 +99,7 @@ export const ScreeningPortal: React.FC = () => {
                 placeholder="Filter candidates..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-white  rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
               />
             </div>
 
@@ -107,7 +107,7 @@ export const ScreeningPortal: React.FC = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-white  rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-indigo-500"
               >
                 <option value="all">All Statuses</option>
                 <option value="Pending">Pending Review</option>
@@ -132,8 +132,8 @@ export const ScreeningPortal: React.FC = () => {
                     onClick={() => setActiveScreeningApp(app)}
                     className={`p-3 rounded-xl cursor-pointer transition flex items-center justify-between ${
                       isSelected
-                        ? 'bg-indigo-50 border border-indigo-200 text-slate-900'
-                        : 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-700'
+                        ? 'bg-indigo-50  text-slate-900'
+                        : 'bg-white  hover:bg-slate-50 text-slate-700'
                     }`}
                   >
                     <div className="space-y-0.5">
@@ -168,11 +168,11 @@ export const ScreeningPortal: React.FC = () => {
         </div>
 
         {/* Right Column: Comprehensive Evaluation Panel */}
-        <div className="lg:col-span-7 glass-card border border-slate-200 rounded-2xl p-6 shadow-2xs">
+        <div className="lg:col-span-7 glass-card  rounded-2xl p-6 shadow-2xs">
           {activeScreeningApp ? (
             <form onSubmit={handleSaveScreening} className="space-y-5">
               {/* Candidate Banner */}
-              <div className="flex items-start justify-between bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div className="flex items-start justify-between bg-slate-50 p-4 rounded-xl ">
                 <div className="flex items-center space-x-3">
                   <img
                     src={activeScreeningApp.applicant.photoUrl}
@@ -192,19 +192,19 @@ export const ScreeningPortal: React.FC = () => {
                   </div>
                 </div>
 
-                <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200">
+                <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-xs font-bold ">
                   {activeScreeningApp.applicant.category} Category
                 </span>
               </div>
 
               {/* Eligibility Matrix Check */}
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <div className="bg-slate-50 p-4 rounded-xl  space-y-3">
                 <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2">
                   Screening Checklist Matrix
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="p-3 bg-white border border-slate-200 rounded-lg">
+                  <div className="p-3 bg-white  rounded-lg">
                     <span className="text-slate-500 block text-[10px] uppercase font-medium">Age Limit Verification</span>
                     <span className="font-semibold text-slate-800 block mt-0.5">
                       Candidate Age: {calculateAge(activeScreeningApp.applicant.dob)} Years
@@ -214,7 +214,7 @@ export const ScreeningPortal: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="p-3 bg-white border border-slate-200 rounded-lg">
+                  <div className="p-3 bg-white  rounded-lg">
                     <span className="text-slate-500 block text-[10px] uppercase font-medium">Highest Educational Degree</span>
                     <span className="font-semibold text-slate-800 block mt-0.5">
                       {activeScreeningApp.academics[0]?.degree || 'Ph.D. Verified'}
@@ -227,7 +227,7 @@ export const ScreeningPortal: React.FC = () => {
               </div>
 
               {/* Screening Decision Input */}
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <div className="bg-slate-50 p-4 rounded-xl  space-y-3">
                 <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2">
                   Committee Decision & Remarks
                 </h4>
@@ -268,7 +268,7 @@ export const ScreeningPortal: React.FC = () => {
                     placeholder="Enter screening observations, document discrepancies, or qualification verification details..."
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-white  rounded-lg p-2.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                   ></textarea>
                 </div>
 
@@ -280,7 +280,7 @@ export const ScreeningPortal: React.FC = () => {
                     type="text"
                     value={committeeMemberName}
                     onChange={(e) => setCommitteeMemberName(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-white  rounded-lg px-3 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               </div>

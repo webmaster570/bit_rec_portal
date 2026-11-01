@@ -67,10 +67,10 @@ export const OverviewDashboard: React.FC<{
     return (
       <div className="space-y-6">
         {/* Welcome Banner for Applicant */}
-        <div className={`${isBitTheme ? 'bg-white border-2 border-stone-200 ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none') : 'bg-gradient-to-r from-blue-800 via-indigo-700 to-purple-800 border border-indigo-500/30 ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none')} rounded-3xl p-6 md:p-8 text-white relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
+        <div className={`${isBitTheme ? 'bg-white ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none') : 'bg-gradient-to-r from-blue-800 via-indigo-700 to-purple-800 ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none')} rounded-3xl p-6 md:p-8 text-white relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
           {!isBitTheme && <div className="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none" />}
           <div className="relative z-10">
-            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-none ${isBitTheme ? 'bg-stone-50 border border-stone-200 text-[#800000]' : 'bg-white/20 border border-white/30 text-white'} text-[10px] font-black uppercase tracking-[0.2em] mb-3 shadow-xs backdrop-blur-xs`}>
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-none ${isBitTheme ? 'bg-stone-50  text-[#800000]' : 'bg-white/20  text-white'} text-[10px] font-black uppercase tracking-[0.2em] mb-3 shadow-xs backdrop-blur-xs`}>
               <Sparkles className={`w-3.5 h-3.5 ${isBitTheme ? 'text-[#800000]' : 'text-pink-200'}`} />
               Candidate Dashboard & Application Hub
             </div>
@@ -92,7 +92,7 @@ export const OverviewDashboard: React.FC<{
             </button>
             <button
               onClick={() => navigate('public_recruitment')}
-              className={`${theme.secondaryButton} px-6 py-3 border-2 flex items-center space-x-2 shadow-sm`}
+              className={`${theme.secondaryButton} px-6 py-3  flex items-center space-x-2 shadow-sm`}
             >
               <Megaphone className="w-4 h-4" />
               <span>Browse Job Notices</span>
@@ -102,7 +102,7 @@ export const OverviewDashboard: React.FC<{
 
         {/* Applicant Primary KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
+          <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between`}>
             <div>
               <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
                 Vacancies Posted
@@ -112,7 +112,7 @@ export const OverviewDashboard: React.FC<{
                 <Building2 className="w-3 h-3" /> Across {drives.length} Active Drives
               </span>
             </div>
-            <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-indigo-50 text-indigo-600'} border border-stone-100 rounded-none shadow-sm`}>
+            <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-indigo-50 text-indigo-600'} rounded-none shadow-sm`}>
               <Megaphone className="w-6 h-6" />
             </div>
           </div>
@@ -120,7 +120,7 @@ export const OverviewDashboard: React.FC<{
               {myApplications.length > 0 && (
                 <div
                   onClick={() => navigate('my_jobs')}
-                  className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000] cursor-pointer hover:bg-stone-50 transition-colors`}
+                  className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between cursor-pointer hover:bg-stone-50 transition-colors`}
                 >
                   <div>
                     <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
@@ -131,13 +131,13 @@ export const OverviewDashboard: React.FC<{
                       <Briefcase className="w-3.5 h-3.5" /> View Status &rarr;
                     </span>
                   </div>
-                  <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-purple-50 text-purple-600'} border border-stone-100 rounded-none shadow-sm`}>
+                  <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-purple-50 text-purple-600'} rounded-none shadow-sm`}>
                     <Briefcase className="w-6 h-6" />
                   </div>
                 </div>
               )}
 
-              <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
+              <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between`}>
                 <div>
                   <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
                     Screened / Shortlisted
@@ -147,12 +147,12 @@ export const OverviewDashboard: React.FC<{
                     <CheckCircle2 className="w-3.5 h-3.5" /> Eligible Candidates
                   </span>
                 </div>
-                <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-emerald-50 text-emerald-600'} border border-stone-100 rounded-none shadow-sm`}>
+                <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-emerald-50 text-emerald-600'} rounded-none shadow-sm`}>
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
               </div>
 
-              <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
+              <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between`}>
                 <div>
                   <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
                     Admit Cards Ready
@@ -162,15 +162,15 @@ export const OverviewDashboard: React.FC<{
                     <Download className="w-3.5 h-3.5" /> Hall Tickets
                   </span>
                 </div>
-                <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-pink-50 text-pink-600'} border border-stone-100 rounded-none shadow-sm`}>
+                <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-pink-50 text-pink-600'} rounded-none shadow-sm`}>
                   <Download className="w-6 h-6" />
                 </div>
               </div>
             </div>
 
             {/* My Jobs & Application Status Panel */}
-            <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-8 border-t-4 border-t-[#800000]`}>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-stone-100 gap-6 mb-8">
+            <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-8`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6  gap-6 mb-8">
                 <div className="space-y-1">
                   <h3 className={`text-xl ${theme.headingFont} flex items-center gap-3`}>
                     <Briefcase className="w-6 h-6" />
@@ -210,12 +210,12 @@ export const OverviewDashboard: React.FC<{
                   {myApplications.map((app) => (
                 <div
                   key={app.id}
-                  className="bg-slate-50 border border-slate-200 rounded-2xl p-5 hover:border-indigo-300 transition shadow-2xs space-y-4"
+                  className="bg-slate-50 rounded-2xl p-5 transition shadow-2xs space-y-4"
                 >
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 ">
                     <div>
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 font-bold border border-indigo-200">
+                        <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 font-bold ">
                           {app.applicationNo}
                         </span>
                         <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold">
@@ -247,7 +247,7 @@ export const OverviewDashboard: React.FC<{
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-white p-3.5 rounded-xl border border-slate-200">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-white p-3.5 rounded-xl">
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Submission Date</span>
                       <span className="font-extrabold text-slate-800">
@@ -288,7 +288,7 @@ export const OverviewDashboard: React.FC<{
 
                       <button
                         onClick={() => navigate('my_jobs')}
-                        className="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs transition flex items-center space-x-1"
+                        className="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700  font-bold text-xs transition flex items-center space-x-1"
                       >
                         <Briefcase className="w-3.5 h-3.5" />
                         <span>View Details in My Jobs</span>
@@ -303,7 +303,7 @@ export const OverviewDashboard: React.FC<{
 
         {/* Vacancies Posted Section */}
         <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6`}>
-          <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
+          <div className="flex items-center justify-between pb-4  mb-4">
             <div>
               <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                 <Megaphone className="w-5 h-5 text-indigo-600" />
@@ -324,13 +324,13 @@ export const OverviewDashboard: React.FC<{
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {drives.flatMap((d) =>
               d.posts.map((p) => (
-                <div key={p.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between hover:border-indigo-300 transition shadow-2xs">
+                <div key={p.id} className="bg-slate-50 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs">
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-bold">
                         {d.advtNumber}
                       </span>
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 ">
                         {p.vacanciesTotal} Sanctioned Vacancies
                       </span>
                     </div>
@@ -338,7 +338,7 @@ export const OverviewDashboard: React.FC<{
                     <h4 className="text-sm font-extrabold text-slate-900 mb-1">{p.title}</h4>
                     <p className="text-xs text-slate-500 font-semibold mb-3">{p.departmentName}</p>
 
-                    <div className="grid grid-cols-5 gap-1 text-[10px] text-center font-bold bg-white p-2 rounded-xl border border-slate-200 my-2">
+                    <div className="grid grid-cols-5 gap-1 text-[10px] text-center font-bold bg-white p-2 rounded-xl my-2">
                       <div className="bg-slate-50 p-1 rounded">UR: {p.vacanciesBreakdown.UR}</div>
                       <div className="bg-slate-50 p-1 rounded">OBC: {p.vacanciesBreakdown.OBC}</div>
                       <div className="bg-slate-50 p-1 rounded">SC: {p.vacanciesBreakdown.SC}</div>
@@ -347,7 +347,7 @@ export const OverviewDashboard: React.FC<{
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-200 mt-2">
+                  <div className="flex items-center justify-between pt-3  mt-2">
                     <span className="text-[11px] font-mono font-bold text-slate-700">{p.payScale}</span>
                     <button
                       onClick={() => navigate('applicant_portal')}
@@ -401,10 +401,10 @@ export const OverviewDashboard: React.FC<{
   return (
     <div className="space-y-6">
       {/* Welcome & Role Banner */}
-      <div className={`${isBitTheme ? 'bg-white border-2 border-stone-200 ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none') : 'bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 border border-indigo-400/30 ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none')} rounded-3xl p-6 md:p-8 text-white relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
+      <div className={`${isBitTheme ? 'bg-white ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none') : 'bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 ' + (branding.showCardShadow ? 'shadow-sm' : 'shadow-none')} rounded-3xl p-6 md:p-8 text-white relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
         {!isBitTheme && <div className="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none" />}
         <div className="relative z-10">
-          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-none ${isBitTheme ? 'bg-stone-50 border border-stone-200 text-[#800000]' : 'bg-white/20 border border-white/30 text-white'} text-[10px] font-black uppercase tracking-[0.2em] mb-3 shadow-xs backdrop-blur-xs`}>
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-none ${isBitTheme ? 'bg-stone-50  text-[#800000]' : 'bg-white/20  text-white'} text-[10px] font-black uppercase tracking-[0.2em] mb-3 shadow-xs backdrop-blur-xs`}>
             <Sparkles className={`w-3.5 h-3.5 ${isBitTheme ? 'text-[#800000]' : 'text-pink-200'}`} />
             Centralized Recruitment Command Center
           </div>
@@ -426,7 +426,7 @@ export const OverviewDashboard: React.FC<{
           </button>
           <button
             onClick={() => navigate('applicant_portal')}
-            className={`${theme.secondaryButton} px-6 py-3 border-2 flex items-center space-x-2 shadow-sm`}
+            className={`${theme.secondaryButton} px-6 py-3  flex items-center space-x-2 shadow-sm`}
           >
             <Users className="w-4 h-4" />
             <span>Submit Application</span>
@@ -436,7 +436,7 @@ export const OverviewDashboard: React.FC<{
 
       {/* Primary KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
+        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between`}>
           <div>
             <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
               Active Drives
@@ -446,12 +446,12 @@ export const OverviewDashboard: React.FC<{
               <TrendingUp className="w-3 h-3" /> Live Notifications
             </span>
           </div>
-          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-indigo-50 text-indigo-600'} border border-stone-100 rounded-none shadow-sm`}>
+          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-indigo-50 text-indigo-600'} rounded-none shadow-sm`}>
             <Megaphone className="w-6 h-6" />
           </div>
         </div>
 
-        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
+        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between`}>
           <div>
             <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
               Applications Received
@@ -459,12 +459,12 @@ export const OverviewDashboard: React.FC<{
             <div className={`text-2xl font-black ${isBitTheme ? 'text-stone-900' : 'text-slate-900'}`}>{totalApps}</div>
             <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-purple-600'} font-bold uppercase mt-1`}> Total Responses</span>
           </div>
-          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-purple-50 text-purple-600'} border border-stone-100 rounded-none shadow-sm`}>
+          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-purple-50 text-purple-600'} rounded-none shadow-sm`}>
             <Users className="w-6 h-6" />
           </div>
         </div>
 
-        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
+        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between`}>
           <div>
             <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
               Pending Screening
@@ -472,12 +472,12 @@ export const OverviewDashboard: React.FC<{
             <div className={`text-2xl font-black ${isBitTheme ? 'text-amber-700' : 'text-amber-600'}`}>{pendingScreening}</div>
             <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-slate-500'} font-bold uppercase mt-1`}>Awaiting Review</span>
           </div>
-          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-amber-50 text-amber-600'} border border-stone-100 rounded-none shadow-sm`}>
+          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-amber-50 text-amber-600'} rounded-none shadow-sm`}>
             <Clock className="w-6 h-6" />
           </div>
         </div>
 
-        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between border-b-4 border-b-[#800000]`}>
+        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between`}>
           <div>
             <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
               Fee Collections
@@ -485,22 +485,22 @@ export const OverviewDashboard: React.FC<{
             <div className={`text-2xl font-black ${isBitTheme ? 'text-emerald-700' : 'text-emerald-600'}`}>₹{totalFeeCollected.toLocaleString('en-IN')}</div>
             <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-teal-600'} font-bold uppercase mt-1`}>Reconciled gateway</span>
           </div>
-          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-emerald-50 text-emerald-600'} border border-stone-100 rounded-none shadow-sm`}>
+          <div className={`p-3.5 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-emerald-50 text-emerald-600'} rounded-none shadow-sm`}>
             <CreditCard className="w-6 h-6" />
           </div>
         </div>
       </div>
 
       {/* Recruitment Lifecycle Phase Navigation Grid */}
-      <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-8 border-t-4 border-t-[#800000]`}>
-        <div className="flex items-center justify-between pb-6 border-b border-stone-100 mb-8">
+      <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-8`}>
+        <div className="flex items-center justify-between pb-6  mb-8">
           <div>
             <h3 className={`text-xl ${theme.headingFont}`}>Complete Recruitment Lifecycle Workflow</h3>
             <p className="text-sm text-stone-500 font-serif italic mt-1">
               Select an operational phase to manage the specific recruitment stage.
             </p>
           </div>
-          <span className={`text-[10px] font-black px-4 py-1.5 ${isBitTheme ? 'bg-stone-50 text-[#800000] border border-stone-200' : 'bg-indigo-50 text-indigo-700 border border-indigo-200'} rounded-none uppercase tracking-widest shadow-sm`}>
+          <span className={`text-[10px] font-black px-4 py-1.5 ${isBitTheme ? 'bg-stone-50 text-[#800000] ' : 'bg-indigo-50 text-indigo-700 '} rounded-none uppercase tracking-widest shadow-sm`}>
             8 Integrated Stages
           </span>
         </div>
@@ -510,7 +510,7 @@ export const OverviewDashboard: React.FC<{
             <div
               key={idx}
               onClick={() => navigate(stage.tab)}
-              className={`group ${isBitTheme ? 'bg-[#FBF9F5] border-stone-200 hover:border-[#800000]' : 'bg-slate-50 border-slate-200 hover:border-indigo-400'} border rounded-none p-5 cursor-pointer transition-all duration-300 relative ${branding.showCardShadow ? 'shadow-sm hover:shadow-lg' : 'shadow-none'}`}
+              className={`group ${isBitTheme ? 'bg-[#FBF9F5] hover:border-[#800000]' : 'bg-slate-50 hover:border-indigo-400'} p-5 cursor-pointer transition-all duration-300 relative ${branding.showCardShadow ? 'shadow-sm hover:shadow-lg' : 'shadow-none'}`}
             >
               <div className="flex items-center justify-between mb-3">
                 <span className={`w-8 h-8 rounded-none ${isBitTheme ? 'bg-[#800000]' : 'bg-gradient-to-r from-indigo-600 to-purple-600'} text-white font-black text-sm flex items-center justify-center shadow-sm`}>
@@ -526,7 +526,7 @@ export const OverviewDashboard: React.FC<{
                 {stage.title}
               </h4>
               <p className="text-[11px] text-stone-500 mt-1.5 leading-relaxed font-serif italic">{stage.desc}</p>
-              <div className={`mt-4 flex items-center justify-between text-[10px] font-black uppercase tracking-widest ${isBitTheme ? 'text-[#800000]' : 'text-indigo-600'} pt-3 border-t border-stone-100`}>
+              <div className={`mt-4 flex items-center justify-between text-[10px] font-black uppercase tracking-widest ${isBitTheme ? 'text-[#800000]' : 'text-indigo-600'} pt-3 `}>
                 <span>{stage.count} Records</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -539,7 +539,7 @@ export const OverviewDashboard: React.FC<{
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Active Recruitment Drives Summary */}
         <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} lg:col-span-2 p-6`}>
-          <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
+          <div className="flex items-center justify-between pb-4  mb-4">
             <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-indigo-600" />
               Active Recruitment Drives & Positions
@@ -556,21 +556,21 @@ export const OverviewDashboard: React.FC<{
             {drives.map((drive) => (
               <div
                 key={drive.id}
-                className="bg-slate-50 border border-slate-200 rounded-2xl p-4 hover:border-indigo-300 transition shadow-2xs"
+                className="bg-slate-50 rounded-2xl p-4 transition shadow-2xs"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                   <div>
-                    <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold mr-2 shadow-2xs">
+                    <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700  font-bold mr-2 shadow-2xs">
                       {drive.advtNumber}
                     </span>
                     <h4 className="text-sm font-extrabold text-slate-900 inline">{drive.title}</h4>
                   </div>
-                  <span className="text-xs px-3 py-0.5 rounded-full font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-300 self-start sm:self-auto shadow-2xs">
+                  <span className="text-xs px-3 py-0.5 rounded-full font-extrabold bg-emerald-50 text-emerald-700  self-start sm:self-auto shadow-2xs">
                     {drive.status.toUpperCase().replace(/_/g, ' ')}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-700 my-3 bg-white p-3 rounded-xl border border-slate-200">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-700 my-3 bg-white p-3 rounded-xl">
                   <div>
                     <span className="block text-[10px] text-slate-500 uppercase font-bold">Closing Date</span>
                     <span className="font-extrabold text-slate-900">{drive.closingDate}</span>
@@ -592,7 +592,7 @@ export const OverviewDashboard: React.FC<{
                 <div className="flex items-center justify-between text-xs pt-1">
                   <div className="flex items-center space-x-2">
                     {drive.posts.slice(0, 2).map((p) => (
-                      <span key={p.id} className="text-[11px] bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg border border-indigo-200 font-medium">
+                      <span key={p.id} className="text-[11px] bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg  font-medium">
                         {p.title} ({p.vacanciesTotal} posts)
                       </span>
                     ))}
@@ -615,7 +615,7 @@ export const OverviewDashboard: React.FC<{
         {/* Live System Audit Trail Panel */}
         <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex flex-col justify-between`}>
           <div>
-            <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
+            <div className="flex items-center justify-between pb-4  mb-4">
               <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-purple-600" />
                 Live Audit Logs
@@ -632,7 +632,7 @@ export const OverviewDashboard: React.FC<{
 
             <div className="space-y-3">
               {auditLogs.slice(0, 5).map((log) => (
-                <div key={log.id} className="text-xs p-3 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs">
+                <div key={log.id} className="text-xs p-3 rounded-2xl bg-slate-50 shadow-2xs">
                   <div className="flex items-center justify-between text-slate-500 mb-1">
                     <span className="font-bold text-indigo-700">{log.userName}</span>
                     <span className="text-[10px] text-slate-500 font-mono">{new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
@@ -644,7 +644,7 @@ export const OverviewDashboard: React.FC<{
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-200 text-center">
+          <div className="mt-4 pt-3  text-center">
             <span className="text-[11px] text-slate-500 font-medium">
               System Audit Logging is 100% Active. All actions recorded with IP & Timestamp.
             </span>

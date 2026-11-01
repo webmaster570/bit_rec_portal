@@ -54,7 +54,7 @@ textarea:disabled,
   .glass-card {
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(226, 232, 240, 0.9);
+    border: none;
     box-shadow: 0 4px 20px -2px rgba(99, 102, 241, var(--shadow-intensity)), 0 2px 6px -1px rgba(0, 0, 0, calc(var(--shadow-intensity) * 0.4));
   }
 
@@ -63,7 +63,7 @@ textarea:disabled,
   }
 
   .glass-card-hover:hover {
-    border-color: rgba(168, 85, 247, 0.4);
+    border: none;
     box-shadow: 0 10px 25px -5px rgba(168, 85, 247, calc(var(--shadow-intensity) * 1.5)), 0 4px 10px -2px rgba(0, 0, 0, calc(var(--shadow-intensity) * 0.5));
     transform: translateY(-2px);
   }

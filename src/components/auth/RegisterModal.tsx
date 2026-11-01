@@ -90,7 +90,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
         {/* Header */}
         <div className={`p-5 text-white flex items-center justify-between ${branding.theme === 'industrial_heavy' ? 'bg-slate-900' : 'bg-slate-900'}`}>
           <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+            <div className="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center ">
               <UserPlus className="w-5 h-5" />
             </div>
             <div>

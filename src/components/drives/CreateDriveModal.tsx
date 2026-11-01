@@ -254,7 +254,7 @@ export const CreateDriveModal: React.FC<CreateDriveModalProps> = ({ isOpen, onCl
             </div>
           </div>
 
-          <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-xs text-indigo-800 flex items-start gap-2">
+          <div className="bg-indigo-50  rounded-xl p-3 text-xs text-indigo-800 flex items-start gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-indigo-600" />
             <p>
               Initial default post position (Assistant Professor - CS) will be created automatically. Additional posts can be configured anytime under the drive management portal.

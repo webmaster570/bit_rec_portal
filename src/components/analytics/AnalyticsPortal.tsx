@@ -49,7 +49,7 @@ export const AnalyticsPortal: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold">
+          <span className="px-3 py-1.5 rounded-xl bg-indigo-50  text-indigo-700 text-xs font-bold">
             Live Database Telemetry
           </span>
         </div>

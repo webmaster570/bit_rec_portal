@@ -58,7 +58,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   classic: {
     rootContainer: 'font-sans bg-slate-50 antialiased text-slate-900',
     mainBg: 'bg-white border-t border-slate-200',
-    cardBase: 'bg-white border-slate-200 shadow-sm rounded-xl',
+    cardBase: 'bg-white shadow-sm rounded-xl',
     sidebarBase: 'bg-white border-r border-slate-200',
     headerBase: 'bg-white border-b border-slate-200',
     accentColor: 'text-indigo-600',
@@ -72,7 +72,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   modern: {
     rootContainer: 'font-sans bg-zinc-50 antialiased text-zinc-900',
     mainBg: 'bg-white/80 backdrop-blur-md border-t border-zinc-200',
-    cardBase: 'bg-white border-zinc-200 shadow-lg shadow-zinc-200/50 rounded-2xl',
+    cardBase: 'bg-white shadow-lg shadow-zinc-200/50 rounded-2xl',
     sidebarBase: 'bg-zinc-50 border-r border-zinc-200',
     headerBase: 'bg-white/80 backdrop-blur-md border-b border-zinc-200',
     accentColor: 'text-violet-600',
@@ -86,7 +86,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   crimson: {
     rootContainer: 'font-sans bg-rose-50/30 antialiased text-slate-900',
     mainBg: 'bg-white border-t border-rose-100',
-    cardBase: 'bg-white border-rose-200 shadow-sm rounded-xl',
+    cardBase: 'bg-white shadow-sm rounded-xl',
     sidebarBase: 'bg-rose-900 text-white border-r border-rose-800',
     headerBase: 'bg-white border-b border-rose-200',
     accentColor: 'text-rose-600',
@@ -100,7 +100,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   academic: {
     rootContainer: 'font-serif bg-[#fdfcf8] antialiased text-stone-900',
     mainBg: 'bg-white border-t border-stone-200',
-    cardBase: 'bg-white border-stone-200 shadow-md rounded-lg',
+    cardBase: 'bg-white shadow-md rounded-lg',
     sidebarBase: 'bg-[#1a365d] text-white border-r border-blue-900',
     headerBase: 'bg-[#fdfcf8] border-b border-stone-200',
     accentColor: 'text-amber-700',
@@ -114,7 +114,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   nature: {
     rootContainer: 'font-sans bg-emerald-50/20 antialiased text-slate-900',
     mainBg: 'bg-white border-t border-emerald-100',
-    cardBase: 'bg-white border-emerald-100 shadow-sm rounded-2xl',
+    cardBase: 'bg-white shadow-sm rounded-2xl',
     sidebarBase: 'bg-emerald-800 text-white border-r border-emerald-900',
     headerBase: 'bg-white border-b border-emerald-100',
     accentColor: 'text-emerald-700',
@@ -128,7 +128,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   sapphire: {
     rootContainer: 'font-sans bg-sky-50/30 antialiased text-slate-900',
     mainBg: 'bg-white border-t border-sky-100',
-    cardBase: 'bg-white border-sky-100 shadow-md rounded-xl',
+    cardBase: 'bg-white shadow-md rounded-xl',
     sidebarBase: 'bg-slate-900 text-white border-r border-slate-800',
     headerBase: 'bg-white border-b border-sky-200 shadow-sm',
     accentColor: 'text-sky-700',
@@ -142,7 +142,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   bit_mesra: {
     rootContainer: 'font-sans bg-[#F7F4EE] antialiased text-[#1C1917]',
     mainBg: 'bg-white border-t border-[#D6CEBE]',
-    cardBase: 'bg-white border-[#EBE6DF] shadow-sm rounded-none',
+    cardBase: 'bg-white shadow-sm rounded-none',
     sidebarBase: 'bg-[#800000] text-white border-r border-[#600000]',
     headerBase: 'bg-white border-b border-[#D6CEBE]',
     accentColor: 'text-[#800000]',
@@ -156,7 +156,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   tech_startup: {
     rootContainer: 'font-sans bg-slate-950 antialiased text-slate-100',
     mainBg: 'bg-slate-900/50 backdrop-blur-xl border-t border-slate-800',
-    cardBase: 'bg-slate-900 border-slate-800 shadow-xl shadow-indigo-500/5 rounded-3xl',
+    cardBase: 'bg-slate-900 shadow-xl shadow-indigo-500/5 rounded-3xl',
     sidebarBase: 'bg-black text-slate-300 border-r border-slate-900',
     headerBase: 'bg-black/80 backdrop-blur-xl border-b border-slate-900',
     accentColor: 'text-indigo-400',
@@ -170,7 +170,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   corporate_pro: {
     rootContainer: 'font-sans bg-[#f3f4f6] antialiased text-slate-900',
     mainBg: 'bg-white border-t border-slate-300',
-    cardBase: 'bg-white border-slate-300 shadow-sm rounded-lg',
+    cardBase: 'bg-white shadow-sm rounded-lg',
     sidebarBase: 'bg-[#0f172a] text-slate-300 border-r border-slate-800',
     headerBase: 'bg-white border-b border-slate-300 shadow-xs',
     accentColor: 'text-blue-800',
@@ -184,7 +184,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   creative_studio: {
     rootContainer: 'font-sans bg-orange-50/50 antialiased text-stone-900',
     mainBg: 'bg-white/40 backdrop-blur-sm border-t border-orange-100',
-    cardBase: 'bg-white border-orange-100 shadow-2xl shadow-orange-200/40 rounded-[2.5rem]',
+    cardBase: 'bg-white shadow-2xl shadow-orange-200/40 rounded-[2.5rem]',
     sidebarBase: 'bg-gradient-to-b from-purple-900 to-indigo-950 text-white border-r border-purple-800',
     headerBase: 'bg-white/80 backdrop-blur-md border-b border-orange-100 shadow-sm',
     accentColor: 'text-orange-600',
@@ -198,7 +198,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   industrial_heavy: {
     rootContainer: 'font-mono bg-[#e5e7eb] antialiased text-slate-900',
     mainBg: 'bg-slate-50 border-t-4 border-slate-800',
-    cardBase: 'bg-white border-2 border-slate-800 shadow-[4px_4px_0px_0px_rgba(30,41,59,1)] rounded-none',
+    cardBase: 'bg-white shadow-[4px_4px_0px_0px_rgba(30,41,59,1)] rounded-none',
     sidebarBase: 'bg-slate-800 text-slate-100 border-r-2 border-slate-900',
     headerBase: 'bg-white border-b-2 border-slate-800 shadow-none',
     accentColor: 'text-amber-600',
@@ -212,7 +212,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   portal_vibrant: {
     rootContainer: 'font-sans bg-indigo-50/30 antialiased text-slate-900',
     mainBg: 'bg-white/70 backdrop-blur-xl border-t border-indigo-100',
-    cardBase: 'bg-white border-indigo-100 shadow-2xl shadow-indigo-200/50 rounded-[2rem]',
+    cardBase: 'bg-white shadow-2xl shadow-indigo-200/50 rounded-[2rem]',
     sidebarBase: 'bg-indigo-900 text-white border-r border-indigo-800',
     headerBase: 'bg-white/80 backdrop-blur-md border-b border-indigo-100',
     accentColor: 'text-pink-600',
@@ -226,7 +226,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   portal_minimal: {
     rootContainer: 'font-sans bg-white antialiased text-slate-800',
     mainBg: 'bg-white border-t border-slate-100',
-    cardBase: 'bg-white border-slate-100 shadow-xs rounded-none',
+    cardBase: 'bg-white shadow-xs rounded-none',
     sidebarBase: 'bg-slate-50 border-r border-slate-100',
     headerBase: 'bg-white border-b border-slate-100',
     accentColor: 'text-slate-900',
@@ -240,7 +240,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   portal_dark_knight: {
     rootContainer: 'font-sans bg-black antialiased text-amber-50',
     mainBg: 'bg-zinc-900 border-t border-amber-900/30',
-    cardBase: 'bg-zinc-800 border-amber-900/20 shadow-2xl rounded-lg',
+    cardBase: 'bg-zinc-800 shadow-2xl rounded-lg',
     sidebarBase: 'bg-black text-amber-200 border-r border-amber-900/30',
     headerBase: 'bg-black border-b border-amber-900/30',
     accentColor: 'text-amber-500',
@@ -254,7 +254,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
   portal_enterprise: {
     rootContainer: 'font-sans bg-slate-100 antialiased text-slate-800',
     mainBg: 'bg-white border-t border-slate-300',
-    cardBase: 'bg-white border-slate-300 shadow-sm rounded-md',
+    cardBase: 'bg-white shadow-sm rounded-md',
     sidebarBase: 'bg-[#1e293b] text-slate-300 border-r border-slate-700',
     headerBase: 'bg-white border-b border-slate-300 shadow-xs',
     accentColor: 'text-[#0f172a]',

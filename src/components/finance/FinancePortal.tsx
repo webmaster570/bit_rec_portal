@@ -34,7 +34,7 @@ export const FinancePortal: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Title Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 rounded-2xl shadow-md border border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 rounded-2xl shadow-md ">
         <div>
           <div className="flex items-center space-x-2">
             <CreditCard className="w-6 h-6 text-emerald-600" />
@@ -56,7 +56,7 @@ export const FinancePortal: React.FC = () => {
               a.download = 'Recruitment_Fee_Transactions_2026.csv';
               a.click();
             }}
-            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-semibold flex items-center space-x-1.5"
+            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700  text-xs font-semibold flex items-center space-x-1.5"
           >
             <Download className="w-4 h-4 text-emerald-600" />
             <span>Export Transactions CSV</span>
@@ -66,7 +66,7 @@ export const FinancePortal: React.FC = () => {
 
       {/* Revenue KPI Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="glass-card border border-slate-200 p-5 rounded-2xl flex items-center justify-between shadow-2xs">
+        <div className="glass-card  p-5 rounded-2xl flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-xs text-slate-500 uppercase font-medium block">Total Fee Collected</span>
             <div className="text-2xl font-extrabold text-emerald-600 mt-1">₹{totalRevenue.toLocaleString('en-IN')}</div>
@@ -77,18 +77,18 @@ export const FinancePortal: React.FC = () => {
           </div>
         </div>
 
-        <div className="glass-card border border-slate-200 p-5 rounded-2xl flex items-center justify-between shadow-2xs">
+        <div className="glass-card  p-5 rounded-2xl flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-xs text-slate-500 uppercase font-medium block">Paid Applications</span>
             <div className="text-2xl font-extrabold text-slate-900 mt-1">{paidApps.length}</div>
             <span className="text-[10px] text-indigo-600 font-medium">Successful Gateway Payments</span>
           </div>
-          <div className="p-3 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200">
+          <div className="p-3 rounded-xl bg-indigo-50 text-indigo-600 ">
             <CheckCircle className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="glass-card border border-slate-200 p-5 rounded-2xl flex items-center justify-between shadow-2xs">
+        <div className="glass-card  p-5 rounded-2xl flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-xs text-slate-500 uppercase font-medium block">Category Fee Exemptions</span>
             <div className="text-2xl font-extrabold text-slate-900 mt-1">
@@ -103,7 +103,7 @@ export const FinancePortal: React.FC = () => {
       </div>
 
       {/* Transactions Table */}
-      <div className="glass-card border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+      <div className="glass-card  rounded-2xl overflow-hidden shadow-xs">
         <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -112,14 +112,14 @@ export const FinancePortal: React.FC = () => {
               placeholder="Search by Txn ID, Application No, Candidate..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-white  rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none"
+            className="bg-white  rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none"
           >
             <option value="all">All Payment Statuses</option>
             <option value="Paid">Paid</option>
@@ -156,7 +156,7 @@ export const FinancePortal: React.FC = () => {
                     <span
                       className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                         app.paymentStatus === 'Paid'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
+                          ? 'bg-emerald-50 text-emerald-700 '
                           : app.paymentStatus === 'Exempted'
                           ? 'bg-blue-50 text-blue-700 border border-blue-200'
                           : 'bg-amber-50 text-amber-700 border border-amber-200'

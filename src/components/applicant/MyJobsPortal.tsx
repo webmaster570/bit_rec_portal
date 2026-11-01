@@ -103,7 +103,7 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
   const getStageBadge = (stage: ApplicationStage, screeningStatus?: string, compact = false) => {
     if (stage === 'offer_issued' || stage === 'offer_accepted') {
       return (
-        <span className={`rounded-full font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center gap-1 shadow-2xs ${compact ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]'}`}>
+        <span className={`rounded-full font-extrabold bg-emerald-100 text-emerald-800  inline-flex items-center gap-1 shadow-2xs ${compact ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]'}`}>
           <Award className="w-3 h-3 text-emerald-600 shrink-0" />
           <span>{stage === 'offer_accepted' ? 'Offer Accepted' : 'Offer Issued'}</span>
         </span>
@@ -119,7 +119,7 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
     }
     if (stage === 'interview_scheduled' || stage === 'test_scheduled') {
       return (
-        <span className={`rounded-full font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 inline-flex items-center gap-1 ${compact ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]'}`}>
+        <span className={`rounded-full font-bold bg-indigo-50 text-indigo-700  inline-flex items-center gap-1 ${compact ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]'}`}>
           <Clock className="w-3 h-3 text-indigo-600 shrink-0" />
           <span>Interview / Exam Scheduled</span>
         </span>
@@ -127,7 +127,7 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
     }
     if (screeningStatus === 'Eligible') {
       return (
-        <span className={`rounded-full font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 inline-flex items-center gap-1 ${compact ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]'}`}>
+        <span className={`rounded-full font-bold bg-emerald-50 text-emerald-700  inline-flex items-center gap-1 ${compact ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]'}`}>
           <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
           <span>Screened Eligible</span>
         </span>
@@ -190,7 +190,7 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
             <div className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">{totalApplied}</div>
             <span className="text-[9px] sm:text-[10px] text-slate-500 font-medium block truncate">Applications</span>
           </div>
-          <div className="p-2 sm:p-3 bg-indigo-50 text-indigo-600 rounded-xl border border-indigo-200 shrink-0 ml-2">
+          <div className="p-2 sm:p-3 bg-indigo-50 text-indigo-600 rounded-xl  shrink-0 ml-2">
             <Briefcase className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
         </div>
@@ -370,7 +370,7 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                   {/* Top Bar: App No & Stage Badge */}
                   <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                     <div className="flex items-center space-x-2 min-w-0">
-                      <span className="font-mono font-bold text-xs text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                      <span className="font-mono font-bold text-xs text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded ">
                         {app.applicationNo}
                       </span>
                       <span className="text-[10px] text-slate-400 truncate">
@@ -483,7 +483,7 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                         {/* 1. App No & Date */}
                         <td className="p-3.5 pl-4 font-mono">
                           <div className="flex items-center space-x-2">
-                            <span className="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 text-xs">
+                            <span className="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded  text-xs">
                               {app.applicationNo}
                             </span>
                           </div>
@@ -625,7 +625,7 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                     <h3 className="text-base sm:text-lg font-extrabold text-slate-900 truncate">
                       {selectedAppDetail.applicant.fullName}
                     </h3>
-                    <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-bold border border-indigo-200">
+                    <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-bold ">
                       {selectedAppDetail.applicationNo}
                     </span>
                   </div>
@@ -886,9 +886,9 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                           <span
                             className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase shrink-0 ${
                               doc.status === 'verified'
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
+                                ? 'bg-emerald-50 text-emerald-700 '
                                 : doc.status === 'discrepancy'
-                                ? 'bg-amber-50 text-amber-700 border border-amber-300'
+                                ? 'bg-amber-50 text-amber-700 '
                                 : 'bg-slate-100 text-slate-600 border border-slate-200'
                             }`}
                           >

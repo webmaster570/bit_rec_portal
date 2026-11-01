@@ -61,7 +61,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
 
           <div className="space-y-3 pr-8">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2 py-0.5 rounded-lg bg-white/10 text-white/80 border border-white/20 font-mono text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-lg bg-white/10 text-white/80  font-mono text-[10px] font-bold">
                 Post Code: {post.postCode}
               </span>
               <span className={`px-2 py-0.5 rounded-lg bg-emerald-500/30 text-emerald-200 border border-emerald-500/30 text-[10px] font-bold uppercase`}>

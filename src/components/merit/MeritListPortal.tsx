@@ -54,7 +54,7 @@ export const MeritListPortal: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Title Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 rounded-2xl shadow-md border border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 rounded-2xl shadow-md ">
         <div>
           <div className="flex items-center space-x-2">
             <Trophy className="w-6 h-6 text-purple-600" />
@@ -77,7 +77,7 @@ export const MeritListPortal: React.FC = () => {
       {/* Drive and Post Selection + Formula Weights Config */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Drive Selector */}
-        <div className="lg:col-span-5 glass-card border border-slate-200 p-5 rounded-2xl shadow-2xs space-y-4">
+        <div className="lg:col-span-5 glass-card  p-5 rounded-2xl shadow-2xs space-y-4">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-200 pb-2 flex items-center gap-2">
             <Layers className="w-4 h-4 text-indigo-600" />
             Select Target Position for Merit List
@@ -92,7 +92,7 @@ export const MeritListPortal: React.FC = () => {
                 const d = drives.find((dr) => dr.id === e.target.value);
                 if (d && d.posts[0]) setSelectedPostId(d.posts[0].id);
               }}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-white  rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
             >
               {drives.map((d) => (
                 <option key={d.id} value={d.id}>
@@ -107,7 +107,7 @@ export const MeritListPortal: React.FC = () => {
             <select
               value={selectedPostId}
               onChange={(e) => setSelectedPostId(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-indigo-500"
+              className="w-full bg-white  rounded-lg px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-indigo-500"
             >
               {activeDrive?.posts.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -117,22 +117,22 @@ export const MeritListPortal: React.FC = () => {
             </select>
           </div>
 
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1">
+          <div className="bg-slate-50 p-3 rounded-xl  text-xs text-slate-700 space-y-1">
             <span className="text-[10px] text-slate-500 uppercase block">Reservation Vacancy Matrix</span>
             <div className="flex flex-wrap gap-2 pt-1 font-mono text-[11px]">
-              <span className="bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+              <span className="bg-white px-2 py-0.5 rounded  shadow-2xs">
                 UR: <strong>{activePost?.vacanciesBreakdown.UR}</strong>
               </span>
-              <span className="bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+              <span className="bg-white px-2 py-0.5 rounded  shadow-2xs">
                 OBC: <strong>{activePost?.vacanciesBreakdown.OBC}</strong>
               </span>
-              <span className="bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+              <span className="bg-white px-2 py-0.5 rounded  shadow-2xs">
                 SC: <strong>{activePost?.vacanciesBreakdown.SC}</strong>
               </span>
-              <span className="bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+              <span className="bg-white px-2 py-0.5 rounded  shadow-2xs">
                 ST: <strong>{activePost?.vacanciesBreakdown.ST}</strong>
               </span>
-              <span className="bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+              <span className="bg-white px-2 py-0.5 rounded  shadow-2xs">
                 EWS: <strong>{activePost?.vacanciesBreakdown.EWS}</strong>
               </span>
             </div>
@@ -140,7 +140,7 @@ export const MeritListPortal: React.FC = () => {
         </div>
 
         {/* Formula Weightage Configuration */}
-        <div className="lg:col-span-7 glass-card border border-slate-200 p-5 rounded-2xl shadow-2xs space-y-4">
+        <div className="lg:col-span-7 glass-card  p-5 rounded-2xl shadow-2xs space-y-4">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-200 pb-2 flex items-center gap-2">
             <Sliders className="w-4 h-4 text-purple-600" />
             Weighted Score Formula & Tie-Breaker Rule
@@ -157,7 +157,7 @@ export const MeritListPortal: React.FC = () => {
                 onChange={(e) =>
                   setWeightageConfig({ ...weightageConfig, writtenTestWeight: Number(e.target.value) })
                 }
-                className="w-full bg-white border border-slate-200 rounded-lg p-2 text-slate-900 font-bold text-center focus:outline-none focus:border-indigo-500"
+                className="w-full bg-white  rounded-lg p-2 text-slate-900 font-bold text-center focus:outline-none focus:border-indigo-500"
               />
             </div>
 
@@ -171,7 +171,7 @@ export const MeritListPortal: React.FC = () => {
                 onChange={(e) =>
                   setWeightageConfig({ ...weightageConfig, interviewWeight: Number(e.target.value) })
                 }
-                className="w-full bg-white border border-slate-200 rounded-lg p-2 text-slate-900 font-bold text-center focus:outline-none focus:border-indigo-500"
+                className="w-full bg-white  rounded-lg p-2 text-slate-900 font-bold text-center focus:outline-none focus:border-indigo-500"
               />
             </div>
 
@@ -185,7 +185,7 @@ export const MeritListPortal: React.FC = () => {
                 onChange={(e) =>
                   setWeightageConfig({ ...weightageConfig, academicWeight: Number(e.target.value) })
                 }
-                className="w-full bg-white border border-slate-200 rounded-lg p-2 text-slate-900 font-bold text-center focus:outline-none focus:border-indigo-500"
+                className="w-full bg-white  rounded-lg p-2 text-slate-900 font-bold text-center focus:outline-none focus:border-indigo-500"
               />
             </div>
           </div>
@@ -197,7 +197,7 @@ export const MeritListPortal: React.FC = () => {
             <select
               value={weightageConfig.tieBreakerRule}
               onChange={(e) => setWeightageConfig({ ...weightageConfig, tieBreakerRule: e.target.value as any })}
-              className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-white  rounded-lg p-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
             >
               <option value="Age">Older Candidate Ranked Higher (Date of Birth)</option>
               <option value="AcademicScore">Higher Academic Degree CGPA First</option>
@@ -208,7 +208,7 @@ export const MeritListPortal: React.FC = () => {
       </div>
 
       {/* Published Merit & Selection Table */}
-      <div className="glass-card border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+      <div className="glass-card  rounded-2xl overflow-hidden shadow-2xs">
         <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
             <Trophy className="w-4 h-4 text-purple-600" />
@@ -219,7 +219,7 @@ export const MeritListPortal: React.FC = () => {
             <select
               value={selectedCategoryFilter}
               onChange={(e) => setSelectedCategoryFilter(e.target.value)}
-              className="bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs text-slate-800 focus:outline-none"
+              className="bg-white  rounded-lg px-2.5 py-1 text-xs text-slate-800 focus:outline-none"
             >
               <option value="all">All Category Candidates</option>
               <option value="UR">UR Category Ranks</option>
@@ -280,7 +280,7 @@ export const MeritListPortal: React.FC = () => {
                     </td>
 
                     <td className="p-3">
-                      <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-slate-100 text-slate-800 border border-slate-200">
+                      <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-slate-100 text-slate-800 ">
                         {app.selectionCategory || app.applicant.category}
                       </span>
                     </td>
@@ -310,7 +310,7 @@ export const MeritListPortal: React.FC = () => {
 
                       <button
                         onClick={() => setShowOfferModalApp(app)}
-                        className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold border border-slate-200 inline-flex items-center gap-1"
+                        className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold  inline-flex items-center gap-1"
                       >
                         <FileText className="w-3.5 h-3.5" />
                         <span>Preview Letter</span>

@@ -53,7 +53,7 @@ export const ApplicationList: React.FC = () => {
       case 'submitted':
         return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Submitted</span>;
       case 'screened_eligible':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">Screened Eligible</span>;
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 ">Screened Eligible</span>;
       case 'screened_ineligible':
         return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Ineligible</span>;
       case 'doc_verified':
@@ -61,22 +61,22 @@ export const ApplicationList: React.FC = () => {
       case 'doc_discrepancy':
         return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Doc Discrepancy</span>;
       case 'interview_scheduled':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">Interview Scheduled</span>;
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 ">Interview Scheduled</span>;
       case 'selected':
         return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">Merit Selected</span>;
       case 'offer_issued':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse">Offer Issued</span>;
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800  animate-pulse">Offer Issued</span>;
       case 'offer_accepted':
         return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-green-50 text-green-700 border border-green-300">Offer Accepted</span>;
       default:
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">{stage}</span>;
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 ">{stage}</span>;
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Title Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 rounded-2xl shadow-md border border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 rounded-2xl shadow-md ">
         <div>
           <div className="flex items-center space-x-2">
             <FileText className="w-6 h-6 text-indigo-600" />
@@ -88,14 +88,14 @@ export const ApplicationList: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2 text-xs text-slate-700 font-medium">
-          <span className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200">
+          <span className="px-3 py-1.5 rounded-xl bg-slate-100 ">
             Total Applications: <strong className="text-indigo-600">{applications.length}</strong>
           </span>
         </div>
       </div>
 
       {/* Filter and Search Controls */}
-      <div className="glass-card p-4 rounded-xl shadow-2xs space-y-3 border border-slate-200">
+      <div className="glass-card p-4 rounded-xl shadow-2xs space-y-3 ">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -104,7 +104,7 @@ export const ApplicationList: React.FC = () => {
               placeholder="Search Application No, Candidate Name, Email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-50  rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
@@ -112,7 +112,7 @@ export const ApplicationList: React.FC = () => {
             <select
               value={selectedDriveFilter}
               onChange={(e) => setSelectedDriveFilter(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-50  rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
             >
               <option value="all">All Recruitment Drives</option>
               {drives.map((d) => (
@@ -127,7 +127,7 @@ export const ApplicationList: React.FC = () => {
             <select
               value={selectedStageFilter}
               onChange={(e) => setSelectedStageFilter(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-50  rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
             >
               <option value="all">All Application Stages</option>
               <option value="submitted">Submitted</option>
@@ -145,7 +145,7 @@ export const ApplicationList: React.FC = () => {
             <select
               value={selectedCategoryFilter}
               onChange={(e) => setSelectedCategoryFilter(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-50  rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
             >
               <option value="all">All Reservation Categories</option>
               <option value="UR">UR (General)</option>
@@ -159,7 +159,7 @@ export const ApplicationList: React.FC = () => {
       </div>
 
       {/* Applications Table */}
-      <div className="glass-card rounded-2xl overflow-hidden shadow-xs border border-slate-200">
+      <div className="glass-card rounded-2xl overflow-hidden shadow-xs ">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-700">
             <thead className="bg-slate-100 text-slate-600 font-bold border-b border-slate-200 uppercase text-[10px]">
@@ -193,7 +193,7 @@ export const ApplicationList: React.FC = () => {
                         <img
                           src={app.applicant.photoUrl}
                           alt={app.applicant.fullName}
-                          className="w-8 h-8 rounded-full object-cover border border-slate-200"
+                          className="w-8 h-8 rounded-full object-cover "
                         />
                         <div>
                           <span className="font-semibold text-slate-900 block">{app.applicant.fullName}</span>
@@ -208,7 +208,7 @@ export const ApplicationList: React.FC = () => {
                     </td>
 
                     <td className="p-3.5">
-                      <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-slate-100 text-slate-700 border border-slate-200">
+                      <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-slate-100 text-slate-700 ">
                         {app.applicant.category} {app.applicant.isPwD ? '(PwD)' : ''}
                       </span>
                     </td>
@@ -217,7 +217,7 @@ export const ApplicationList: React.FC = () => {
                       <span
                         className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                           app.paymentStatus === 'Paid'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
+                            ? 'bg-emerald-50 text-emerald-700 '
                             : app.paymentStatus === 'Exempted'
                             ? 'bg-blue-50 text-blue-700 border border-blue-200'
                             : 'bg-amber-50 text-amber-700 border border-amber-200'
@@ -232,7 +232,7 @@ export const ApplicationList: React.FC = () => {
                     <td className="p-3.5 text-right space-x-1.5 whitespace-nowrap">
                       <button
                         onClick={() => setSelectedAppDetail(app)}
-                        className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-semibold border border-slate-200 inline-flex items-center gap-1"
+                        className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-semibold  inline-flex items-center gap-1"
                       >
                         <Eye className="w-3.5 h-3.5 text-indigo-600" />
                         <span>Inspect</span>
@@ -241,7 +241,7 @@ export const ApplicationList: React.FC = () => {
                       {app.admitCardIssued && (
                         <button
                           onClick={() => setShowAdmitCardModal(app)}
-                          className="px-2.5 py-1 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-semibold border border-indigo-200 inline-flex items-center gap-1"
+                          className="px-2.5 py-1 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-semibold  inline-flex items-center gap-1"
                           title="View / Print Hall Ticket"
                         >
                           <Download className="w-3.5 h-3.5 text-indigo-600" />
@@ -270,7 +270,7 @@ export const ApplicationList: React.FC = () => {
       {/* Inspect Application Full Detail Drawer Modal */}
       {selectedAppDetail && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border border-slate-200 rounded-2xl max-w-4xl w-full shadow-2xl overflow-hidden my-8">
+          <div className="bg-white  rounded-2xl max-w-4xl w-full shadow-2xl overflow-hidden my-8">
             <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-slate-50">
               <div className="flex items-center space-x-3">
                 <img
@@ -298,7 +298,7 @@ export const ApplicationList: React.FC = () => {
 
             <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto text-xs text-slate-700">
               {/* Personal Info Grid */}
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <div className="bg-slate-50 p-4 rounded-xl  space-y-3">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">
                   1. Applicant Personal Profile
                 </h4>
@@ -340,7 +340,7 @@ export const ApplicationList: React.FC = () => {
               </div>
 
               {/* Academic History */}
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <div className="bg-slate-50 p-4 rounded-xl  space-y-3">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">
                   2. Academic Qualifications
                 </h4>
@@ -370,7 +370,7 @@ export const ApplicationList: React.FC = () => {
               </div>
 
               {/* Uploaded Documents */}
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <div className="bg-slate-50 p-4 rounded-xl  space-y-3">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">
                   3. Uploaded Certificates & Verification Status
                 </h4>
@@ -379,7 +379,7 @@ export const ApplicationList: React.FC = () => {
                   {selectedAppDetail.documents.map((doc) => (
                     <div
                       key={doc.id}
-                      className="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between"
+                      className="p-3 bg-white  rounded-lg flex items-center justify-between"
                     >
                       <div>
                         <span className="font-semibold text-slate-900 block">{doc.name}</span>
@@ -388,9 +388,9 @@ export const ApplicationList: React.FC = () => {
                       <span
                         className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                           doc.status === 'verified'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
+                            ? 'bg-emerald-50 text-emerald-700 '
                             : doc.status === 'discrepancy'
-                            ? 'bg-amber-50 text-amber-700 border border-amber-300'
+                            ? 'bg-amber-50 text-amber-700 '
                             : 'bg-slate-100 text-slate-600'
                         }`}
                       >
@@ -403,12 +403,12 @@ export const ApplicationList: React.FC = () => {
 
               {/* Screening & Evaluation Summary */}
               {selectedAppDetail.screeningRemarks && selectedAppDetail.screeningRemarks.length > 0 && (
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                <div className="bg-slate-50 p-4 rounded-xl  space-y-2">
                   <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">
                     4. Committee Screening Audit Trail
                   </h4>
                   {selectedAppDetail.screeningRemarks.map((rem, idx) => (
-                    <div key={idx} className="p-2.5 bg-white rounded border border-slate-200">
+                    <div key={idx} className="p-2.5 bg-white rounded ">
                       <div className="flex justify-between font-semibold text-slate-900">
                         <span>{rem.committeeMember} ({rem.committeeMemberRole})</span>
                         <span className="text-emerald-600">{rem.decision}</span>

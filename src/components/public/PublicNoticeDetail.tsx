@@ -117,10 +117,10 @@ export const PublicNoticeDetail: React.FC<PublicNoticeDetailProps> = ({
           
           <div className="relative z-10 space-y-4">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="px-3 py-1 rounded-full bg-white/10 text-white/90 border border-white/20 font-mono text-[10px] font-bold uppercase tracking-widest">
+              <span className="px-3 py-1 rounded-full bg-white/10 text-white/90  font-mono text-[10px] font-bold uppercase tracking-widest">
                 Advt No: {drive.advtNumber}
               </span>
-              <span className="px-3 py-1 rounded-full bg-white/10 text-white/90 border border-white/20 font-mono text-[10px] font-bold uppercase tracking-widest">
+              <span className="px-3 py-1 rounded-full bg-white/10 text-white/90  font-mono text-[10px] font-bold uppercase tracking-widest">
                 Post Code: {post.postCode}
               </span>
               <span className="px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider">
