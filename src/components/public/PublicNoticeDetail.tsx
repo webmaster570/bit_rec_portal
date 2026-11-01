@@ -78,7 +78,10 @@ export const PublicNoticeDetail: React.FC<PublicNoticeDetailProps> = ({
       if (onRequestLogin) {
         onRequestLogin();
       } else {
-        setActiveTab('public_recruitment');
+        // Fallback: search for login button in header or similar, 
+        // but since we are in App.tsx we know it's passed.
+        // If not, at least don't navigate away.
+        console.warn('onRequestLogin not provided to PublicNoticeDetail');
       }
     }
   };

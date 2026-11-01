@@ -170,7 +170,7 @@ export const AdminPortal: React.FC = () => {
   const [deptHeadEmail, setDeptHeadEmail] = useState('');
 
   // Selected Role for Permission Editing
-  const [selectedRole, setSelectedRole] = useState<UserRole>('screening_committee');
+  const [selectedRole, setSelectedRole] = useState<UserRole>(currentRole === 'admin' ? 'recruitment_admin' : 'super_admin');
   const roleObj = roles.find((r) => r.id === selectedRole);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>(roleObj?.permissions || []);
 
@@ -185,6 +185,7 @@ export const AdminPortal: React.FC = () => {
     { id: 'generate_merit', name: 'Calculate & Publish Merit Lists' },
     { id: 'reconcile_payments', name: 'Monitor & Reconcile Payment Receipts' },
     { id: 'view_audit_logs', name: 'Inspect Security Audit Logs' },
+    { id: 'master_data', name: 'Manage Departments & Master Data' },
   ];
 
   const handleSaveBranding = (e: React.FormEvent) => {
@@ -243,7 +244,15 @@ export const AdminPortal: React.FC = () => {
     setIsUserModalOpen(true);
   };
 
+  const isActionRestricted = (targetUserRole: string) => {
+    return currentRole === 'admin' && targetUserRole === 'super_admin';
+  };
+
   const handleOpenEditUser = (user: PortalUser) => {
+    if (isActionRestricted(user.role)) {
+      alert('Access Denied: Admin cannot edit Super Admin accounts.');
+      return;
+    }
     setEditingUserId(user.id);
     setUserFormName(user.name);
     setUserFormEmail(user.email);
@@ -316,6 +325,10 @@ export const AdminPortal: React.FC = () => {
   };
 
   const handleToggleUserStatus = (user: PortalUser) => {
+    if (isActionRestricted(user.role)) {
+      alert('Access Denied: Admin cannot modify Super Admin status.');
+      return;
+    }
     const nextStatus = user.status === 'active' ? 'suspended' : 'active';
     updateUser(user.id, { status: nextStatus });
     setUserActionNotice(`User "${user.name}" status switched to [${nextStatus}].`);
@@ -331,6 +344,10 @@ export const AdminPortal: React.FC = () => {
   };
 
   const handleSwitchToUserAccount = (user: PortalUser) => {
+    if (isActionRestricted(user.role)) {
+      alert('Access Denied: Admin cannot hijack Super Admin sessions.');
+      return;
+    }
     login(user.role, user.email, user.name, user.regNumber);
     switchRole(user.role);
     setUserActionNotice(`Switched active session to: ${user.name} (${user.role})`);
@@ -973,8 +990,12 @@ export const AdminPortal: React.FC = () => {
                         onChange={(e) => setUserFormRole(e.target.value as UserRole)}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                       >
-                        <option value="super_admin">Super Admin (Full Governance)</option>
-                        <option value="admin">Admin (Restricted Management)</option>
+                        {currentRole === 'super_admin' && (
+                          <>
+                            <option value="super_admin">Super Admin (Full Governance)</option>
+                            <option value="admin">Admin (Restricted Management)</option>
+                          </>
+                        )}
                         <option value="recruitment_admin">Recruitment Admin (Drives & Posts)</option>
                         <option value="recruitment_officer">Recruitment Officer (Operations)</option>
                         <option value="dept_admin">Department Admin (Dept Vacancies)</option>
@@ -1643,7 +1664,7 @@ export const AdminPortal: React.FC = () => {
             </h3>
 
             <div className="space-y-1">
-              {roles.map((r) => (
+              {roles.filter(r => !(currentRole === 'admin' && (r.id === 'super_admin' || r.id === 'admin'))).map((r) => (
                 <button
                   key={r.id}
                   onClick={() => {

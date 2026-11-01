@@ -22,7 +22,19 @@ export const INITIAL_ROLES: RoleInfo[] = [
     name: 'Admin',
     description: 'General administration with restricted access to system branding and status.',
     badgeColor: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-300',
-    permissions: ['manage_users', 'manage_drives', 'manage_posts', 'process_applications'],
+    permissions: [
+      'manage_users', 
+      'manage_drives', 
+      'manage_posts', 
+      'process_applications', 
+      'screen_applications', 
+      'verify_documents', 
+      'enter_interview_scores', 
+      'generate_merit', 
+      'reconcile_payments', 
+      'view_audit_logs',
+      'master_data'
+    ],
   },
   {
     id: 'recruitment_admin',

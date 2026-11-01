@@ -202,11 +202,20 @@ async function syncInitialDatabase(database: Db) {
   try {
     const brandingCol = database.collection('branding');
     const usersCol = database.collection('users');
+    const rolesCol = database.collection('roles');
     
-    const [existingBranding, existingUser] = await Promise.all([
+    const [existingBranding, existingUser, existingRoles] = await Promise.all([
       brandingCol.findOne({ _id: 'portal_branding' as any }).catch(() => null),
-      usersCol.findOne({}).catch(() => null)
+      usersCol.findOne({}).catch(() => null),
+      rolesCol.find({}).toArray().catch(() => [])
     ]);
+
+    // Ensure all INITIAL_ROLES exist
+    const missingRoles = INITIAL_ROLES.filter(r => !existingRoles.some(er => (er.id || er._id) === r.id));
+    if (missingRoles.length > 0) {
+      console.log(`[MongoDB] Adding ${missingRoles.length} missing roles to database...`);
+      await rolesCol.insertMany(missingRoles.map((r) => ({ ...r, _id: r.id as any }))).catch(() => {});
+    }
 
     if (existingBranding || existingUser) {
       globalThis._hasInitialSyncDone = true;
@@ -217,9 +226,8 @@ async function syncInitialDatabase(database: Db) {
     console.log('[MongoDB] Initializing clean database...');
     await brandingCol.insertOne({ _id: 'portal_branding' as any, ...memoryState.branding }).catch(() => {});
 
-    // Fast seed
+    // Fast seed for other collections
     await Promise.all([
-      database.collection('roles').insertMany(memoryState.roles.map((r) => ({ ...r, _id: r.id as any }))).catch(() => {}),
       database.collection('departments').insertMany(memoryState.departments.map((d) => ({ ...d, _id: d.id as any }))).catch(() => {}),
       database.collection('drives').insertMany(memoryState.drives.map((d) => ({ ...d, _id: d.id as any }))).catch(() => {}),
       database.collection('users').insertMany(memoryState.users.map((u) => ({ ...u, _id: u.id as any }))).catch(() => {}),

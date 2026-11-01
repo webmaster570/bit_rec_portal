@@ -1569,6 +1569,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const updateRolePermissions = (roleId: UserRole, permissions: string[]) => {
+    if (currentRole === 'admin' && (roleId === 'admin' || roleId === 'super_admin')) {
+      console.warn('Blocked: Admin attempted to modify sensitive RBAC role:', roleId);
+      return;
+    }
+
     setRoles((prev) =>
       prev.map((r) => (r.id === roleId ? { ...r, permissions } : r))
     );
