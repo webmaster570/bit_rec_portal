@@ -109,6 +109,7 @@ export const AdminPortal: React.FC = () => {
   const [showNavbarShadow, setShowNavbarShadow] = useState(branding.showNavbarShadow ?? true);
   const [showSidebarShadow, setShowSidebarShadow] = useState(branding.showSidebarShadow ?? false);
   const [showCardShadow, setShowCardShadow] = useState(branding.showCardShadow ?? true);
+  const [shadowIntensity, setShadowIntensity] = useState(branding.shadowIntensity || 0.08);
   const [brandingSavedNotice, setBrandingSavedNotice] = useState(false);
   const [isBrandingDirty, setIsBrandingDirty] = useState(false);
 
@@ -126,6 +127,7 @@ export const AdminPortal: React.FC = () => {
       setShowNavbarShadow(branding.showNavbarShadow ?? true);
       setShowSidebarShadow(branding.showSidebarShadow ?? false);
       setShowCardShadow(branding.showCardShadow ?? true);
+      setShadowIntensity(branding.shadowIntensity || 0.08);
     }
   }, [branding, isBrandingDirty]);
   // Mail Config Form State
@@ -202,6 +204,7 @@ export const AdminPortal: React.FC = () => {
       showNavbarShadow,
       showSidebarShadow,
       showCardShadow,
+      shadowIntensity,
     });
     setIsBrandingDirty(false);
     setBrandingSavedNotice(true);
@@ -222,6 +225,7 @@ export const AdminPortal: React.FC = () => {
       setShowNavbarShadow(INITIAL_BRANDING.showNavbarShadow);
       setShowSidebarShadow(INITIAL_BRANDING.showSidebarShadow);
       setShowCardShadow(INITIAL_BRANDING.showCardShadow);
+      setShadowIntensity(INITIAL_BRANDING.shadowIntensity);
       setIsBrandingDirty(false);
       setBrandingSavedNotice(true);
       setTimeout(() => setBrandingSavedNotice(false), 4000);
@@ -1444,6 +1448,8 @@ export const AdminPortal: React.FC = () => {
                     { id: 'purple', label: 'Purple', color: 'bg-purple-600' },
                     { id: 'maroon', label: 'Maroon', color: 'bg-[#800000]' },
                     { id: 'bit_mesra', label: 'BIT Maroon', color: 'bg-[#800000]' },
+                    { id: 'grey', label: 'Slate Grey', color: 'bg-slate-700' },
+                    { id: 'whitish_grey', label: 'Whitish Grey', color: 'bg-slate-50 border-slate-300' },
                   ].map((c) => (
                     <button
                       key={c.id}
@@ -1482,6 +1488,8 @@ export const AdminPortal: React.FC = () => {
                     { id: 'purple', label: 'Purple', color: 'bg-purple-900' },
                     { id: 'maroon', label: 'Maroon', color: 'bg-[#500000]' },
                     { id: 'bit_mesra', label: 'BIT Maroon', color: 'bg-[#800000]' },
+                    { id: 'grey', label: 'Slate Grey', color: 'bg-slate-700' },
+                    { id: 'whitish_grey', label: 'Whitish Grey', color: 'bg-slate-50 border-slate-300' },
                   ].map((c) => (
                     <button
                       key={c.id}
@@ -1555,6 +1563,39 @@ export const AdminPortal: React.FC = () => {
                     </button>
                   </div>
                 </div>
+
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                        Shadow Intensity
+                      </div>
+                      <div className="text-[10px] text-slate-500">Global elevation depth and contrast</div>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-200">
+                      {Math.round(shadowIntensity * 100)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="0.4"
+                    step="0.01"
+                    value={shadowIntensity}
+                    onChange={(e) => {
+                      setShadowIntensity(parseFloat(e.target.value));
+                      setIsBrandingDirty(true);
+                    }}
+                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                  />
+                  <div className="flex justify-between text-[9px] text-slate-400 font-bold uppercase tracking-tighter">
+                    <span>Subtle</span>
+                    <span>Standard</span>
+                    <span>Deep</span>
+                    <span>Vibrant</span>
+                  </div>
+                </div>
               </div>
 
               <div className="pt-3 flex items-center gap-3">
@@ -1590,7 +1631,10 @@ export const AdminPortal: React.FC = () => {
               This preview shows how public visitors and candidates will see the navigation bar at the top of the portal.
             </p>
 
-            <div className={`${(navbarColor && navbarColor !== 'default' && BRAND_COLORS[navbarColor as any]) ? BRAND_COLORS[navbarColor as any].header : 'bg-white'} border border-slate-300 rounded-2xl p-4 shadow-md space-y-3 transition-colors duration-300`}>
+            <div 
+              className={`${(navbarColor && navbarColor !== 'default' && BRAND_COLORS[navbarColor as any]) ? BRAND_COLORS[navbarColor as any].header : 'bg-white'} border border-slate-300 rounded-2xl p-4 shadow-md space-y-3 transition-colors duration-300`}
+              style={{ '--shadow-intensity': shadowIntensity.toString() } as React.CSSProperties}
+            >
               <div className={`text-[10px] uppercase font-mono font-bold ${(navbarColor && navbarColor !== 'default' && BRAND_COLORS[navbarColor as any]) ? 'text-white/50 bg-white/10 border-white/20' : 'text-indigo-600 bg-indigo-50 border border-indigo-200'} px-2.5 py-0.5 rounded-full inline-block border`}>
                 Simulated Header
               </div>
@@ -1633,7 +1677,10 @@ export const AdminPortal: React.FC = () => {
             {/* Sidebar Preview */}
             <div className="space-y-2 mt-4">
               <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sidebar Menu Preview</h4>
-              <div className={`${(sidebarColor && sidebarColor !== 'default' && BRAND_COLORS[sidebarColor as any]) ? BRAND_COLORS[sidebarColor as any].sidebar : 'bg-white'} border border-slate-300 rounded-2xl p-4 shadow-sm h-32 flex flex-col justify-between transition-colors duration-300`}>
+              <div 
+                className={`${(sidebarColor && sidebarColor !== 'default' && BRAND_COLORS[sidebarColor as any]) ? BRAND_COLORS[sidebarColor as any].sidebar : 'bg-white'} border border-slate-300 rounded-2xl p-4 shadow-sm h-32 flex flex-col justify-between transition-colors duration-300`}
+                style={{ '--shadow-intensity': shadowIntensity.toString() } as React.CSSProperties}
+              >
                 <div className="space-y-2">
                   <div className={`h-2 rounded-full w-24 ${(sidebarColor && sidebarColor !== 'default' && BRAND_COLORS[sidebarColor as any]) ? 'bg-white/20' : 'bg-slate-200'}`} />
                   <div className={`h-2 rounded-full w-32 ${(sidebarColor && sidebarColor !== 'default' && BRAND_COLORS[sidebarColor as any]) ? 'bg-white/40' : 'bg-slate-100'}`} />

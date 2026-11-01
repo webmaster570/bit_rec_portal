@@ -13,6 +13,7 @@ export const INITIAL_BRANDING: PortalBranding = {
   showNavbarShadow: true,
   showSidebarShadow: false,
   showCardShadow: true,
+  shadowIntensity: 0.08,
 };
 
 export const DEFAULT_WEIGHTAGE_CONFIG: WeightageConfig = {

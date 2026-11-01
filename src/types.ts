@@ -19,7 +19,7 @@ export interface RoleInfo {
 }
 
 export type PortalTheme = 'classic' | 'modern' | 'crimson' | 'academic' | 'nature' | 'sapphire' | 'bit_mesra' | 'tech_startup' | 'corporate_pro' | 'creative_studio' | 'industrial_heavy' | 'portal_vibrant' | 'portal_minimal' | 'portal_dark_knight' | 'portal_enterprise';
-export type BrandColor = 'default' | 'green' | 'blue' | 'purple' | 'maroon' | 'bit_mesra';
+export type BrandColor = 'default' | 'green' | 'blue' | 'purple' | 'maroon' | 'bit_mesra' | 'grey' | 'whitish_grey';
 
 export interface PortalBranding {
   title: string;
@@ -34,6 +34,7 @@ export interface PortalBranding {
   showNavbarShadow: boolean;
   showSidebarShadow: boolean;
   showCardShadow: boolean;
+  shadowIntensity: number;
 }
 
 export interface PortalUser {

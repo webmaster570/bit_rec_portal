@@ -26,6 +26,16 @@ export const BRAND_COLORS: Record<BrandColor, { sidebar: string; header: string;
     sidebar: 'bg-[#800000] border-[#600000]',
     header: 'bg-[#800000] border-[#600000]',
     isDark: true
+  },
+  grey: {
+    sidebar: 'bg-slate-700 border-slate-600',
+    header: 'bg-slate-800 border-slate-700',
+    isDark: true
+  },
+  whitish_grey: {
+    sidebar: 'bg-slate-50 border-slate-200',
+    header: 'bg-slate-100 border-slate-200',
+    isDark: false
   }
 };
 

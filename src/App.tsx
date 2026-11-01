@@ -28,6 +28,11 @@ import { PublicNoticeDetail } from './components/public/PublicNoticeDetail';
 const MainAppContent: React.FC = () => {
   const { currentRole, isLoggedIn, branding, activeTab, setActiveTab } = usePortal();
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
+  
+  // Apply global shadow intensity from branding
+  React.useEffect(() => {
+    document.documentElement.style.setProperty('--shadow-intensity', (branding.shadowIntensity || 0.08).toString());
+  }, [branding.shadowIntensity]);
 
   // Mobile navigation drawer state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
