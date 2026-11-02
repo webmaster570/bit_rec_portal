@@ -21,6 +21,7 @@ import { AuditLogViewer } from './components/audit/AuditLogViewer';
 import { AdminPortal } from './components/admin/AdminPortal';
 import { ServerTransactionToastContainer } from './components/common/ServerTransactionToastContainer';
 import { THEME_CONFIGS } from './themeStyles';
+import { Footer } from './components/Footer';
 
 import { SystemStatusPortal } from './components/public/SystemStatusPortal';
 import { PublicNoticeDetail } from './components/public/PublicNoticeDetail';
@@ -203,7 +204,7 @@ const MainAppContent: React.FC = () => {
       {/* Main Layout Area */}
       <div className="flex flex-1 overflow-hidden relative">
         {/* Navigation Sidebar (Desktop + Mobile Slide-Over Drawer) */}
-        {isLoggedIn && (
+        {(isLoggedIn || activeTab === 'public_recruitment' || activeTab === 'notice_detail' || activeTab === 'applicant_portal') && (
           <Sidebar
             activeTab={activeTab}
             setActiveTab={handleTabChange}
@@ -215,8 +216,17 @@ const MainAppContent: React.FC = () => {
         )}
 
         {/* Dynamic View Panel */}
-        <main className={`flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8 ${theme.mainBg} min-w-0 max-w-full`}>
-          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">{renderContent()}</div>
+        <main className={`flex-1 overflow-y-auto ${theme.mainBg} min-w-0 max-w-full`}>
+          <div className="p-3 sm:p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+              {renderContent()}
+            </div>
+          </div>
+          
+          {/* Footer (Only on public recruitment or explicitly for all) */}
+          {(activeTab === 'public_recruitment' || activeTab === 'notice_detail' || activeTab === 'notices') && (
+            <Footer />
+          )}
         </main>
       </div>
 

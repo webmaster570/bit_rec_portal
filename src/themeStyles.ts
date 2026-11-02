@@ -23,8 +23,8 @@ export const BRAND_COLORS: Record<BrandColor, { sidebar: string; header: string;
     isDark: true
   },
   bit_mesra: {
-    sidebar: 'bg-[#800000] border-[#600000]',
-    header: 'bg-[#800000] border-[#600000]',
+    sidebar: 'bg-[#142D4E] border-[#10243E]',
+    header: 'bg-[#142D4E] border-[#10243E]',
     isDark: true
   },
   grey: {
@@ -33,8 +33,8 @@ export const BRAND_COLORS: Record<BrandColor, { sidebar: string; header: string;
     isDark: true
   },
   whitish_grey: {
-    sidebar: 'bg-slate-50 border-slate-200',
-    header: 'bg-slate-100 border-slate-200',
+    sidebar: 'bg-[#F8FAFC] border-slate-200',
+    header: 'bg-white border-slate-200',
     isDark: false
   }
 };
@@ -140,18 +140,18 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     focusColor: 'focus:border-sky-600 focus:ring-sky-600',
   },
   bit_mesra: {
-    rootContainer: 'font-sans bg-[#F7F4EE] antialiased text-[#1C1917]',
-    mainBg: 'bg-white border-t border-[#D6CEBE]',
-    cardBase: 'bg-white shadow-sm rounded-none',
-    sidebarBase: 'bg-[#800000] text-white border-r border-[#600000]',
-    headerBase: 'bg-white border-b border-[#D6CEBE]',
-    accentColor: 'text-[#800000]',
-    primaryButton: 'bg-[#800000] hover:bg-[#600000] text-white rounded-none shadow-sm font-bold uppercase tracking-wider',
-    headingFont: 'font-serif font-black tracking-tight text-[#800000]',
-    secondaryButton: 'bg-[#FBF9F5] text-[#800000] border-[#D6CEBE] hover:bg-[#EBE6DF] rounded-none uppercase tracking-wider font-bold',
-    paperBg: 'bg-[#F7F4EE]',
-    heroGradient: 'from-[#800000] via-[#700000] to-[#600000]',
-    focusColor: 'focus:border-[#800000] focus:ring-[#800000]',
+    rootContainer: 'font-sans bg-[#F5F7FA] antialiased text-[#263238]',
+    mainBg: 'bg-white border-none',
+    cardBase: 'bg-white shadow-sm border-none rounded-none',
+    sidebarBase: 'bg-[#142D4E] text-white border-r border-[#10243E]',
+    headerBase: 'bg-white border-b border-[#E2E8F0]',
+    accentColor: 'text-[#A77B32]',
+    primaryButton: 'bg-[#142D4E] hover:bg-[#0F223B] text-white rounded-none shadow-sm font-bold uppercase tracking-wider',
+    headingFont: 'font-sans font-extrabold tracking-tight text-[#142D4E]',
+    secondaryButton: 'bg-[#F8FAFC] text-[#142D4E] border-[#E2E8F0] hover:bg-[#F1F5F9] rounded-none uppercase tracking-wider font-bold',
+    paperBg: 'bg-[#F5F7FA]',
+    heroGradient: 'from-[#142D4E] via-[#10243E] to-[#0D1B2E]',
+    focusColor: 'focus:border-[#142D4E] focus:ring-[#142D4E]',
   },
   tech_startup: {
     rootContainer: 'font-sans bg-slate-950 antialiased text-slate-100',

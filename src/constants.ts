@@ -2,7 +2,7 @@ import { PortalBranding, WeightageConfig, MailConfig } from './types.js';
 
 export const INITIAL_BRANDING: PortalBranding = {
   title: 'Birla Institute of Technology',
-  subtitle: 'Online Recruitment & Merit Application System',
+  subtitle: 'Mesra, Ranchi',
   logoType: 'icon',
   logoIconName: 'Building2',
   logoImageUrl: '',
@@ -12,8 +12,8 @@ export const INITIAL_BRANDING: PortalBranding = {
   sidebarColor: 'bit_mesra',
   showNavbarShadow: true,
   showSidebarShadow: false,
-  showCardShadow: true,
-  shadowIntensity: 0.08,
+  showCardShadow: false, // Changed to false as per "remove borders" and clean design
+  shadowIntensity: 0.05,
 };
 
 export const DEFAULT_WEIGHTAGE_CONFIG: WeightageConfig = {

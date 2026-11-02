@@ -86,6 +86,27 @@ export const INITIAL_ROLES: RoleInfo[] = [
     permissions: ['reconcile_payments', 'process_refunds', 'view_finance_reports'],
   },
   {
+    id: 'registrar',
+    name: 'Registrar',
+    description: 'Final approval authority for recruitment notifications and appointment letters.',
+    badgeColor: 'bg-indigo-100 text-indigo-800 border-indigo-300',
+    permissions: ['all_access', 'issue_offers', 'publish_results'],
+  },
+  {
+    id: 'dean_academic',
+    name: 'Dean (Academic)',
+    description: 'Oversees academic recruitment drives and departmental requirements.',
+    badgeColor: 'bg-blue-100 text-blue-800 border-blue-300',
+    permissions: ['manage_drives', 'manage_posts', 'view_dept_applications'],
+  },
+  {
+    id: 'dean_faculty_affairs',
+    name: 'Dean (Faculty Affairs)',
+    description: 'Management of faculty recruitment, screening, and selection processes.',
+    badgeColor: 'bg-purple-100 text-purple-800 border-purple-300',
+    permissions: ['screen_applications', 'enter_interview_scores', 'generate_merit'],
+  },
+  {
     id: 'applicant',
     name: 'Applicant Dashboard',
     description: 'Candidate view to register, apply, pay fee, download admit card, track status.',

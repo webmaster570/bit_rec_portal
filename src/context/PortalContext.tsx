@@ -189,12 +189,12 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [activeTab, setActiveTabState] = useState<string>(() => loadInitialState('activeTab', 'public_recruitment', AUTH_STORAGE_KEY));
   const [currentRole, setCurrentRole] = useState<UserRole>(() => loadInitialState('currentRole', 'super_admin', AUTH_STORAGE_KEY));
   const [roles, setRoles] = useState<RoleInfo[]>(INITIAL_ROLES);
-  const [drives, setDrives] = useState<RecruitmentDrive[]>(INITIAL_DRIVES);
-  const [applications, setApplications] = useState<Application[]>(INITIAL_APPLICATIONS);
-  const [departments, setDepartments] = useState<Department[]>(INITIAL_DEPARTMENTS);
-  const [users, setUsers] = useState<PortalUser[]>(INITIAL_USERS);
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
-  const [notifications, setNotifications] = useState<SystemNotification[]>(INITIAL_NOTIFICATIONS);
+  const [drives, setDrives] = useState<RecruitmentDrive[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [users, setUsers] = useState<PortalUser[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [notifications, setNotifications] = useState<SystemNotification[]>([]);
   const [selectedDriveId, setSelectedDriveId] = useState<string | null>(() => loadInitialState('selectedDriveId', 'drive-2026-01'));
   const [selectedPostId, setSelectedPostId] = useState<string | null>(() => loadInitialState('selectedPostId', null));
   

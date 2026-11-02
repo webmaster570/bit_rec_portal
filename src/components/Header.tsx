@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { usePortal } from '../context/PortalContext';
-import { UserRole } from '../types';
 import {
   ShieldCheck,
   Bell,
@@ -13,13 +12,15 @@ import {
   LogIn,
   UserPlus,
   LogOut,
-  Sparkles,
-  LayoutDashboard,
   Globe,
   Menu,
   X,
   Lock,
-  Send,
+  Mail,
+  Phone,
+  LayoutDashboard,
+  Search,
+  Sparkles,
 } from 'lucide-react';
 import { THEME_CONFIGS, BRAND_COLORS } from '../themeStyles';
 import { ChangePasswordModal } from './auth/ChangePasswordModal';
@@ -55,15 +56,15 @@ export const Header: React.FC<HeaderProps> = ({
   } = usePortal();
 
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
+  const isHeaderBranded = !!(branding.navbarColor && branding.navbarColor !== 'default' && BRAND_COLORS[branding.navbarColor]);
+  const headerColors = isHeaderBranded ? BRAND_COLORS[branding.navbarColor as any] : null;
 
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [showNotifPopover, setShowNotifPopover] = useState(false);
   const [isChangePassOpen, setIsChangePassOpen] = useState(false);
 
-  const activeRoleObj = roles.find((r) => r.id === currentRole);
+  const currentRoleInfo = roles.find((r) => r.id === currentRole);
   const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const isNavbarBranded = !!(branding.navbarColor && branding.navbarColor !== 'default' && BRAND_COLORS[branding.navbarColor]);
 
   const renderLogoIcon = () => {
     switch (branding.logoIconName) {
@@ -82,264 +83,192 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className={`sticky top-0 z-40 ${isNavbarBranded && branding.navbarColor && BRAND_COLORS[branding.navbarColor] ? BRAND_COLORS[branding.navbarColor].header : (theme?.headerBase || 'bg-white border-b border-slate-200')} ${branding.showNavbarShadow ? 'shadow-md' : 'shadow-none'} transition-all duration-300`}>
-      {/* Main Navigation Header */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Left Side: Mobile Menu Button & Brand Logo */}
-        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
-          {/* Mobile Hamburger Toggle Button (< lg screens) */}
-          {isLoggedIn && (
+    <header 
+      className={`sticky top-0 z-50 ${isHeaderBranded ? headerColors?.header : 'bg-white'} border-b ${isHeaderBranded ? 'border-white/10' : 'border-slate-200'} ${branding.showNavbarShadow ? 'shadow-md' : 'shadow-none'} transition-all duration-300`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Brand Identity Section */}
+          <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
             <button
               onClick={onToggleMobileMenu}
-              className={`lg:hidden p-2 rounded-xl border transition shrink-0 active:scale-95 shadow-2xs ${isNavbarBranded ? 'bg-white/10 text-white border-white/20 hover:bg-white/20' : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-slate-200'}`}
-              aria-label={isMobileMenuOpen ? 'Close navigation panel' : 'Open navigation panel'}
-              title="Toggle Menu"
+              className={`lg:hidden p-2 rounded-xl transition ${isHeaderBranded ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
             >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
-          )}
 
-          {/* Brand & Organization Title */}
-          <div
-            className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group shrink-0 min-w-0"
-            onClick={() => setActiveTab('public_recruitment')}
-          >
-            {branding.logoType === 'image' && branding.logoImageUrl ? (
-              <img
-                src={branding.logoImageUrl}
-                alt="Portal Logo"
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl object-contain bg-white border border-slate-200 p-0.5 shadow-md group-hover:scale-105 transition-transform shrink-0"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
-              />
-            ) : (
-              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md ${theme?.headingFont || 'font-bold'} text-lg sm:text-xl group-hover:scale-105 transition-transform shrink-0`}>
-                {renderLogoIcon()}
-              </div>
-            )}
-            <div className="min-w-0">
-              <div className="flex items-center space-x-1.5">
-                <h1 className={`text-xs sm:text-base lg:text-lg ${theme?.headingFont || 'font-bold'} tracking-tight leading-tight truncate ${isNavbarBranded ? 'text-white' : ''}`}>
+            <div 
+              className="flex items-center gap-3 cursor-pointer"
+              onClick={() => setActiveTab('public_recruitment')}
+            >
+              {branding.logoType === 'image' && branding.logoImageUrl ? (
+                <img
+                  src={branding.logoImageUrl}
+                  alt={branding.title}
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-contain bg-white border border-slate-200 p-0.5 shadow-sm shrink-0"
+                />
+              ) : (
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-md shrink-0`}>
+                  {renderLogoIcon()}
+                </div>
+              )}
+
+              <div className="hidden sm:block overflow-hidden">
+                <h1 className={`text-sm sm:text-base font-black tracking-tight leading-tight truncate ${isHeaderBranded ? 'text-white' : 'text-slate-900'}`}>
                   {branding.title}
                 </h1>
-                <span className={`hidden sm:inline-block text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.2 rounded-full font-mono font-bold shrink-0 border ${isNavbarBranded ? 'bg-white/10 text-emerald-300 border-white/20' : 'bg-emerald-50 text-emerald-700 border-emerald-300'}`}>
-                  Portal
-                </span>
+                <p className={`text-[10px] sm:text-[11px] font-bold truncate ${isHeaderBranded ? 'text-white/60' : 'text-slate-500'}`}>
+                  {branding.subtitle}
+                </p>
               </div>
-              <p className={`text-[10px] sm:text-xs ${isNavbarBranded ? 'text-white/60' : 'text-slate-500'} hidden md:block truncate max-w-sm`}>
-                {branding.subtitle}
-              </p>
             </div>
           </div>
-        </div>
 
-        {/* Center / Navigation Quick Links (Desktop only) */}
-        <div className="hidden lg:flex items-center space-x-2">
-          <button
-            onClick={() => setActiveTab('public_recruitment')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
-              activeTab === 'public_recruitment'
-                ? (isNavbarBranded ? 'bg-white/10 text-white border border-white/20 shadow-2xs' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs')
-                : (isNavbarBranded ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900')
-            }`}
-          >
-            <Globe className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white/70' : (theme?.accentColor || 'text-indigo-600')}`} />
-            <span>Public Notices</span>
-          </button>
-
-          {!isLoggedIn && (
-            <button
-              onClick={() => setActiveTab('applicant_portal')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
-                activeTab === 'applicant_portal'
-                  ? (isNavbarBranded ? 'bg-white/10 text-white border border-white/20 shadow-2xs' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs')
-                  : (isNavbarBranded ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900')
-              }`}
-            >
-              <Send className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white/70' : (theme?.accentColor || 'text-indigo-600')}`} />
-              <span>Apply Online</span>
-            </button>
-          )}
-
-          {isLoggedIn && (
-            <button
-              onClick={() => {
-                if (currentRole === 'applicant') setActiveTab('applicant_portal');
-                else setActiveTab('overview');
-              }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
-                activeTab !== 'public_recruitment' && activeTab !== 'applicant_portal'
-                  ? (isNavbarBranded ? 'bg-white/10 text-white border border-white/20 shadow-2xs' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs')
-                  : (isNavbarBranded ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900')
-              }`}
-            >
-              <LayoutDashboard className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white/70' : (theme?.accentColor || 'text-indigo-600')}`} />
-              <span>My Dashboard</span>
-            </button>
-          )}
-        </div>
-
-        {/* Right Action Controls: Login / Register / User Controls */}
-        <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-          {!isLoggedIn ? (
-            /* Visitor Action Buttons: Login & Register */
-            <div className="flex items-center space-x-1.5 sm:space-x-2">
-              <button
-                onClick={onOpenLogin}
-                className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl font-bold text-[11px] sm:text-xs transition flex items-center space-x-1 sm:space-x-1.5 shadow-2xs border ${isNavbarBranded ? 'bg-white/10 text-white border-white/20 hover:bg-white/20' : 'bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200'}`}
-              >
-                <LogIn className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white' : (theme?.accentColor || 'text-indigo-600')}`} />
-                <span>Login</span>
-              </button>
-
-              <button
-                onClick={onOpenRegister}
-                className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl ${theme?.primaryButton || 'bg-indigo-600 text-white'} font-bold text-[11px] sm:text-xs shadow-md transition flex items-center space-x-1 sm:space-x-1.5`}
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline">Register</span>
-                <span className="xs:hidden">Sign Up</span>
-              </button>
-            </div>
-          ) : (
-            /* Authenticated User Controls */
-            <div className="flex items-center space-x-1.5 sm:space-x-2">
-              {/* Notifications Popover */}
-              <div className="relative">
+          {/* Search & Actions Section */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {!isLoggedIn ? (
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setShowNotifPopover(!showNotifPopover)}
-                  className={`relative p-1.5 sm:p-2 rounded-xl transition shadow-2xs border ${isNavbarBranded ? 'bg-white/10 text-white border-white/20 hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 border-slate-200'}`}
-                  title="System Notifications"
+                  onClick={onOpenLogin}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${isHeaderBranded ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
                 >
-                  <Bell className="w-4 h-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-rose-500 to-pink-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse shadow-xs">
-                      {unreadCount}
-                    </span>
-                  )}
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Login</span>
                 </button>
-
-                {showNotifPopover && (
-                  <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 text-xs z-50">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                      <span className="font-bold text-slate-900">System Notifications</span>
-                      <span className="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full font-semibold">
-                        {notifications.length} Messages
-                      </span>
-                    </div>
-                    <div className="divide-y divide-slate-100 max-h-64 overflow-y-auto my-2">
-                      {notifications.map((n) => (
-                        <div
-                          key={n.id}
-                          onClick={() => markNotificationRead(n.id)}
-                          className={`p-2.5 rounded-xl cursor-pointer transition ${
-                            n.read ? 'opacity-60 hover:opacity-100' : 'bg-indigo-50/50 border border-indigo-100'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between font-semibold text-slate-800 mb-0.5">
-                            <span>{n.title}</span>
-                            {!n.read && <span className="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span>}
-                          </div>
-                          <p className="text-slate-600 text-[11px] leading-snug">{n.message}</p>
-                          <span className="text-[10px] text-indigo-600 block mt-1 font-mono">
-                            {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                <button
+                  onClick={onOpenRegister}
+                  className={`px-4 py-2 rounded-xl text-xs font-black shadow-lg transition flex items-center gap-1.5 ${theme.primaryButton}`}
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Register</span>
+                </button>
               </div>
-
-              {/* User Avatar Badge & Role Selector */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-                  className={`flex items-center space-x-1.5 px-2 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-2xs max-w-[140px] sm:max-w-[180px] border ${isNavbarBranded ? 'bg-white/10 border-white/20 hover:bg-white/20' : 'bg-slate-100 border-slate-200 hover:bg-slate-200'}`}
-                >
-                  <User className={`w-3.5 h-3.5 ${isNavbarBranded ? 'text-white' : 'text-purple-600'} shrink-0`} />
-                  <span className={`font-bold truncate ${isNavbarBranded ? 'text-white' : 'text-slate-900'}`}>
-                    {currentUser?.name?.split(' ')[0] || activeRoleObj?.name}
-                  </span>
-                  <ChevronDown className={`w-3 h-3 ${isNavbarBranded ? 'text-white/70' : 'text-slate-500'} shrink-0`} />
-                </button>
-
-                {showRoleDropdown && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50">
-                    <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 border-b border-slate-100 mb-1">
-                      User Account Session
-                    </div>
-                    <div className="px-3 py-2 bg-slate-50 rounded-xl mb-2 text-xs">
-                      <div className="font-bold text-slate-900">{currentUser?.name}</div>
-                      <div className="text-[10px] text-slate-500 truncate">{currentUser?.email}</div>
-                      <span className="mt-1 inline-block px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 text-[9px] font-bold">
-                        {activeRoleObj?.name}
+            ) : (
+              <div className="flex items-center gap-2 sm:gap-4">
+                {/* Notifications */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifPopover(!showNotifPopover)}
+                    className={`p-2 rounded-xl transition relative ${isHeaderBranded ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+                  >
+                    <Bell className="w-5 h-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-rose-600 text-white text-[9px] font-black rounded-full flex items-center justify-center ring-2 ring-white">
+                        {unreadCount}
                       </span>
-                    </div>
-
-                    <div className="p-1 space-y-1">
-                      <button
-                        onClick={() => {
-                          setShowRoleDropdown(false);
-                          setIsChangePassOpen(true);
-                        }}
-                        className="w-full text-left px-3 py-2 rounded-xl text-xs flex items-center space-x-2 text-slate-700 hover:bg-slate-100 transition"
-                      >
-                        <Lock className="w-3.5 h-3.5 text-slate-400" />
-                        <span>Change Password</span>
-                      </button>
-                    </div>
-
-                    {/* Role Switcher (Active if Dev Selector Enabled) */}
-                    {allowDevRoleSelector && (
-                      <div className="p-1 space-y-1 border-t border-slate-100 mt-1">
-                        <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Switch Active Role
-                        </div>
-                        <div className="grid grid-cols-1 gap-1">
-                          {roles.map((r) => (
-                            <button
-                              key={r.id}
-                              onClick={() => {
-                                switchRole(r.id);
-                                setShowRoleDropdown(false);
-                              }}
-                              className={`w-full text-left px-3 py-2 rounded-xl text-[11px] font-semibold flex items-center justify-between transition ${
-                                currentRole === r.id
-                                  ? 'bg-indigo-50 text-indigo-700 border border-indigo-100'
-                                  : 'text-slate-600 hover:bg-slate-50'
-                              }`}
-                            >
-                              <span>{r.name}</span>
-                              {currentRole === r.id && <CheckCircle className="w-3 h-3 text-emerald-500" />}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
                     )}
-                  </div>
-                )}
-              </div>
+                  </button>
 
-              {/* Logout Button */}
-              <button
-                onClick={() => {
-                  logout();
-                  setActiveTab('public_recruitment');
-                }}
-                className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-bold transition flex items-center space-x-1"
-                title="Log out of session"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Logout</span>
-              </button>
-            </div>
-          )}
+                  {showNotifPopover && (
+                    <div className="absolute right-0 mt-3 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                       <div className={`p-4 ${theme.heroGradient || 'bg-slate-900'} text-white flex items-center justify-between`}>
+                         <div className="flex items-center gap-2">
+                            <Bell className="w-4 h-4" />
+                            <span className="text-xs font-black uppercase tracking-wider">Alert Center</span>
+                         </div>
+                         <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full">{notifications.length} Messages</span>
+                       </div>
+                       <div className="max-h-80 overflow-y-auto divide-y divide-slate-50">
+                         {notifications.length === 0 ? (
+                           <div className="p-8 text-center space-y-2">
+                              <Sparkles className="w-8 h-8 text-slate-200 mx-auto" />
+                              <p className="text-xs text-slate-400 font-bold">No new notifications</p>
+                           </div>
+                         ) : (
+                           notifications.map(n => (
+                             <div 
+                               key={n.id} 
+                               className={`p-4 hover:bg-slate-50 cursor-pointer transition-colors ${!n.read ? 'bg-indigo-50/30' : ''}`}
+                               onClick={() => {
+                                 markNotificationRead(n.id);
+                                 setShowNotifPopover(false);
+                               }}
+                             >
+                               <div className="flex justify-between gap-2">
+                                 <h4 className="text-xs font-black text-slate-900 leading-tight">{n.title}</h4>
+                                 {!n.read && <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0 mt-1"></span>}
+                               </div>
+                               <p className="text-[11px] text-slate-500 mt-1 leading-relaxed line-clamp-2">{n.message}</p>
+                               <span className="text-[9px] text-slate-400 font-bold uppercase mt-2 block">Just Now</span>
+                             </div>
+                           ))
+                         )}
+                       </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* User Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+                    className={`flex items-center gap-2.5 p-1 pr-3 rounded-full transition border ${isHeaderBranded ? 'bg-white/10 border-white/20 hover:bg-white/20' : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'}`}
+                  >
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-sm ring-2 ring-white/20">
+                      <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </div>
+                    <div className="hidden md:block text-left">
+                      <div className={`text-xs font-black leading-tight ${isHeaderBranded ? 'text-white' : 'text-slate-900'}`}>
+                        {currentUser?.name?.split(' ')[0]}
+                      </div>
+                      <div className={`text-[10px] font-bold ${isHeaderBranded ? 'text-white/50' : 'text-slate-500'}`}>
+                        {currentRoleInfo?.name || 'Account'}
+                      </div>
+                    </div>
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showRoleDropdown ? 'rotate-180' : ''} ${isHeaderBranded ? 'text-white/40' : 'text-slate-400'}`} />
+                  </button>
+
+                  {showRoleDropdown && (
+                    <div className="absolute right-0 mt-3 w-64 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 py-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                       <div className="px-5 py-3 border-b border-slate-50 mb-2">
+                         <div className="text-xs font-black text-slate-900 truncate">{currentUser?.name}</div>
+                         <div className="text-[10px] font-bold text-slate-400 truncate">{currentUser?.email}</div>
+                         <span className={`inline-block mt-2 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider ${theme.accentColor} bg-indigo-50`}>
+                            {currentRoleInfo?.name}
+                         </span>
+                       </div>
+                       
+                       <div className="px-2 space-y-1">
+                          <button
+                            onClick={() => { setShowRoleDropdown(false); setIsChangePassOpen(true); }}
+                            className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 flex items-center gap-3 transition-colors"
+                          >
+                            <Lock className="w-4 h-4 text-slate-400" />
+                            <span>Security & Password</span>
+                          </button>
+
+                          {allowDevRoleSelector && (
+                            <div className="pt-2 pb-1">
+                              <div className="px-4 py-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Developer: Switch Role</div>
+                              {roles.map(r => (
+                                <button
+                                  key={r.id}
+                                  onClick={() => { switchRole(r.id); setShowRoleDropdown(false); }}
+                                  className={`w-full text-left px-3 py-2 rounded-xl text-[11px] font-bold flex items-center justify-between ${currentRole === r.id ? 'bg-indigo-50 text-indigo-700 font-black' : 'text-slate-500 hover:bg-slate-50'}`}
+                                >
+                                  <span>{r.name}</span>
+                                  {currentRole === r.id && <CheckCircle className="w-3 h-3 text-emerald-500" />}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                       </div>
+
+                       <div className="mt-3 pt-3 border-t border-slate-50 px-2">
+                         <button
+                           onClick={() => { logout(); setActiveTab('public_recruitment'); }}
+                           className="w-full text-left px-3 py-2 rounded-xl text-xs font-black text-rose-600 hover:bg-rose-50 flex items-center gap-3 transition-colors"
+                         >
+                           <LogOut className="w-4 h-4" />
+                           <span>Sign Out Session</span>
+                         </button>
+                       </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

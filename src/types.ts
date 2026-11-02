@@ -8,6 +8,9 @@ export type UserRole =
   | 'interview_panel'
   | 'doc_verifier'
   | 'finance_admin'
+  | 'registrar'
+  | 'dean_academic'
+  | 'dean_faculty_affairs'
   | 'applicant';
 
 export interface RoleInfo {

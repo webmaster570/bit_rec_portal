@@ -654,6 +654,9 @@ export const AdminPortal: React.FC = () => {
                   <option value="interview_panel">Interview Panel</option>
                   <option value="doc_verifier">Doc Verifier</option>
                   <option value="finance_admin">Finance Admin</option>
+                  <option value="registrar">Registrar</option>
+                  <option value="dean_academic">Dean Academic</option>
+                  <option value="dean_faculty_affairs">Dean Faculty Affairs</option>
                   <option value="applicant">Public Applicant</option>
                 </select>
 
@@ -738,6 +741,15 @@ export const AdminPortal: React.FC = () => {
                       } else if (user.role === 'finance_admin') {
                         roleBadgeClass = 'bg-green-50 text-green-800 border-green-300';
                         roleLabel = 'Finance Admin';
+                      } else if (user.role === 'registrar') {
+                        roleBadgeClass = 'bg-indigo-50 text-indigo-800 border-indigo-300';
+                        roleLabel = 'Registrar';
+                      } else if (user.role === 'dean_academic') {
+                        roleBadgeClass = 'bg-blue-50 text-blue-800 border-blue-300';
+                        roleLabel = 'Dean Academic';
+                      } else if (user.role === 'dean_faculty_affairs') {
+                        roleBadgeClass = 'bg-purple-50 text-purple-800 border-purple-300';
+                        roleLabel = 'Dean Faculty Affairs';
                       } else if (user.role === 'applicant') {
                         roleBadgeClass = 'bg-slate-100 text-slate-700 border-slate-300';
                         roleLabel = 'Public Applicant';
@@ -1007,6 +1019,9 @@ export const AdminPortal: React.FC = () => {
                         <option value="interview_panel">Interview Panel (Score Entry)</option>
                         <option value="doc_verifier">Document Verifier (Certificates)</option>
                         <option value="finance_admin">Finance Admin (Fee Reconciliation)</option>
+                        <option value="registrar">Registrar (Final Approval)</option>
+                        <option value="dean_academic">Dean - Academic (Recruitment Lead)</option>
+                        <option value="dean_faculty_affairs">Dean - Faculty Affairs (Selection Lead)</option>
                         <option value="applicant">Public Applicant</option>
                       </select>
                     </div>
@@ -1398,7 +1413,7 @@ export const AdminPortal: React.FC = () => {
                     { id: 'academic', label: 'Academic Gold', desc: 'Navy Sidebar, Serifs, Prestigious', color: 'bg-[#1a365d]', preset: { title: 'Institute of Excellence', subtitle: 'Official Faculty and Research Staff Appointment System', icon: 'GraduationCap' } },
                     { id: 'nature', label: 'Nature Mint', desc: 'Forest Green Sidebar, Organic', color: 'bg-emerald-800', preset: { title: 'EcoRecruit Portal', subtitle: 'Sustainable career paths in environmental and social impact', icon: 'Globe' } },
                     { id: 'sapphire', label: 'Sapphire Ocean', desc: 'Slate Sidebar, Professional Blue', color: 'bg-slate-900', preset: { title: 'Sapphire Professional Search', subtitle: 'Transparent and efficient merit-based recruitment', icon: 'ShieldCheck' } },
-                    { id: 'bit_mesra', label: 'Institutional (BIT)', desc: 'Maroon & Gold, Formal University', color: 'bg-[#800000]', preset: { title: 'BIT Recruitment Portal', subtitle: 'Official Career Opportunities at Birla Institute of Technology', icon: 'Building2' } },
+                    { id: 'bit_mesra', label: 'Institutional (BIT)', desc: 'Navy & Gold, Formal University', color: 'bg-[#142D4E]', preset: { title: 'BIT Recruitment Portal', subtitle: 'Official Career Opportunities at Birla Institute of Technology', icon: 'Building2' } },
                   ].map((themeOption) => {
                     const isSelected = selectedTheme === themeOption.id;
                     return (
@@ -1407,9 +1422,6 @@ export const AdminPortal: React.FC = () => {
                         type="button"
                         onClick={() => {
                           setSelectedTheme(themeOption.id as any);
-                          setNavTitle(themeOption.preset.title);
-                          setNavSubtitle(themeOption.preset.subtitle);
-                          setLogoIconName(themeOption.preset.icon);
                           setIsBrandingDirty(true);
                         }}
                         className={`p-3.5 rounded-2xl border text-left transition flex items-start space-x-3 ${
@@ -1430,7 +1442,7 @@ export const AdminPortal: React.FC = () => {
                   })}
                 </div>
                 <p className="text-[10px] text-slate-400 italic">
-                  Note: Selecting a template will automatically apply recommended industry presets for the title and icon.
+                  Note: Selecting a template will update the visual theme (colors, fonts, and layout) without affecting your custom titles or logo settings.
                 </p>
               </div>
 
@@ -1446,8 +1458,8 @@ export const AdminPortal: React.FC = () => {
                     { id: 'green', label: 'Green', color: 'bg-emerald-600' },
                     { id: 'blue', label: 'Blue', color: 'bg-blue-600' },
                     { id: 'purple', label: 'Purple', color: 'bg-purple-600' },
-                    { id: 'maroon', label: 'Maroon', color: 'bg-[#800000]' },
-                    { id: 'bit_mesra', label: 'BIT Maroon', color: 'bg-[#800000]' },
+                    { id: 'maroon', label: 'Navy Blue', color: 'bg-[#142D4E]' },
+                    { id: 'bit_mesra', label: 'BIT Navy', color: 'bg-[#142D4E]' },
                     { id: 'grey', label: 'Slate Grey', color: 'bg-slate-700' },
                     { id: 'whitish_grey', label: 'Whitish Grey', color: 'bg-slate-50 border-slate-300' },
                   ].map((c) => (
@@ -1486,8 +1498,8 @@ export const AdminPortal: React.FC = () => {
                     { id: 'green', label: 'Green', color: 'bg-emerald-900' },
                     { id: 'blue', label: 'Blue', color: 'bg-blue-900' },
                     { id: 'purple', label: 'Purple', color: 'bg-purple-900' },
-                    { id: 'maroon', label: 'Maroon', color: 'bg-[#500000]' },
-                    { id: 'bit_mesra', label: 'BIT Maroon', color: 'bg-[#800000]' },
+                    { id: 'maroon', label: 'Navy Blue', color: 'bg-[#500000]' },
+                    { id: 'bit_mesra', label: 'BIT Navy', color: 'bg-[#142D4E]' },
                     { id: 'grey', label: 'Slate Grey', color: 'bg-slate-700' },
                     { id: 'whitish_grey', label: 'Whitish Grey', color: 'bg-slate-50 border-slate-300' },
                   ].map((c) => (

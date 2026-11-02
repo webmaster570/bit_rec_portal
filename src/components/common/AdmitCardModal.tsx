@@ -10,7 +10,7 @@ interface AdmitCardModalProps {
 export const AdmitCardModal: React.FC<AdmitCardModalProps> = ({ application, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-      <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto text-slate-900 animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto text-slate-900 animate-in fade-in zoom-in-95 duration-150">
         {/* Modal Header */}
         <div className="flex items-center justify-between p-3.5 sm:p-4 border-b border-slate-200 bg-slate-50 shrink-0">
           <div className="flex items-center space-x-2 min-w-0">
@@ -52,7 +52,7 @@ export const AdmitCardModal: React.FC<AdmitCardModalProps> = ({ application, onC
           </div>
 
           {/* Candidate Profile Details & Photo */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 items-center bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 items-center bg-slate-50 p-3 sm:p-4 rounded-xl">
             <div className="sm:col-span-2 space-y-2">
               <div>
                 <span className="text-slate-500 text-[10px] uppercase block">Candidate Full Name</span>
@@ -90,7 +90,7 @@ export const AdmitCardModal: React.FC<AdmitCardModalProps> = ({ application, onC
           </div>
 
           {/* Applied Post & Test Venue Details */}
-          <div className="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 space-y-2">
+          <div className="bg-slate-50 p-3 sm:p-4 rounded-xl space-y-2">
             <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-1">
               Examination Schedule & Venue Allocation
             </h4>
@@ -116,7 +116,7 @@ export const AdmitCardModal: React.FC<AdmitCardModalProps> = ({ application, onC
           </div>
 
           {/* Verification QR Code & Instructions */}
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="p-3 bg-slate-50 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="space-y-1">
               <span className="text-xs font-bold text-slate-900 flex items-center gap-1">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -129,7 +129,7 @@ export const AdmitCardModal: React.FC<AdmitCardModalProps> = ({ application, onC
               </p>
             </div>
 
-            <div className="p-2 bg-white rounded-lg border border-slate-200 text-slate-900 text-center shrink-0">
+            <div className="p-2 bg-white rounded-lg text-slate-900 text-center shrink-0">
               <QrCode className="w-10 h-10 sm:w-12 sm:h-12 mx-auto" />
               <span className="text-[8px] font-mono block font-bold mt-0.5 text-slate-600">AUTH-VERIFIED</span>
             </div>

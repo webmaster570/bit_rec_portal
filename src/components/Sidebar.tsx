@@ -92,6 +92,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         'interview_panel',
         'doc_verifier',
         'finance_admin',
+        'registrar',
+        'dean_academic',
+        'dean_faculty_affairs',
         'applicant',
       ],
     },
@@ -103,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'public_recruitment',
-      label: 'Public Job Notices',
+      label: 'Current Openings',
       icon: Globe,
       roles: [
         'super_admin',
@@ -115,6 +118,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         'interview_panel',
         'doc_verifier',
         'finance_admin',
+        'registrar',
+        'dean_academic',
+        'dean_faculty_affairs',
         'applicant',
       ],
     },
@@ -122,11 +128,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'drives',
       label: 'Recruitment Drives',
       icon: Megaphone,
-      roles: ['super_admin', 'admin', 'recruitment_admin', 'recruitment_officer', 'department_admin'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'recruitment_officer', 'department_admin', 'registrar', 'dean_academic'],
     },
     {
       id: 'applicant_portal',
-      label: 'Online Apply Portal',
+      label: 'Apply Online',
       icon: Send,
       roles: ['super_admin', 'admin', 'recruitment_admin', 'recruitment_officer', 'applicant'],
     },
@@ -134,13 +140,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'applications',
       label: 'Application Master List',
       icon: FileText,
-      roles: ['super_admin', 'admin', 'recruitment_admin', 'recruitment_officer', 'department_admin', 'finance_admin'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'recruitment_officer', 'department_admin', 'finance_admin', 'registrar', 'dean_academic', 'dean_faculty_affairs'],
     },
     {
       id: 'screening',
       label: 'Applicant Screening',
       icon: CheckSquare,
-      roles: ['super_admin', 'admin', 'recruitment_admin', 'screening_committee', 'department_admin'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'screening_committee', 'department_admin', 'dean_faculty_affairs'],
     },
     {
       id: 'doc_verification',
@@ -152,13 +158,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'interviews',
       label: 'Test & Interview Grading',
       icon: Award,
-      roles: ['super_admin', 'admin', 'recruitment_admin', 'interview_panel', 'department_admin'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'interview_panel', 'department_admin', 'dean_faculty_affairs'],
     },
     {
       id: 'merit',
       label: 'Merit List & Offer Letters',
       icon: Trophy,
-      roles: ['super_admin', 'admin', 'recruitment_admin', 'recruitment_officer'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'recruitment_officer', 'registrar', 'dean_faculty_affairs'],
     },
     {
       id: 'finance',
@@ -170,19 +176,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'analytics',
       label: 'Recruitment Analytics',
       icon: BarChart2,
-      roles: ['super_admin', 'admin', 'recruitment_admin', 'department_admin'],
+      roles: ['super_admin', 'admin', 'recruitment_admin', 'department_admin', 'registrar', 'dean_academic', 'dean_faculty_affairs'],
     },
     {
       id: 'admin',
       label: 'RBAC & Master Settings',
       icon: Settings,
-      roles: ['super_admin', 'admin'],
+      roles: ['super_admin', 'admin', 'registrar'],
     },
     {
       id: 'audit',
       label: 'System Audit Logs',
       icon: ShieldAlert,
-      roles: ['super_admin'],
+      roles: ['super_admin', 'registrar'],
     },
     {
       id: 'system_status',
@@ -195,7 +201,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   // Filter items visible to current active role
   const visibleNavItems = navItems.filter((item) => {
     if (!isLoggedIn) {
-      // Unauthenticated visitor on public page: display public notices and apply portal
+      // Unauthenticated visitor on public page: display Current Openings and Apply Online
       return item.id === 'public_recruitment' || item.id === 'applicant_portal';
     }
     return item.roles.includes(currentRole);

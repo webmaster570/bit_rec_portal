@@ -64,7 +64,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
               <span className="px-2 py-0.5 rounded-lg bg-white/10 text-white/80  font-mono text-[10px] font-bold">
                 Post Code: {post.postCode}
               </span>
-              <span className={`px-2 py-0.5 rounded-lg bg-emerald-500/30 text-emerald-200 border border-emerald-500/30 text-[10px] font-bold uppercase`}>
+              <span className={`px-2 py-0.5 rounded-lg bg-emerald-500/30 text-emerald-200 text-[10px] font-bold uppercase`}>
                 Sanctioned Vacancy
               </span>
             </div>
@@ -82,19 +82,19 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
         <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8">
           {/* Job Summary Matrix */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className={`p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl border border-slate-100'} bg-slate-50 space-y-1`}>
+            <div className={`p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl'} bg-slate-50 space-y-1`}>
               <span className="text-[10px] opacity-40 font-bold uppercase tracking-wider block">Pay Scale</span>
               <span className="text-sm font-black">{post.payScale}</span>
             </div>
-            <div className={`p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl border border-slate-100'} bg-slate-50 space-y-1`}>
+            <div className={`p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl'} bg-slate-50 space-y-1`}>
               <span className="text-[10px] opacity-40 font-bold uppercase tracking-wider block">Total Vacancies</span>
               <span className={`text-sm font-black ${theme.accentColor}`}>{post.vacanciesTotal} Posts</span>
             </div>
-            <div className={`p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl border border-slate-100'} bg-slate-50 space-y-1`}>
+            <div className={`p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl'} bg-slate-50 space-y-1`}>
               <span className="text-[10px] opacity-40 font-bold uppercase tracking-wider block">Application Fee</span>
               <span className="text-sm font-black">₹{post.applicationFee}</span>
             </div>
-            <div className={`p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl border border-slate-100'} bg-slate-50 space-y-1`}>
+            <div className={`p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl'} bg-slate-50 space-y-1`}>
               <span className="text-[10px] opacity-40 font-bold uppercase tracking-wider block">Last Date</span>
               <span className="text-sm font-black text-rose-600">{new Date(drive.closingDate).toLocaleDateString()}</span>
             </div>
@@ -116,7 +116,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
                   { label: 'EWS', count: post.vacanciesBreakdown.EWS, color: 'bg-teal-50' },
                   { label: 'PwD', count: post.vacanciesBreakdown.PwD, color: 'bg-rose-50' },
                 ].map((cat) => (
-                  <div key={cat.label} className={`p-3 border border-slate-100 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-slate-800' : 'rounded-2xl'} ${cat.color} text-center ${branding.showCardShadow ? 'shadow-xs' : 'shadow-none'}`}>
+                  <div key={cat.label} className={`p-3 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-slate-800' : 'rounded-2xl'} ${cat.color} text-center ${branding.showCardShadow ? 'shadow-xs' : 'shadow-none'}`}>
                     <div className="text-[9px] font-bold opacity-40 uppercase">{cat.label}</div>
                     <div className="text-sm font-black">{cat.count}</div>
                   </div>
@@ -132,7 +132,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
                 <GraduationCap className={`w-4 h-4 ${theme.accentColor}`} />
                 <span>Academic Requirements</span>
               </h3>
-              <div className={`p-5 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl border border-slate-100'} bg-slate-50 space-y-3`}>
+              <div className={`p-5 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl'} bg-slate-50 space-y-3`}>
                 <div className="space-y-1">
                   <span className={`text-[10px] font-bold ${theme.accentColor} uppercase`}>Essential Qualification</span>
                   <p className="text-xs font-medium leading-relaxed italic">{post.minQualification}</p>
@@ -149,7 +149,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
                 <ShieldCheck className={`w-4 h-4 ${theme.accentColor}`} />
                 <span>General Criteria</span>
               </h3>
-              <div className={`p-5 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl border border-slate-100'} bg-slate-50 space-y-3`}>
+              <div className={`p-5 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl'} bg-slate-50 space-y-3`}>
                 <div className="flex items-center justify-between text-xs">
                   <span className="opacity-60 font-medium">Minimum Age Limit</span>
                   <span className="font-bold">{post.minAge} Years</span>
@@ -176,7 +176,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
               <BookOpen className={`w-4 h-4 ${theme.accentColor}`} />
               <span>Selection Methodology</span>
             </h3>
-            <div className={`p-5 bg-white border border-slate-200 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800 shadow-none' : 'rounded-2xl shadow-xs'} flex flex-col md:flex-row gap-6`}>
+            <div className={`p-5 bg-white ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800 shadow-none' : 'rounded-2xl shadow-xs'} flex flex-col md:flex-row gap-6`}>
               <div className="flex-1 space-y-2">
                 <div className="flex items-center gap-2">
                   <div className={`w-6 h-6 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-lg'} bg-slate-100 ${theme.accentColor} flex items-center justify-center text-[10px] font-black`}>1</div>

@@ -192,7 +192,7 @@ export const OverviewDashboard: React.FC<{
               </div>
 
               {myApplications.length === 0 ? (
-                <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                <div className="text-center py-12 bg-slate-50 rounded-2xl">
                   <Briefcase className="w-10 h-10 text-slate-400 mx-auto mb-2" />
                   <h4 className="text-sm font-bold text-slate-800">No Job Applications Submitted Yet</h4>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-4">
@@ -227,20 +227,20 @@ export const OverviewDashboard: React.FC<{
                     </div>
 
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-xs px-3 py-1 rounded-full font-extrabold border shadow-2xs ${
+                      <span className={`text-xs px-3 py-1 rounded-full font-extrabold shadow-2xs ${
                         app.screeningStatus === 'Eligible'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                          ? 'bg-emerald-50 text-emerald-700'
                           : app.screeningStatus === 'Ineligible'
-                          ? 'bg-rose-50 text-rose-700 border-rose-300'
-                          : 'bg-amber-50 text-amber-700 border-amber-300'
+                          ? 'bg-rose-50 text-rose-700'
+                          : 'bg-amber-50 text-amber-700'
                       }`}>
                         Screening: {app.screeningStatus}
                       </span>
 
-                      <span className={`text-xs px-3 py-1 rounded-full font-extrabold border shadow-2xs ${
+                      <span className={`text-xs px-3 py-1 rounded-full font-extrabold shadow-2xs ${
                         app.paymentStatus === 'Paid' || app.paymentStatus === 'Exempted'
-                          ? 'bg-indigo-50 text-indigo-700 border-indigo-300'
-                          : 'bg-rose-50 text-rose-700 border-rose-300'
+                          ? 'bg-indigo-50 text-indigo-700'
+                          : 'bg-rose-50 text-rose-700'
                       }`}>
                         Payment: {app.paymentStatus}
                       </span>
@@ -510,7 +510,7 @@ export const OverviewDashboard: React.FC<{
             <div
               key={idx}
               onClick={() => navigate(stage.tab)}
-              className={`group ${isBitTheme ? 'bg-[#FBF9F5] hover:border-[#800000]' : 'bg-slate-50 hover:border-indigo-400'} p-5 cursor-pointer transition-all duration-300 relative ${branding.showCardShadow ? 'shadow-sm hover:shadow-lg' : 'shadow-none'}`}
+              className={`group ${isBitTheme ? 'bg-[#FBF9F5]' : 'bg-slate-50'} p-5 cursor-pointer transition-all duration-300 relative ${branding.showCardShadow ? 'shadow-sm hover:shadow-lg' : 'shadow-none'}`}
             >
               <div className="flex items-center justify-between mb-3">
                 <span className={`w-8 h-8 rounded-none ${isBitTheme ? 'bg-[#800000]' : 'bg-gradient-to-r from-indigo-600 to-purple-600'} text-white font-black text-sm flex items-center justify-center shadow-sm`}>

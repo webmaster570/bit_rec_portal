@@ -175,263 +175,156 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
               return null;
             }
 
+            const isExpanded = expandedSyllabusPostId === drive.id;
+
             return (
-              <div
-                key={drive.id}
-                className={`${theme.cardBase} ${branding.showCardShadow ? 'shadow-lg hover:shadow-xl' : 'shadow-none'} overflow-hidden transition `}
-              >
-                {/* Drive Header Bar */}
-                <div className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b ${branding.theme === 'industrial_heavy' ? 'bg-slate-900 text-white' : 'bg-slate-900 text-white'}`}>
-                  <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono text-[11px] font-bold">
-                        Advt No: {drive.advtNumber}
+              <div key={drive.id} className="space-y-4">
+                {/* Drive Summary Card (Image 1 Design) */}
+                <div className={`${theme.cardBase} ${branding.showCardShadow ? 'shadow-md hover:shadow-lg' : 'shadow-none'} overflow-hidden transition-all duration-300 flex flex-col md:flex-row`}>
+                  {/* Left Content Area */}
+                  <div className="flex-1 p-6 sm:p-8 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <span className="px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-[10px] font-extrabold uppercase tracking-wider">
+                        ADVT NO: {drive.advtNumber}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold uppercase tracking-wider">
-                        {drive.status.replace('_', ' ')}
+                      <span className="px-3 py-1 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-extrabold uppercase tracking-wider">
+                        {drive.status === 'applications_open' ? 'OPEN' : drive.status.replace('_', ' ')}
                       </span>
                     </div>
 
-                    <h2 className={`text-lg ${theme.headingFont} text-white tracking-tight`}>{drive.title}</h2>
-                    <p className="text-xs text-slate-300">{drive.organization} — Official Recruitment Notification</p>
+                    <h2 className={`text-xl sm:text-2xl font-black text-slate-900 leading-tight ${theme.headingFont}`}>
+                      {drive.title}
+                    </h2>
+
+                    <p className="text-sm text-slate-500 leading-relaxed max-w-3xl">
+                      {drive.description || `Direct recruitment drive for specialized positions at ${drive.organization}. Official vacancy notification for the academic year 2026-2027.`}
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 border-t border-slate-50">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="w-5 h-5 text-slate-400" />
+                        <div>
+                          <span className="text-[10px] uppercase font-black text-slate-400 block tracking-tight">Posted On</span>
+                          <span className="text-xs font-bold text-slate-800">{new Date(drive.startDate).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Clock className="w-5 h-5 text-slate-400" />
+                        <div>
+                          <span className="text-[10px] uppercase font-black text-slate-400 block tracking-tight">Closing Date</span>
+                          <span className="text-xs font-bold text-slate-800 text-rose-600">{new Date(drive.closingDate).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <MapPin className="w-5 h-5 text-slate-400" />
+                        <div>
+                          <span className="text-[10px] uppercase font-black text-slate-400 block tracking-tight">Location</span>
+                          <span className="text-xs font-bold text-slate-800">Mesra, Ranchi</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center space-x-2 shrink-0">
+                  {/* Right Sidebar Actions */}
+                  <div className="w-full md:w-72 bg-slate-50/40 p-6 flex flex-col justify-center items-center gap-3">
+                    <button
+                      onClick={() => setExpandedSyllabusPostId(isExpanded ? null : drive.id)}
+                      className="w-full py-3 rounded-xl bg-white text-slate-900 text-xs font-black flex items-center justify-center gap-2 hover:bg-slate-50 transition shadow-xs active:scale-95"
+                    >
+                      <Info className="w-4 h-4 text-slate-400" />
+                      <span>{isExpanded ? 'Hide Details' : 'View Details'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        if (!isExpanded) setExpandedSyllabusPostId(drive.id);
+                        const firstPost = matchingPosts[0];
+                        if (firstPost) {
+                           if (isLoggedIn) onApplyForPost(drive.id, firstPost.id, firstPost.title);
+                           else onRequestLogin(firstPost.title);
+                        } else {
+                           setActiveTab('applicant_portal');
+                        }
+                      }}
+                      className="w-full py-3 rounded-xl bg-[#1e293b] text-white text-xs font-black flex items-center justify-center gap-2 shadow-md hover:bg-slate-900 transition active:scale-95"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>Apply Online</span>
+                    </button>
+
                     <button
                       onClick={() => setActivePdfModalDrive(drive)}
-                      className={`${theme.secondaryButton} px-3.5 py-2 text-xs font-bold transition flex items-center space-x-1.5 shadow-2xs`}
+                      className="text-[11px] font-bold text-slate-500 hover:text-indigo-600 flex items-center gap-1.5 transition mt-2"
                     >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>View Gazette PDF</span>
+                      <Download className="w-4 h-4" />
+                      <span>Download Advertisement</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Drive Important Dates Matrix */}
-                <div className={`${branding.theme === 'tech_startup' ? 'bg-slate-900/50' : 'bg-slate-50'} border-b p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs`}>
-                  <div className="flex items-center space-x-2">
-                    <Calendar className={`w-4 h-4 ${theme.accentColor} shrink-0`} />
-                    <div>
-                      <span className="text-[10px] uppercase font-bold opacity-60 block">Opening Date</span>
-                      <span className="font-semibold">{new Date(drive.startDate).toLocaleDateString()}</span>
+                {/* Expanded Section: List of Posts */}
+                {isExpanded && (
+                  <div className="animate-in slide-in-from-top-4 duration-500 space-y-3 pl-4 md:pl-12 border-l-2 border-slate-100 ml-4 mb-8">
+                    <div className="flex items-center gap-3 pb-2 pt-2">
+                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white pr-3">Advertised Positions ({matchingPosts.length})</span>
+                       <div className="h-px bg-slate-100 flex-1"></div>
                     </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-rose-600 shrink-0" />
-                    <div>
-                      <span className="text-[10px] uppercase font-bold opacity-60 block">Closing Date</span>
-                      <span className="font-semibold text-rose-600">{new Date(drive.closingDate).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <div>
-                      <span className="text-[10px] uppercase font-bold opacity-60 block">Fee Deadline</span>
-                      <span className="font-semibold">{new Date(drive.feeDeadline).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <BookOpen className={`w-4 h-4 ${theme.accentColor} shrink-0`} />
-                    <div>
-                      <span className="text-[10px] uppercase font-bold opacity-60 block">Tentative Exam</span>
-                      <span className="font-semibold">{drive.examDate || 'Q3 2026'}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Posts Breakdown List */}
-                <div className="p-6 space-y-8">
-                  {matchingPosts.map((post) => {
-                    const isSyllabusExpanded = expandedSyllabusPostId === post.id;
-
-                    return (
-                      <div 
-                        key={post.id} 
-                        className={`group relative p-6 transition-all duration-300 border-l-4 border-l-blue-600 bg-white/40 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-2xl'} shadow-none /30`}
-                      >
-                        {/* 1. Header: Title & Status Badge */}
-                        <div className="flex justify-between items-start mb-1">
-                          <h3 className={`text-lg sm:text-xl font-bold text-slate-900 ${theme.headingFont}`}>
-                            {post.title}
-                          </h3>
-                          <div className={`px-3 py-1 rounded-full text-[10px] font-bold ${branding.theme === 'industrial_heavy' ? 'bg-slate-900 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
-                            {drive.status === 'applications_open' ? 'Open' : drive.status.replace('_', ' ')}
-                          </div>
-                        </div>
-
-                        {/* 2. Subtitle: Department */}
-                        <div className="text-sm font-medium text-slate-500 mb-4">
-                          {post.departmentName}
-                        </div>
-
-                        {/* 3. Description / Summary */}
-                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6 line-clamp-2 max-w-3xl">
-                          Joining as {post.title} requires {post.minQualification}. This is a {post.payScale} sanctioned position under the {post.departmentName} unit.
-                        </p>
-
-                        {/* 4. Meta Row: Location, Salary, Posted/Deadline (Matching Screenshot) */}
-                        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[11px] sm:text-xs text-slate-500 mb-6">
-                          <div className="flex items-center gap-1.5">
-                            <MapPin className="w-4 h-4 opacity-70" />
-                            <span>Main Campus</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <DollarSign className="w-4 h-4 opacity-70" />
-                            <span>{post.payScale}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <Clock className="w-4 h-4 opacity-70" />
-                            <span>Ends {new Date(drive.closingDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-                          </div>
-                        </div>
-
-                        {/* 5. Details Section (Vertical breakdown as requested in step 1) */}
-                        <div className="space-y-6 mb-8 border-t border-slate-50 pt-6">
-                           {/* Vacancy Breakdown */}
-                           {drive.showCategoryRow !== false && (
-                             <div className="space-y-3">
-                                <div className="flex items-center gap-2 text-[10px] font-black opacity-30 uppercase tracking-widest">
-                                   <Users className="w-3.5 h-3.5" />
-                                   <span>Vacancy Breakdown</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                   {[
-                                      { label: 'UR', count: post.vacanciesBreakdown.UR },
-                                      { label: 'OBC', count: post.vacanciesBreakdown.OBC },
-                                      { label: 'SC', count: post.vacanciesBreakdown.SC },
-                                      { label: 'ST', count: post.vacanciesBreakdown.ST },
-                                      { label: 'EWS', count: post.vacanciesBreakdown.EWS },
-                                      { label: 'PwD', count: post.vacanciesBreakdown.PwD }
-                                   ].map(v => (
-                                      <div key={v.label} className={`flex flex-col items-center justify-center  ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} px-3 py-1.5 min-w-[55px] bg-slate-50/50`}>
-                                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">{v.label}</span>
-                                         <span className="text-xs font-black text-slate-800 tabular-nums">{v.count}</span>
-                                      </div>
-                                   ))}
-                                   <div className={`flex flex-col items-center justify-center ${theme.primaryButton} ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} px-4 py-1.5 min-w-[60px] shadow-xs`}>
-                                      <span className="text-[8px] font-bold opacity-70 uppercase tracking-tighter">Total</span>
-                                      <span className="text-xs font-black tabular-nums">{post.vacanciesTotal}</span>
-                                   </div>
-                                </div>
-                             </div>
-                           )}
-
-                           {/* Qualification */}
-                           <div className="space-y-2">
-                              <div className="flex items-center gap-2 text-[10px] font-black opacity-30 uppercase tracking-widest">
-                                 <GraduationCap className="w-3.5 h-3.5" />
-                                 <span>Qualification</span>
-                              </div>
-                              <p className="text-xs font-bold text-slate-700 leading-relaxed italic">
-                                 &ldquo;{post.minQualification}&rdquo;
-                              </p>
+                    
+                    {matchingPosts.map((post) => (
+                      <div key={post.id} className={`${theme.cardBase} ${branding.showCardShadow ? 'shadow-sm hover:shadow-md' : 'shadow-none'} overflow-hidden transition-all duration-300 flex flex-col md:flex-row`}>
+                        {/* Left Content Area */}
+                        <div className="flex-1 p-5 space-y-3">
+                           <div className="flex items-center gap-2">
+                             <span className="px-2 py-0.5 rounded-md bg-slate-50 text-slate-500 text-[9px] font-bold uppercase tracking-wider">
+                               POST CODE: {post.postCode}
+                             </span>
                            </div>
-
-                           {/* Eligibility Summary */}
-                           <div className="space-y-2">
-                              <div className="flex items-center gap-2 text-[10px] font-black opacity-30 uppercase tracking-widest">
-                                 <ShieldCheck className="w-3.5 h-3.5" />
-                                 <span>Eligibility Summary</span>
+                           <h3 className="text-base font-black text-slate-900">{post.title}</h3>
+                           <div className="flex flex-wrap items-center gap-4 text-[10px]">
+                              <div className="flex items-center gap-1.5 text-slate-500">
+                                 <Building2 className="w-3.5 h-3.5" />
+                                 <span className="font-bold uppercase tracking-tight">{post.departmentName}</span>
                               </div>
-                              <div className="flex flex-wrap gap-4 text-xs font-bold text-slate-800">
-                                 <span className="flex items-center gap-1.5"><Briefcase className={`w-3.5 h-3.5 ${theme.accentColor}`} /> {post.requiredExperienceYears}Y Experience</span>
-                                 <span className="flex items-center gap-1.5"><Clock className={`w-3.5 h-3.5 ${theme.accentColor}`} /> {post.minAge}-{post.maxAge}Y Age</span>
+                              <div className="flex items-center gap-1.5 text-emerald-600">
+                                 <DollarSign className="w-3.5 h-3.5" />
+                                 <span className="font-bold">Pay Scale: {post.payScale}</span>
                               </div>
-                           </div>
-
-                           {/* Fee Age/date etc */}
-                           <div className="space-y-2">
-                              <div className="flex items-center gap-2 text-[10px] font-black opacity-30 uppercase tracking-widest">
-                                 <Info className="w-3.5 h-3.5" />
-                                 <span>Fee & Dates</span>
-                              </div>
-                              <div className="flex flex-wrap items-center gap-6 text-[11px] font-bold">
-                                 <div className="flex items-center gap-1.5 text-emerald-700">
-                                    <DollarSign className="w-3.5 h-3.5" />
-                                    <span>Fee: ₹{post.applicationFee}</span>
-                                 </div>
-                                 <div className="flex items-center gap-1.5 text-rose-700">
-                                    <Calendar className="w-3.5 h-3.5" />
-                                    <span>Closing: {new Date(drive.closingDate).toLocaleDateString()}</span>
-                                 </div>
+                              <div className="flex items-center gap-1.5 text-slate-500">
+                                 <Users className="w-3.5 h-3.5" />
+                                 <span className="font-bold">{post.vacanciesTotal} Vacancies</span>
                               </div>
                            </div>
                         </div>
-
-                        {/* 6. Footer Actions */}
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                           <div className="flex items-center gap-6">
-                             <button
-                               onClick={() => {
-                                 setSelectedDriveId(drive.id);
-                                 setSelectedPostId(post.id);
-                                 setActiveTab('notice_detail');
-                               }}
-                               className={`text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 group/link transition-all`}
-                             >
-                               <span>View Details</span>
-                               <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                             </button>
-
-                             <button
-                               onClick={() => setExpandedSyllabusPostId(isSyllabusExpanded ? null : post.id)}
-                               className="text-[11px] font-medium text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition"
-                             >
-                               <BookOpen className="w-3.5 h-3.5" />
-                               <span>{isSyllabusExpanded ? 'Hide Syllabus' : 'Syllabus & Pattern'}</span>
-                               {isSyllabusExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                             </button>
-                           </div>
-
+                        {/* Right Sidebar Actions */}
+                        <div className="w-full md:w-56 bg-slate-50/30 p-5 flex flex-col justify-center gap-2">
                            <button
-                             onClick={() => {
-                               if (isLoggedIn) onApplyForPost(drive.id, post.id, post.title);
-                               else onRequestLogin(post.title);
-                             }}
-                             className={`w-full sm:w-auto px-10 py-2.5 ${theme.primaryButton} text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm`}
+                              onClick={() => {
+                                setSelectedDriveId(drive.id);
+                                setSelectedPostId(post.id);
+                                setActiveTab('notice_detail');
+                              }}
+                              className="w-full py-2 rounded-xl bg-white text-slate-900 text-[10px] font-black uppercase flex items-center justify-center gap-2 hover:bg-slate-50 transition shadow-xs"
                            >
-                             <Send className="w-3.5 h-3.5" />
-                             <span>Apply Now</span>
+                              <Info className="w-3.5 h-3.5 text-slate-400" />
+                              <span>View Notice</span>
+                           </button>
+                           <button
+                              onClick={() => {
+                                if (isLoggedIn) onApplyForPost(drive.id, post.id, post.title);
+                                else onRequestLogin(post.title);
+                              }}
+                              className={`w-full py-2 rounded-xl ${theme.primaryButton} text-[10px] font-black uppercase flex items-center justify-center gap-2 shadow-sm transition active:scale-95`}
+                           >
+                              <Send className="w-3.5 h-3.5" />
+                              <span>Apply Now</span>
                            </button>
                         </div>
-
-                        {isSyllabusExpanded && (
-                          <div className={`mt-6 p-5 ${branding.theme === 'tech_startup' ? 'bg-slate-900/80 border-indigo-500/20' : 'bg-slate-50 border-slate-100'} border ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-2xl'} text-xs space-y-3 animate-in slide-in-from-top-2 duration-300`}>
-                            <div className="flex items-center space-x-2 font-bold text-slate-800">
-                              <BookOpen className={`w-4 h-4 ${theme.accentColor}`} />
-                              <span>Examination Methodology</span>
-                            </div>
-                            
-                            {drive.syllabusContent ? (
-                              <div className={`text-[11px] whitespace-pre-wrap font-mono leading-relaxed bg-white/50 p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} `}>
-                                {drive.syllabusContent}
-                              </div>
-                            ) : (
-                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                 <div className="bg-white p-3 rounded-xl ">
-                                    <div className={`font-black ${theme.accentColor} text-[10px] mb-1 uppercase`}>Screening</div>
-                                    <div className="text-[10px] text-slate-500">Initial academic audit.</div>
-                                 </div>
-                                 <div className="bg-white p-3 rounded-xl ">
-                                    <div className={`font-black ${theme.accentColor} text-[10px] mb-1 uppercase`}>Written</div>
-                                    <div className="text-[10px] text-slate-500">Domain competency test.</div>
-                                 </div>
-                                 <div className="bg-white p-3 rounded-xl ">
-                                    <div className={`font-black ${theme.accentColor} text-[10px] mb-1 uppercase`}>Interview</div>
-                                    <div className="text-[10px] text-slate-500">Final board evaluation.</div>
-                                 </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
                       </div>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })

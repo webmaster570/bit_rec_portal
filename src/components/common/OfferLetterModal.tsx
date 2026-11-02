@@ -19,7 +19,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({ application,
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-      <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto text-slate-900 animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto text-slate-900 animate-in fade-in zoom-in-95 duration-150">
         {/* Modal Header */}
         <div className="flex items-center justify-between p-3.5 sm:p-4 border-b border-slate-200 bg-slate-50 shrink-0">
           <div className="flex items-center space-x-2 min-w-0">
@@ -29,7 +29,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({ application,
           <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
             <button
               onClick={() => window.print()}
-              className="px-2.5 sm:px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] sm:text-xs font-semibold flex items-center space-x-1 border border-slate-200 transition"
+              className="px-2.5 sm:px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] sm:text-xs font-semibold flex items-center space-x-1 transition"
             >
               <Printer className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Print Letter</span>
@@ -66,7 +66,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({ application,
               </span>
             </p>
 
-            <p className="font-semibold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+            <p className="font-semibold text-slate-800 bg-slate-50 p-2.5 rounded-xl">
               Subject: Offer of Appointment for the post of <span className="text-emerald-700 font-bold">{application.postTitle}</span> under {application.departmentName}.
             </p>
 
@@ -76,7 +76,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({ application,
               We are pleased to inform you that based on your merit performance in the Written Examination and Interview evaluation under Advertisement <span className="font-mono text-indigo-600 font-bold">{application.advtNumber}</span>, you have been selected for appointment as <strong className="text-slate-900">{application.postTitle}</strong> under <strong className="text-slate-900">{application.selectionCategory || application.applicant.category} Category</strong>.
             </p>
 
-            <div className="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 space-y-2 font-mono text-[10px] sm:text-[11px]">
+            <div className="bg-slate-50 p-3 sm:p-4 rounded-xl space-y-2 font-mono text-[10px] sm:text-[11px]">
               <div className="flex justify-between">
                 <span className="text-slate-500">Merit Rank Position:</span>
                 <span className="font-bold text-purple-700">#{application.meritRank || 1}</span>
@@ -97,7 +97,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({ application,
           </div>
 
           {/* Interactive Candidate Response Controls */}
-          <div className="bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3">
+          <div className="bg-slate-50 p-3 sm:p-4 rounded-xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3">
             <div>
               <span className="text-xs font-bold text-slate-900 block">Candidate Offer Response</span>
               <span className="text-[10px] text-slate-500">Current Status: {application.offerStatus || 'Pending'}</span>
@@ -115,7 +115,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({ application,
               <button
                 onClick={() => handleRespond('Declined')}
                 disabled={application.offerStatus === 'Declined'}
-                className="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition flex items-center justify-center space-x-1 disabled:opacity-50"
+                className="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs transition flex items-center justify-center space-x-1 disabled:opacity-50"
               >
                 <XCircle className="w-3.5 h-3.5" />
                 <span>Decline</span>
