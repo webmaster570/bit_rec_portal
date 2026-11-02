@@ -1,7 +1,9 @@
 import React from 'react';
 import { Building2, Mail, Phone, MapPin, Globe, Facebook, Twitter, Linkedin, ExternalLink } from 'lucide-react';
+import { usePortal } from '../context/PortalContext';
 
 export const Footer: React.FC = () => {
+  const { branding } = usePortal();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -11,13 +13,21 @@ export const Footer: React.FC = () => {
           {/* Institute Info */}
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="bg-white p-1 rounded shadow-sm">
-                <Building2 className="w-8 h-8 text-[#142D4E]" />
+              <div className="bg-white p-1 rounded shadow-sm flex items-center justify-center min-w-[40px] min-h-[40px]">
+                {branding.logoType === 'image' && branding.logoImageUrl ? (
+                  <img 
+                    src={branding.logoImageUrl} 
+                    alt="Logo" 
+                    className="w-8 h-8 object-contain"
+                  />
+                ) : (
+                  <Building2 className="w-8 h-8 text-[#142D4E]" />
+                )}
               </div>
-              <h3 className="text-lg font-bold tracking-tight">BIT Mesra</h3>
+              <h3 className="text-lg font-bold tracking-tight">{branding.title || 'BIT Mesra'}</h3>
             </div>
             <p className="text-sm text-white/60 leading-relaxed">
-              Birla Institute of Technology, Mesra, established in 1955, is a premier technical institution committed to academic excellence and research innovation.
+              {branding.subtitle || 'Birla Institute of Technology, Mesra, established in 1955, is a premier technical institution committed to academic excellence and research innovation.'}
             </p>
             <div className="flex items-center space-x-4">
               <a href="#" className="p-2 bg-white/5 hover:bg-[#A77B32] rounded-full transition-colors">
@@ -83,13 +93,13 @@ export const Footer: React.FC = () => {
 
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] sm:text-xs text-white/40 font-medium">
           <div className="flex flex-wrap justify-center gap-6">
-            <span>© {currentYear} Birla Institute of Technology, Mesra. All Rights Reserved.</span>
+            <span>© {currentYear} {branding.title || 'Birla Institute of Technology, Mesra'}. All Rights Reserved.</span>
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms & Conditions</a>
           </div>
           <div className="flex items-center space-x-1">
              <span>Developed by</span>
-             <span className="text-white/60">Recruitment Systems Division, BIT Mesra</span>
+             <span className="text-white/60">Recruitment Systems Division, {branding.title || 'BIT Mesra'}</span>
           </div>
         </div>
       </div>

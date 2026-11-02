@@ -30,10 +30,21 @@ const MainAppContent: React.FC = () => {
   const { currentRole, isLoggedIn, branding, activeTab, setActiveTab } = usePortal();
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
   
-  // Apply global shadow intensity from branding
+  // Apply global shadow intensity and dynamic favicon from branding
   React.useEffect(() => {
     document.documentElement.style.setProperty('--shadow-intensity', (branding.shadowIntensity || 0.08).toString());
-  }, [branding.shadowIntensity]);
+    
+    // Update Favicon
+    if (branding.logoType === 'image' && branding.logoImageUrl) {
+      let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = branding.logoImageUrl;
+    }
+  }, [branding.shadowIntensity, branding.logoImageUrl, branding.logoType]);
 
   // Mobile navigation drawer state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);

@@ -2038,8 +2038,11 @@ export const AdminPortal: React.FC = () => {
             </div>
           )}
 
-          {/* Dev Mode Role Selector Settings Card */}
-          <div className="glass-card border border-purple-200 p-6 rounded-2xl shadow-2xs bg-purple-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          {/* Dev Mode Role Selector & Database Settings - Only on System Tab */}
+          {activeAdminTab === 'system' && (
+            <>
+              {/* Dev Mode Role Selector Settings Card */}
+              <div className="glass-card border border-purple-200 p-6 rounded-2xl shadow-2xs bg-purple-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
                 <ShieldCheck className="w-5 h-5 text-purple-700" />
@@ -2265,8 +2268,10 @@ export const AdminPortal: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
+  )}
+</div>
   );
 };
