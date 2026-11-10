@@ -3,6 +3,7 @@ import { usePortal } from '../../context/PortalContext';
 import { Application, ApplicationStage } from '../../types';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import { OfferLetterModal } from '../common/OfferLetterModal';
+import { ApplicationPreviewModal } from '../applications/ApplicationPreviewModal';
 import {
   Briefcase,
   Search,
@@ -34,6 +35,7 @@ import {
   MapPin,
   Hash,
   ArrowRight,
+  AlertCircle,
 } from 'lucide-react';
 
 interface MyJobsPortalProps {
@@ -41,7 +43,7 @@ interface MyJobsPortalProps {
 }
 
 export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
-  const { applications, currentUser, drives } = usePortal();
+  const { applications, currentUser, drives, setEditingAppId, setActiveTab } = usePortal();
 
   // Filter applications strictly for current applicant
   const myApplications = applications.filter((app) => {
@@ -61,6 +63,8 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
   const [showAdmitCardModal, setShowAdmitCardModal] = useState<Application | null>(null);
   const [showOfferModal, setShowOfferModal] = useState<Application | null>(null);
   const [activeModalTab, setActiveModalTab] = useState<'profile' | 'academics' | 'documents' | 'status'>('profile');
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewApp, setPreviewApp] = useState<Application | null>(null);
 
   // Filter logic
   const filteredApps = myApplications.filter((app) => {
@@ -138,6 +142,14 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
         <span className={`rounded-full font-bold bg-rose-50 text-rose-700 border border-rose-200 inline-flex items-center gap-1 ${compact ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]'}`}>
           <XCircle className="w-3 h-3 text-rose-600 shrink-0" />
           <span>Ineligible</span>
+        </span>
+      );
+    }
+    if (stage === 'draft') {
+      return (
+        <span className={`rounded-full font-bold bg-slate-100 text-slate-700 border border-slate-300 inline-flex items-center gap-1 ${compact ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]'}`}>
+          <FileText className="w-3 h-3 text-slate-500 shrink-0" />
+          <span>Draft / In-Progress</span>
         </span>
       );
     }
@@ -265,6 +277,8 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
             className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 font-semibold focus:outline-none focus:border-indigo-500 w-full sm:w-auto"
           >
             <option value="all">All Stages & Statuses</option>
+            <option value="draft">Draft / In-Progress</option>
+            <option value="submitted">Submitted</option>
             <option value="eligible">Screened Eligible</option>
             <option value="ineligible">Ineligible</option>
             <option value="interview_scheduled">Interview / Exam Scheduled</option>
@@ -429,6 +443,21 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                       <span>View Details</span>
                     </button>
 
+                    {/* Complete Draft Button */}
+                    {app.stage === 'draft' && (
+                      <button
+                        onClick={() => {
+                          setEditingAppId(app.id);
+                          if (onNavigate) onNavigate('applicant_portal');
+                          else setActiveTab('applicant_portal');
+                        }}
+                        className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-98 text-white text-xs font-bold shadow-2xs flex items-center justify-center gap-1.5 transition"
+                      >
+                        <ArrowRight className="w-3.5 h-3.5" />
+                        <span>Complete Application</span>
+                      </button>
+                    )}
+
                     {/* Download Admit Card */}
                     {hasAdmitCard && (
                       <button
@@ -448,6 +477,20 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                       >
                         <Award className="w-3.5 h-3.5 text-purple-600" />
                         <span>Offer Letter</span>
+                      </button>
+                    )}
+
+                    {/* Preview Form Button for Submitted Apps */}
+                    {app.stage !== 'draft' && (
+                      <button
+                        onClick={() => {
+                          setPreviewApp(app);
+                          setIsPreviewOpen(true);
+                        }}
+                        className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-800 text-xs font-bold border border-slate-200 flex items-center justify-center gap-1.5 transition"
+                      >
+                        <Printer className="w-3.5 h-3.5 text-indigo-600" />
+                        <span>Preview Form</span>
                       </button>
                     )}
                   </div>
@@ -574,6 +617,22 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                             <span>View Details</span>
                           </button>
 
+                          {/* Complete Draft Button */}
+                          {app.stage === 'draft' && (
+                            <button
+                              onClick={() => {
+                                setEditingAppId(app.id);
+                                if (onNavigate) onNavigate('applicant_portal');
+                                else setActiveTab('applicant_portal');
+                              }}
+                              className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-2xs inline-flex items-center gap-1.5 transition hover:scale-102"
+                              title="Resume and Complete Draft Application"
+                            >
+                              <ArrowRight className="w-3.5 h-3.5" />
+                              <span>Complete</span>
+                            </button>
+                          )}
+
                           {/* Download Hall Ticket */}
                           {hasAdmitCard && (
                             <button
@@ -595,6 +654,21 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                             >
                               <Award className="w-3.5 h-3.5 text-purple-600" />
                               <span className="hidden xl:inline">Offer Letter</span>
+                            </button>
+                          )}
+
+                          {/* Preview Form Button for Submitted Apps */}
+                          {app.stage !== 'draft' && (
+                            <button
+                              onClick={() => {
+                                setPreviewApp(app);
+                                setIsPreviewOpen(true);
+                              }}
+                              className="px-2.5 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 inline-flex items-center gap-1 transition"
+                              title="Preview and Print Full Application Form"
+                            >
+                              <Printer className="w-3.5 h-3.5 text-indigo-600" />
+                              <span className="hidden xl:inline">Preview Form</span>
                             </button>
                           )}
                         </td>
@@ -637,12 +711,15 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
 
               <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
                 <button
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    setPreviewApp(selectedAppDetail);
+                    setIsPreviewOpen(true);
+                  }}
                   className="p-1.5 sm:p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 text-xs font-semibold flex items-center gap-1 transition"
-                  title="Print Application Summary"
+                  title="Print Full Application Form"
                 >
                   <Printer className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Print Slip</span>
+                  <span className="hidden sm:inline">Preview Form</span>
                 </button>
                 <button
                   onClick={() => setSelectedAppDetail(null)}
@@ -700,10 +777,11 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
             {/* Navigation Tabs Inside Modal (Touch Friendly Scrollable) */}
             <div className="flex border-b border-slate-200 px-3 sm:px-6 bg-white gap-1 sm:gap-2 text-xs font-bold text-slate-600 overflow-x-auto shrink-0 scrollbar-none">
               {[
-                { id: 'profile', label: '1. Profile', icon: User },
+                { id: 'profile', label: '1. Profile Details', icon: User },
                 { id: 'academics', label: '2. Qualifications', icon: GraduationCap },
-                { id: 'documents', label: '3. Documents & Fee', icon: FileText },
-                { id: 'status', label: '4. Evaluation', icon: ShieldCheck },
+                { id: 'research', label: '3. Research & Misc', icon: FileText },
+                { id: 'documents', label: '4. Documents & Fee', icon: CreditCard },
+                { id: 'status', label: '5. Evaluation Status', icon: ShieldCheck },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeModalTab === tab.id;
@@ -868,7 +946,115 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                 </div>
               )}
 
-              {/* TAB 3: Documents & Fee */}
+              {/* TAB 3: Research & Misc */}
+              {activeModalTab === 'research' && (
+                <div className="space-y-4">
+                  <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <FileText className="w-4 h-4 text-indigo-600" />
+                      Research Papers & Publications
+                    </h4>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase">Research Papers / Review Articles</span>
+                        <p className="mt-1 p-2 bg-white border border-slate-200 rounded-lg text-[11px] whitespace-pre-wrap min-h-[40px]">
+                          {selectedAppDetail.researchPapers || 'Not Provided'}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase">Books, Chapters & Edited Works</span>
+                        <p className="mt-1 p-2 bg-white border border-slate-200 rounded-lg text-[11px] whitespace-pre-wrap min-h-[40px]">
+                          {selectedAppDetail.researchPublications || 'Not Provided'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <AlertCircle className="w-4 h-4 text-indigo-600" />
+                      Miscellaneous Details & Suitability
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-2.5 bg-white border border-slate-200 rounded-lg">
+                        <span className="text-[10px] text-slate-500 block uppercase">Joining Time Required</span>
+                        <span className="font-bold text-[11px]">{selectedAppDetail.joiningTimeRequired || 'Not Specified'}</span>
+                      </div>
+                      <div className="p-2.5 bg-white border border-slate-200 rounded-lg">
+                        <span className="text-[10px] text-slate-500 block uppercase">Computer Proficiency</span>
+                        <span className="font-bold text-[11px]">{selectedAppDetail.hasComputerProficiency ? 'Yes' : 'No'}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">Institutional Contribution</span>
+                      <p className="mt-1 p-2 bg-white border border-slate-200 rounded-lg text-[11px] whitespace-pre-wrap">
+                        {selectedAppDetail.institutionalContribution || 'None'}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">Suitability Statement</span>
+                      <p className="mt-1 p-2 bg-white border border-slate-200 rounded-lg text-[11px] whitespace-pre-wrap">
+                        {selectedAppDetail.suitabilityStatement || 'None'}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">Honours & Awards</span>
+                      <p className="mt-1 p-2 bg-white border border-slate-200 rounded-lg text-[11px] whitespace-pre-wrap">
+                        {selectedAppDetail.honoursAndAwards || 'None'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-indigo-600" />
+                      Legal & Disciplinary History
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {[
+                        { label: 'Punished during service', val: selectedAppDetail.punishedDuringService },
+                        { label: 'Medically unfit/asked to resign', val: selectedAppDetail.medicallyUnfitResignation || selectedAppDetail.medicallyUnfit },
+                        { label: 'Case pending in court', val: selectedAppDetail.casePending },
+                        { label: 'Debarred for unfair means', val: selectedAppDetail.debarredForUnfairMeans },
+                        { label: 'Administrative malpractice', val: selectedAppDetail.administrativeMalpractice },
+                        { label: 'Financial irregularity', val: selectedAppDetail.financialIrregularity },
+                        { label: 'Discharged or dismissed', val: selectedAppDetail.dischargedOrDismissed },
+                        { label: 'Pending disciplinary proceeding', val: selectedAppDetail.pendingDisciplinaryProceeding },
+                        { label: 'NOC Available', val: selectedAppDetail.nocAvailable },
+                      ].map((item, idx) => (
+                        <div key={idx} className="flex justify-between p-2 bg-white border border-slate-200 rounded-lg items-center">
+                          <span className="text-[10px] text-slate-700">{item.label}</span>
+                          <span className="font-bold text-[10px]">{item.val ? 'YES' : 'NO'}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {selectedAppDetail.referees && selectedAppDetail.referees.length > 0 && (
+                    <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200 space-y-3">
+                      <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                        <User className="w-4 h-4 text-indigo-600" />
+                        Professional Referees
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {selectedAppDetail.referees.map((ref, idx) => (
+                          <div key={idx} className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                            <span className="font-bold text-slate-900 block">{ref.name}</span>
+                            <span className="text-[10px] text-indigo-600 font-bold block">{ref.designation}</span>
+                            <span className="text-[10px] text-slate-500 block">{ref.address}</span>
+                            <div className="flex gap-2 text-[10px] text-slate-400 mt-1">
+                              <span>{ref.email}</span>
+                              <span>{ref.mobile}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 4: Documents & Fee */}
               {activeModalTab === 'documents' && (
                 <div className="space-y-3 sm:space-y-4">
                   <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 space-y-2.5">
@@ -1028,6 +1214,17 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
         <OfferLetterModal
           application={showOfferModal}
           onClose={() => setShowOfferModal(null)}
+        />
+      )}
+
+      {isPreviewOpen && previewApp && (
+        <ApplicationPreviewModal
+          application={previewApp}
+          drive={drives.find(d => d.id === previewApp.driveId)}
+          onClose={() => {
+            setIsPreviewOpen(false);
+            setPreviewApp(null);
+          }}
         />
       )}
     </div>

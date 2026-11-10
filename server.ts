@@ -2,8 +2,18 @@ import 'dotenv/config';
 import path from 'path';
 import app from './api/server-app.js';
 import { tryConnectDb } from './api/server-db.js';
+import express from 'express';
 
 const PORT = 3000; // Dev server must run on port 3000 as per environment constraints
+
+// Serve uploaded files statically with CORS and caching headers
+const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+app.use('/uploads', express.static(uploadsDir, {
+  setHeaders: (res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+  }
+}));
 
 // Non-blocking database connection attempt on startup
 if (!process.env.VERCEL) {

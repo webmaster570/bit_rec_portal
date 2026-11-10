@@ -180,7 +180,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'admin',
-      label: 'RBAC & Master Settings',
+      label: 'Master Settings',
       icon: Settings,
       roles: ['super_admin', 'admin', 'registrar'],
     },

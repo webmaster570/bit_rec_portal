@@ -53,6 +53,8 @@ export interface PortalUser {
   createdAt: string;
   lastLoginAt?: string;
   regNumber?: string;
+  dob?: string;
+  category?: 'UR' | 'OBC' | 'SC' | 'ST' | 'EWS';
   notes?: string;
   password?: string;
 }
@@ -139,7 +141,11 @@ export interface AcademicRecord {
   boardOrUniversity: string;
   passingYear: number;
   gradeOrPercentage: string;
+  division?: string;
+  cgpa?: string;
+  subjects?: string;
   documentRef?: string;
+  proofSlNo?: string;
 }
 
 export interface ExperienceRecord {
@@ -149,7 +155,9 @@ export interface ExperienceRecord {
   endDate: string;
   isCurrent: boolean;
   jobDescription: string;
+  durationYearsMonths?: string;
   documentRef?: string;
+  proofSlNo?: string;
 }
 
 export interface DocumentAttachment {
@@ -165,6 +173,20 @@ export interface DocumentAttachment {
   verifiedAt?: string;
 }
 
+export interface ExperienceNatureDetail {
+  years: number;
+  months: number;
+  days: number;
+  proofSlNo?: string;
+}
+
+export interface NatureOfExperience {
+  teaching?: ExperienceNatureDetail;
+  administrative?: ExperienceNatureDetail;
+  research?: ExperienceNatureDetail;
+  other?: ExperienceNatureDetail & { description?: string };
+}
+
 export interface ApplicantProfile {
   applicantId: string;
   regNumber: string;
@@ -174,21 +196,54 @@ export interface ApplicantProfile {
   dob: string;
   gender: 'Male' | 'Female' | 'Other';
   category: 'UR' | 'OBC' | 'SC' | 'ST' | 'EWS';
-  isPwD: boolean;
-  pwdType?: string;
   nationality: string;
   maritalStatus: 'Single' | 'Married' | 'Divorced' | 'Widowed';
   email: string;
   mobile: string;
   alternateMobile?: string;
-  address: string;
-  state: string;
-  district: string;
-  pin: string;
   photoUrl: string;
   signatureUrl: string;
   idProofType: string;
   idProofNumber: string;
+  religion?: string;
+  spouseName?: string;
+  isPwD: boolean;
+  pwdType?: string;
+  isInstituteEmployee?: boolean;
+  isGovtEmployee?: boolean;
+  isExServiceMan?: boolean;
+  placeOfBirth?: string;
+  ageOnLastDate?: string;
+  correspondenceAddress?: string;
+  permanentAddress?: string;
+  campusUnit?: string;
+  address?: string;
+  state?: string;
+  district?: string;
+  pin?: string;
+  
+  // New fields from PDF
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  subCategory?: string;
+  categoryCertificateNo?: string;
+  categoryCertificateDate?: string;
+  categoryIssuingAuthority?: string;
+  disabilityPercentage?: number;
+  aadhaarNumber?: string;
+  correspondenceCity?: string;
+  correspondenceDistrict?: string;
+  correspondenceState?: string;
+  correspondencePin?: string;
+  correspondenceCountry?: string;
+  permanentLine1?: string;
+  permanentLine2?: string;
+  permanentCity?: string;
+  permanentDistrict?: string;
+  permanentState?: string;
+  permanentPin?: string;
+  permanentCountry?: string;
 }
 
 export interface ScreeningRemark {
@@ -231,6 +286,8 @@ export interface Application {
   feeAmount: number;
   paymentStatus: 'Exempted' | 'Pending' | 'Paid' | 'Failed' | 'Refunded';
   transactionId?: string;
+  orderId?: string;
+  paymentMode?: string;
   paymentDate?: string;
   paymentReceiptNo?: string;
 
@@ -264,6 +321,70 @@ export interface Application {
   offerIssuedAt?: string;
   offerDeadline?: string;
   offerStatus?: 'Pending' | 'Accepted' | 'Declined';
+
+  // Research & Publications (Page 3)
+  researchPapers?: string;
+  researchPublications?: string;
+
+  // Miscellaneous (Page 3/4)
+  punishedDuringService?: boolean;
+  medicallyUnfit?: boolean;
+  casePending?: boolean;
+  additionalInfo?: string;
+
+  // Declaration
+  declarationAccepted: boolean;
+  natureOfExperience?: NatureOfExperience;
+
+  // Additional Fields from PDF Part E, F, G
+  totalExperienceYearsMonths?: string;
+  relevantExperience?: string;
+  presentEmployer?: string;
+  presentDesignation?: string;
+  presentPayLevel?: string;
+  presentBasicPay?: string;
+  presentJoiningDate?: string;
+  isWorkingInGovtPSU?: boolean;
+  isProbationCompleted?: boolean;
+  isVigilanceClearanceAvailable?: boolean;
+  
+  adminExperienceDetails?: string;
+  recruitmentMattersExperience?: string;
+  academicAdminExperience?: string;
+  goiRulesKnowledge?: string;
+  financialServiceMattersExperience?: string;
+  eGovErpSamarthExperience?: string;
+  awardsRecognitions?: string;
+  relevantAchievements?: string;
+  languagesKnown?: string;
+  
+  fulfillsQualifications?: boolean;
+  fulfillsExperience?: boolean;
+  fulfillsAgeCriteria?: boolean;
+  isRelaxationClaimed?: boolean;
+  isCurrentlyEmployed?: boolean;
+  isNocRequired?: boolean;
+  disciplinaryPending?: boolean;
+  criminalDisclosed?: boolean;
+  previouslyAppliedSamePost?: boolean;
+  debarredFromExams?: boolean;
+  
+  place?: string;
+  date?: string;
+
+  // Miscellaneous Fields (New Step)
+  joiningTimeRequired?: string;
+  hasComputerProficiency?: boolean;
+  institutionalContribution?: string;
+  suitabilityStatement?: string;
+  honoursAndAwards?: string;
+  debarredForUnfairMeans?: boolean;
+  administrativeMalpractice?: boolean;
+  financialIrregularity?: boolean;
+  dischargedOrDismissed?: boolean;
+  medicallyUnfitResignation?: boolean;
+  referees?: Array<{ name: string; designation: string; address: string; email: string; mobile: string }>;
+  nocAvailable?: boolean;
 }
 
 export interface AuditLog {

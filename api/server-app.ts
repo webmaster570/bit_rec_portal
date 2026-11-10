@@ -1,4 +1,6 @@
 import express from 'express';
+import fs from 'fs';
+import path from 'path';
 import {
   tryConnectDb,
   getDbStatus,
@@ -123,6 +125,43 @@ apiRouter.get('/', (req, res) => {
 
 apiRouter.get('/ping', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
+// 0. File Upload Simulation
+apiRouter.post('/upload', async (req, res) => {
+  try {
+    const { fileName, fileType, base64 } = req.body;
+    if (!base64 || !fileName) {
+      return res.status(400).json({ success: false, error: 'Missing file data' });
+    }
+
+    // Ensure uploads directory exists
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    // Clean base64 string
+    const base64Data = base64.replace(/^data:.*;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    // Generate unique filename to avoid collisions
+    const uniqueName = `${Date.now()}-${fileName.replace(/\s+/g, '_')}`;
+    const filePath = path.join(uploadsDir, uniqueName);
+    
+    fs.writeFileSync(filePath, buffer);
+
+    res.json({
+      success: true,
+      url: `/uploads/${uniqueName}`,
+      name: fileName,
+      type: fileType,
+      size: `${(buffer.length / 1024).toFixed(1)} KB`
+    });
+  } catch (err: any) {
+    console.error('[API] Upload error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // 1. Health & Database connection status

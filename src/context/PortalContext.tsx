@@ -116,7 +116,8 @@ interface PortalContextType {
     academics: Application['academics'],
     experience: Application['experience'],
     documents: Application['documents'],
-    isExempted: boolean
+    isExempted: boolean,
+    additionalData?: Partial<Application>
   ) => Application;
 
   updateScreening: (
@@ -149,7 +150,11 @@ interface PortalContextType {
   publishOfferLetter: (appId: string, deadlineDays?: number) => void;
   respondToOffer: (appId: string, response: 'Accepted' | 'Declined') => void;
   reconcilePayment: (appId: string, newStatus: 'Paid' | 'Refunded') => void;
+  updateApplication: (appId: string, updates: Partial<Application>) => void;
   
+  editingAppId: string | null;
+  setEditingAppId: (id: string | null) => void;
+
   addDepartment: (dept: Omit<Department, 'id' | 'activePostsCount'>) => void;
   addUser: (user: Omit<PortalUser, 'id' | 'createdAt'>) => PortalUser;
   updateUser: (userId: string, updates: Partial<PortalUser>) => void;
@@ -197,6 +202,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [notifications, setNotifications] = useState<SystemNotification[]>([]);
   const [selectedDriveId, setSelectedDriveId] = useState<string | null>(() => loadInitialState('selectedDriveId', 'drive-2026-01'));
   const [selectedPostId, setSelectedPostId] = useState<string | null>(() => loadInitialState('selectedPostId', null));
+  const [editingAppId, setEditingAppId] = useState<string | null>(null);
   
   const setActiveTab = useCallback((tab: string) => {
     setActiveTabState(tab);
@@ -693,6 +699,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       role: 'applicant',
       mobile: profile.mobile,
       regNumber: regNum,
+      dob: profile.dob,
+      category: profile.category,
       status: 'active',
       password: profile.password || 'pass123',
     });
@@ -970,7 +978,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     academics: Application['academics'],
     experience: Application['experience'],
     documents: Application['documents'],
-    isExempted: boolean
+    isExempted: boolean,
+    additionalData?: Partial<Application>
   ): Application => {
     const targetDrive = drives.find((d) => d.id === driveId);
     const targetPost = targetDrive?.posts.find((p) => p.id === postId);
@@ -992,14 +1001,16 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       experience,
       documents,
       submittedAt: new Date().toISOString(),
-      stage: 'submitted',
+      stage: additionalData?.stage || 'submitted',
       feeAmount,
-      paymentStatus: isExempted ? 'Exempted' : 'Paid',
-      transactionId: isExempted ? undefined : `TXN${Math.floor(100000000 + Math.random() * 900000000)}`,
-      paymentDate: isExempted ? undefined : new Date().toISOString(),
-      paymentReceiptNo: isExempted ? undefined : `RCP-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+      paymentStatus: isExempted ? 'Exempted' : (additionalData?.paymentStatus || 'Paid'),
+      transactionId: isExempted ? undefined : (additionalData?.transactionId || `TXN${Math.floor(100000000 + Math.random() * 900000000)}`),
+      paymentDate: isExempted ? undefined : (additionalData?.paymentDate || new Date().toISOString()),
+      paymentReceiptNo: isExempted ? undefined : (additionalData?.paymentReceiptNo || `RCP-2026-${Math.floor(1000 + Math.random() * 9000)}`),
       screeningStatus: 'Pending',
       docVerificationStatus: 'Pending',
+      declarationAccepted: false,
+      ...additionalData,
     };
 
     setApplications((prev) => [newApp, ...prev]);
@@ -1029,6 +1040,37 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     logAudit('APPLICATION_SUBMITTED', 'Application', `Submitted new application ${newApp.applicationNo} for post ${targetPost?.title}`);
     return newApp;
+  };
+
+  const updateApplication = (appId: string, updates: Partial<Application>) => {
+    let updatedApp: Application | null = null;
+    setApplications((prev) =>
+      prev.map((app) => {
+        if (app.id === appId) {
+          updatedApp = { ...app, ...updates };
+          return updatedApp;
+        }
+        return app;
+      })
+    );
+
+    if (updatedApp) {
+      runDbTransaction(
+        'Draft Auto-Save',
+        `PUT /api/applications/${appId}`,
+        'Updating application progress in database...',
+        'Draft progress saved to MongoDB.',
+        async () => {
+          const res = await fetch(`/api/applications/${appId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedApp),
+          });
+          if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
+          return await res.json();
+        }
+      );
+    }
   };
 
   const updateScreening = (
@@ -1698,6 +1740,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         publishOfferLetter,
         respondToOffer,
         reconcilePayment,
+        updateApplication,
+        editingAppId,
+        setEditingAppId,
         addDepartment,
         addUser,
         updateUser,
