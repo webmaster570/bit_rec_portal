@@ -148,6 +148,13 @@ export interface AcademicRecord {
   proofSlNo?: string;
 }
 
+export interface OtherExamRecord {
+  examName: string;
+  rollNo?: string;
+  year?: string | number;
+  proofSlNo?: string;
+}
+
 export interface ExperienceRecord {
   organization: string;
   designation: string;
@@ -277,6 +284,7 @@ export interface Application {
   departmentName: string;
   applicant: ApplicantProfile;
   academics: AcademicRecord[];
+  otherQualifications?: OtherExamRecord[];
   experience: ExperienceRecord[];
   documents: DocumentAttachment[];
   submittedAt?: string;

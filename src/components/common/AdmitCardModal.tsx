@@ -1,6 +1,7 @@
 import React from 'react';
+import { usePortal } from '../../context/PortalContext';
 import { Application } from '../../types';
-import { X, Printer, Building2, Calendar, MapPin, QrCode, ShieldCheck, Download } from 'lucide-react';
+import { X, Printer, Building2, Calendar, MapPin, QrCode, ShieldCheck, User, CheckCircle2, Clock } from 'lucide-react';
 
 interface AdmitCardModalProps {
   application: Application;
@@ -8,142 +9,183 @@ interface AdmitCardModalProps {
 }
 
 export const AdmitCardModal: React.FC<AdmitCardModalProps> = ({ application, onClose }) => {
+  const { branding } = usePortal();
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto text-slate-900 animate-in fade-in zoom-in-95 duration-150">
-        {/* Modal Header */}
-        <div className="flex items-center justify-between p-3.5 sm:p-4 border-b border-slate-200 bg-slate-50 shrink-0">
-          <div className="flex items-center space-x-2 min-w-0">
-            <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 shrink-0" />
-            <h3 className="text-xs sm:text-sm font-bold text-slate-900 truncate">Official Admit Card / Hall Ticket</h3>
+    <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl flex flex-col overflow-hidden my-auto text-slate-900 border border-slate-200">
+        {/* Actions Header */}
+        <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-white sticky top-0 z-20 print:hidden">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100">
+              <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Recruitment Hall Ticket</h3>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Official Copy</p>
+            </div>
           </div>
-          <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="px-2.5 sm:px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] sm:text-xs font-semibold flex items-center space-x-1 shadow-2xs transition"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black flex items-center gap-2 transition shadow-md shadow-indigo-100"
             >
-              <Printer className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Print Hall Ticket</span>
-              <span className="sm:hidden">Print</span>
+              <Printer className="w-4 h-4" />
+              <span>PRINT ADMIT CARD</span>
             </button>
             <button
               onClick={onClose}
-              className="p-1 sm:p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
-              aria-label="Close dialog"
+              className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6" />
             </button>
           </div>
         </div>
 
-        {/* Admit Card Document Body (Scrollable on small screens) */}
-        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 bg-white text-xs text-slate-700 flex-1 overflow-y-auto">
-          {/* Header Seal */}
-          <div className="text-center border-b border-slate-200 pb-3.5 space-y-1">
-            <h2 className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight uppercase">
-              National University of Technology & Sciences
-            </h2>
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">
-              Centralized Recruitment Examination Admit Card — 2026
-            </p>
-            <span className="inline-block bg-indigo-50 text-indigo-700  px-2 py-0.5 rounded font-mono text-[10px] font-bold">
-              {application.advtNumber}
-            </span>
-          </div>
+        {/* Admit Card Document Body */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-50 print:bg-white print:p-0">
+          <div className="bg-white p-8 sm:p-10 border-2 border-slate-900 rounded-3xl shadow-sm print:border-0 print:shadow-none print:p-0 w-full max-w-full mx-auto relative overflow-hidden">
+            
+            {/* Design Elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-slate-900 text-white flex items-center justify-center rotate-45 translate-x-16 -translate-y-16 print:hidden">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] -rotate-45 mt-12 mr-4">ADMIT CARD</span>
+            </div>
 
-          {/* Candidate Profile Details & Photo */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 items-center bg-slate-50 p-3 sm:p-4 rounded-xl">
-            <div className="sm:col-span-2 space-y-2">
-              <div>
-                <span className="text-slate-500 text-[10px] uppercase block">Candidate Full Name</span>
-                <span className="font-extrabold text-slate-900 text-xs sm:text-sm">{application.applicant.fullName}</span>
+            {/* University Header */}
+            <div className="text-center border-b-2 border-slate-900 pb-6 space-y-2 relative">
+              {/* Logo Section */}
+              <div className="absolute left-0 top-0 w-20 h-20 flex items-center justify-center">
+                {branding.logoImageUrl ? (
+                  <img src={branding.logoImageUrl} alt="Logo" className="max-w-full max-h-full object-contain" />
+                ) : (
+                  <Building2 className="w-10 h-10 text-slate-200" />
+                )}
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[10px] sm:text-[11px]">
-                <div>
-                  <span className="text-slate-500 block">Roll Number:</span>
-                  <span className="font-mono font-bold text-emerald-600 truncate block">{application.rollNumber || 'ROLL-2026-9921'}</span>
+              <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-slate-900 pl-20">Birla Institute of Technology</h1>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] pl-20">Mesra, Ranchi - 835215, Jharkhand</p>
+              <div className="pt-2 pl-20">
+                <span className="px-4 py-1 bg-slate-100 text-slate-900 text-[10px] font-black rounded-lg border border-slate-200 uppercase tracking-widest">
+                  Examination Hall Ticket — 2026
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-8 space-y-8">
+              {/* Profile Section */}
+              <div className="grid grid-cols-12 gap-8 items-start">
+                <div className="col-span-12 md:col-span-9 space-y-6">
+                  <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                    <div className="col-span-2">
+                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">Full Name of Candidate</span>
+                      <span className="text-lg font-black text-slate-900 uppercase tracking-tight">{application.applicant.fullName}</span>
+                    </div>
+                    <div>
+                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">Exam Roll Number</span>
+                      <span className="text-base font-black text-indigo-700 font-mono tracking-wider">{application.rollNumber || 'T-2026-9021'}</span>
+                    </div>
+                    <div>
+                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">Application ID</span>
+                      <span className="text-base font-bold text-slate-700 font-mono">{application.applicationNo}</span>
+                    </div>
+                    <div>
+                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">Category</span>
+                      <span className="text-sm font-bold text-slate-800">{application.applicant.category}</span>
+                    </div>
+                    <div>
+                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">Date of Birth</span>
+                      <span className="text-sm font-bold text-slate-800">{application.applicant.dob}</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-slate-500 block">Application No:</span>
-                  <span className="font-mono font-bold text-indigo-600 truncate block">{application.applicationNo}</span>
+
+                {/* Candidate Photo */}
+                <div className="col-span-12 md:col-span-3 flex flex-col items-center gap-3">
+                  <div className="w-full aspect-[3/4] border-2 border-slate-900 rounded-2xl p-1 bg-white shadow-md">
+                    <div className="w-full h-full border border-slate-100 rounded-xl overflow-hidden">
+                      <img
+                        src={application.applicant.photoUrl}
+                        alt="Photo"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div className="w-full h-10 border border-slate-200 rounded-lg flex items-center justify-center p-1 bg-slate-50">
+                     {application.applicant.signatureUrl ? (
+                        <img src={application.applicant.signatureUrl} alt="Signature" className="h-full w-auto object-contain" />
+                     ) : (
+                        <span className="text-[8px] font-bold text-slate-300 uppercase">Signature Attached</span>
+                     )}
+                  </div>
                 </div>
-                <div>
-                  <span className="text-slate-500 block">Category:</span>
-                  <span className="font-semibold text-slate-800">{application.applicant.category}</span>
+              </div>
+
+              {/* Schedule & Venue */}
+              <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 space-y-6">
+                <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-indigo-300" />
+                  </div>
+                  <h4 className="text-xs font-black uppercase tracking-[0.2em]">Examination Schedule & Venue</h4>
                 </div>
-                <div>
-                  <span className="text-slate-500 block">Date of Birth:</span>
-                  <span className="font-semibold text-slate-800">{application.applicant.dob}</span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <Clock className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                      <div>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Reporting Date & Time</span>
+                        <span className="text-sm font-black tracking-tight">{application.examDateTime || 'Monday, April 20, 2026 | 09:30 AM'}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Building2 className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                      <div>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Position & Department</span>
+                        <span className="text-sm font-black tracking-tight uppercase">{application.postTitle}</span>
+                        <p className="text-[10px] text-indigo-300 font-bold">{application.departmentName}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+                    <MapPin className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" />
+                    <div>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Venue Address</span>
+                      <span className="text-sm font-black tracking-tight leading-relaxed">
+                        {application.examCenter || 'Main Campus Auditorium, Block-B, First Floor, Hall 3, Mesra, Ranchi, Jharkhand - 835215'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Security & Verification */}
+              <div className="flex flex-col sm:flex-row gap-8 items-center justify-between border-t-2 border-slate-900 pt-8">
+                <div className="space-y-4 flex-1">
+                   <h4 className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" /> Instructions for Candidate
+                  </h4>
+                  <ul className="space-y-1.5 text-[9px] font-bold text-slate-500 leading-tight">
+                    <li className="flex gap-2"><span>1.</span> <span>Candidate must carry this original Hall Ticket and a valid Government Photo ID Proof.</span></li>
+                    <li className="flex gap-2"><span>2.</span> <span>Reporting time is 60 minutes prior to the commencement of the examination.</span></li>
+                    <li className="flex gap-2"><span>3.</span> <span>Electronic gadgets including mobile phones, calculators, and watches are strictly prohibited.</span></li>
+                  </ul>
+                </div>
+
+                <div className="flex flex-col items-center gap-2">
+                  <div className="p-3 border-2 border-slate-900 rounded-2xl bg-white">
+                    <QrCode className="w-16 h-16 sm:w-20 sm:h-20" />
+                  </div>
+                  <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">System Verified</span>
                 </div>
               </div>
             </div>
 
-            <div className="text-center space-y-1.5 flex flex-col items-center">
-              <img
-                src={application.applicant.photoUrl}
-                alt="Candidate Photo"
-                className="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded border border-slate-300 shadow-xs"
-              />
-              <span className="text-[9px] font-mono text-slate-500 block">Verified Photo</span>
+            {/* Footer Text */}
+            <div className="mt-12 text-center text-[8px] font-black uppercase text-slate-300 tracking-[0.3em] py-4 border-t border-slate-50">
+               Issued by Recruitment Cell | Birla Institute of Technology, Mesra
             </div>
           </div>
-
-          {/* Applied Post & Test Venue Details */}
-          <div className="bg-slate-50 p-3 sm:p-4 rounded-xl space-y-2">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-1">
-              Examination Schedule & Venue Allocation
-            </h4>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-xs">
-              <div>
-                <span className="text-slate-500 text-[11px] block">Applied Position:</span>
-                <span className="font-bold text-slate-900">{application.postTitle}</span>
-              </div>
-              <div>
-                <span className="text-slate-500 text-[11px] block">Department:</span>
-                <span className="font-semibold text-indigo-600">{application.departmentName}</span>
-              </div>
-              <div>
-                <span className="text-slate-500 text-[11px] block">Test Date & Time:</span>
-                <span className="font-semibold text-amber-700">{application.examDateTime || 'April 20, 2026 (10:00 AM)'}</span>
-              </div>
-              <div>
-                <span className="text-slate-500 text-[11px] block">Examination Center:</span>
-                <span className="font-semibold text-slate-800">{application.examCenter || 'Main Campus Auditorium, Hall 3'}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Verification QR Code & Instructions */}
-          <div className="p-3 bg-slate-50 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="space-y-1">
-              <span className="text-xs font-bold text-slate-900 flex items-center gap-1">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                Security Instructions
-              </span>
-              <p className="text-[10px] text-slate-500 leading-relaxed">
-                1. Carry original government photo ID proof along with this printed hall ticket.
-                <br />
-                2. Electronic gadgets, smartphones, and calculators strictly prohibited.
-              </p>
-            </div>
-
-            <div className="p-2 bg-white rounded-lg text-slate-900 text-center shrink-0">
-              <QrCode className="w-10 h-10 sm:w-12 sm:h-12 mx-auto" />
-              <span className="text-[8px] font-mono block font-bold mt-0.5 text-slate-600">AUTH-VERIFIED</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="p-3 sm:p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
-          <button
-            onClick={onClose}
-            className="w-full sm:w-auto px-4 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition"
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { usePortal } from '../../context/PortalContext';
 import { Application, ApplicationStage } from '../../types';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import { OfferLetterModal } from '../common/OfferLetterModal';
+import { ApplicationPreviewModal } from './ApplicationPreviewModal';
 import {
   FileText,
   Search,
@@ -33,6 +34,7 @@ export const ApplicationList: React.FC = () => {
   const [selectedAppDetail, setSelectedAppDetail] = useState<Application | null>(null);
   const [showAdmitCardModal, setShowAdmitCardModal] = useState<Application | null>(null);
   const [showOfferModal, setShowOfferModal] = useState<Application | null>(null);
+  const [showPreviewModal, setShowPreviewModal] = useState<Application | null>(null);
 
   const filteredApps = applications.filter((app) => {
     const matchesSearch =
@@ -258,6 +260,15 @@ export const ApplicationList: React.FC = () => {
                           <span>Offer Letter</span>
                         </button>
                       )}
+
+                      <button
+                        onClick={() => setShowPreviewModal(app)}
+                        className="px-2.5 py-1 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-semibold border border-indigo-200 inline-flex items-center gap-1"
+                        title="View / Print Full Professional Form"
+                      >
+                        <Printer className="w-3.5 h-3.5 text-indigo-600" />
+                        <span>Preview</span>
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -367,6 +378,34 @@ export const ApplicationList: React.FC = () => {
                     ))}
                   </tbody>
                 </table>
+
+                {selectedAppDetail.otherQualifications && selectedAppDetail.otherQualifications.some(o => o.examName?.trim()) && (
+                  <div className="pt-3 border-t border-slate-200/60 mt-3 space-y-1.5">
+                    <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider block">
+                      Other Exams Passed (ITI / Diploma / Certificate)
+                    </span>
+                    <table className="w-full text-left">
+                      <thead className="text-[10px] uppercase text-slate-500 border-b border-slate-200">
+                        <tr>
+                          <th className="py-1">Exam / Course</th>
+                          <th className="py-1">Roll No</th>
+                          <th className="py-1">Year</th>
+                          <th className="py-1">Proof Sl No</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {selectedAppDetail.otherQualifications.filter(o => o.examName?.trim()).map((o, i) => (
+                          <tr key={i}>
+                            <td className="py-1.5 font-semibold text-slate-900">{o.examName}</td>
+                            <td className="py-1.5 text-slate-700 font-mono">{o.rollNo || '-'}</td>
+                            <td className="py-1.5 text-slate-700 font-mono">{o.year || '-'}</td>
+                            <td className="py-1.5 text-slate-600 font-mono">{o.proofSlNo || '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
 
               {/* Uploaded Documents */}
@@ -430,6 +469,14 @@ export const ApplicationList: React.FC = () => {
 
       {showOfferModal && (
         <OfferLetterModal application={showOfferModal} onClose={() => setShowOfferModal(null)} />
+      )}
+
+      {showPreviewModal && (
+        <ApplicationPreviewModal
+          application={showPreviewModal}
+          drive={drives.find(d => d.id === showPreviewModal.driveId)}
+          onClose={() => setShowPreviewModal(null)}
+        />
       )}
     </div>
   );

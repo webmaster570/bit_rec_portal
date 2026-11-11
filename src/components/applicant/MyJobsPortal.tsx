@@ -921,6 +921,37 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                     </div>
                   </div>
 
+                  {selectedAppDetail.otherQualifications && selectedAppDetail.otherQualifications.some(o => o.examName?.trim()) && (
+                    <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 space-y-2.5">
+                      <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                        <GraduationCap className="w-4 h-4 text-indigo-600" />
+                        Other Exams Passed (ITI / Diploma / Certificate)
+                      </h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left min-w-[480px]">
+                          <thead className="text-[10px] uppercase text-slate-500 border-b border-slate-200">
+                            <tr>
+                              <th className="py-2">Exam / Course / Subject</th>
+                              <th className="py-2">Roll No.</th>
+                              <th className="py-2">Passing Year</th>
+                              <th className="py-2 text-center">Proof Sl No</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-200">
+                            {selectedAppDetail.otherQualifications.filter(o => o.examName?.trim()).map((other, idx) => (
+                              <tr key={idx}>
+                                <td className="py-2 font-bold text-slate-900">{other.examName}</td>
+                                <td className="py-2 text-slate-700 font-mono">{other.rollNo || '-'}</td>
+                                <td className="py-2 text-slate-700 font-mono">{other.year || '-'}</td>
+                                <td className="py-2 text-center font-mono text-slate-600">{other.proofSlNo || '-'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
                   {selectedAppDetail.experience && selectedAppDetail.experience.length > 0 && (
                     <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 space-y-2.5">
                       <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">

@@ -85,7 +85,8 @@ interface PortalContextType {
     operationTag: string,
     processingMsg: string,
     successMsg: string,
-    asyncAction: () => Promise<T>
+    asyncAction: () => Promise<T>,
+    silent?: boolean
   ) => Promise<T | null>;
 
   login: (role: UserRole, email: string, name?: string, regNumber?: string) => void;
@@ -268,48 +269,55 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       operationTag: string,
       processingMsg: string,
       successMsg: string,
-      asyncAction: () => Promise<T>
+      asyncAction: () => Promise<T>,
+      silent = false
     ): Promise<T | null> => {
       const startTime = Date.now();
       const toastId = `txn-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 
-      // 1. Emit Processing Toast
-      setTransactionToasts((prev) => [
-        {
-          id: toastId,
-          status: 'processing',
-          title,
-          message: processingMsg,
-          operationTag,
-          timestamp: new Date().toISOString(),
-        },
-        ...prev.slice(0, 4),
-      ]);
+      // 1. Emit Processing Toast (Skip if silent)
+      if (!silent) {
+        setTransactionToasts((prev) => [
+          {
+            id: toastId,
+            status: 'processing',
+            title,
+            message: processingMsg,
+            operationTag,
+            timestamp: new Date().toISOString(),
+          },
+          ...prev.slice(0, 4),
+        ]);
+      }
 
       try {
         const result = await asyncAction();
         const durationMs = Date.now() - startTime;
 
-        // 2. Transition to Success Toast
-        setTransactionToasts((prev) =>
-          prev.map((t) =>
-            t.id === toastId
-              ? {
-                  ...t,
-                  status: 'success',
-                  title: `${title} — Committed`,
-                  message: successMsg,
-                  durationMs,
-                  autoDismissAfter: 4500,
-                }
-              : t
-          )
-        );
+        // 2. Transition to Success Toast (Skip if silent)
+        if (!silent) {
+          setTransactionToasts((prev) =>
+            prev.map((t) =>
+              t.id === toastId
+                ? {
+                    ...t,
+                    status: 'success',
+                    title: `${title} — Committed`,
+                    message: successMsg,
+                    durationMs,
+                    autoDismissAfter: 4500,
+                  }
+                : t
+            )
+          );
+        }
 
-        // Auto-dismiss success toast after 4.5s
-        setTimeout(() => {
-          setTransactionToasts((prev) => prev.filter((t) => t.id !== toastId));
-        }, 4500);
+        // Auto-dismiss success toast after 4.5s (Skip if silent)
+        if (!silent) {
+          setTimeout(() => {
+            setTransactionToasts((prev) => prev.filter((t) => t.id !== toastId));
+          }, 4500);
+        }
 
         return result;
       } catch (err: any) {
@@ -1035,7 +1043,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         });
         if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
         return await res.json();
-      }
+      },
+      true // Silent save for applicant flow
     );
 
     logAudit('APPLICATION_SUBMITTED', 'Application', `Submitted new application ${newApp.applicationNo} for post ${targetPost?.title}`);
@@ -1068,7 +1077,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           });
           if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
           return await res.json();
-        }
+        },
+        true // Silent save for applicant flow
       );
     }
   };

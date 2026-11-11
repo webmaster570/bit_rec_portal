@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { Application } from '../../types';
+import { Application, OtherExamRecord } from '../../types';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import {
   Send,
@@ -234,6 +234,15 @@ export const ApplicantPortal: React.FC = () => {
     }
   ]);
 
+  const [otherQualifications, setOtherQualifications] = useState<OtherExamRecord[]>([
+    {
+      examName: '',
+      rollNo: '',
+      year: '',
+      proofSlNo: ''
+    }
+  ]);
+
   const [experience, setExperience] = useState([
     {
       organization: 'Pune Institute of Computer Technology',
@@ -379,6 +388,9 @@ export const ApplicantPortal: React.FC = () => {
         // Map fields using functional updates to ensure consistency
         if (draftApp.applicant) setProfile(prev => ({ ...prev, ...draftApp.applicant }));
         if (draftApp.academics) setAcademics(draftApp.academics);
+        if (draftApp.otherQualifications && draftApp.otherQualifications.length > 0) {
+          setOtherQualifications(draftApp.otherQualifications);
+        }
         if (draftApp.experience) setExperience(draftApp.experience);
         if (draftApp.natureOfExperience) setNatureOfExperience(draftApp.natureOfExperience);
         if (draftApp.researchPapers !== undefined) setResearchPapers(draftApp.researchPapers);
@@ -435,6 +447,7 @@ export const ApplicantPortal: React.FC = () => {
       natureOfExperience,
       researchPapers,
       researchPublications,
+      otherQualifications,
       ...miscInfo,
       ...extraMisc,
       referees,
@@ -464,6 +477,7 @@ export const ApplicantPortal: React.FC = () => {
       updateApplication(currentAppId, {
         applicant: profile,
         academics,
+        otherQualifications,
         experience,
         documents,
         ...additionalData
@@ -477,6 +491,7 @@ export const ApplicantPortal: React.FC = () => {
       natureOfExperience,
       researchPapers,
       researchPublications,
+      otherQualifications,
       ...miscInfo,
       ...extraMisc,
       referees,
@@ -1241,7 +1256,24 @@ export const ApplicantPortal: React.FC = () => {
 
             {/* Other Qualifications Table */}
             <div className="space-y-3 pt-4 border-t border-slate-100">
-              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Any other exams passed (ITI / Diploma / Certificate)</h4>
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  Any other exams passed (ITI / Diploma / Certificate)
+                </h4>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setOtherQualifications([
+                      ...otherQualifications,
+                      { examName: '', rollNo: '', year: '', proofSlNo: '' }
+                    ])
+                  }
+                  className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add more
+                </button>
+              </div>
+
               <div className="overflow-x-auto border border-slate-200 rounded-xl">
                 <table className="w-full text-[10px] text-left border-collapse">
                   <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
@@ -1249,24 +1281,92 @@ export const ApplicantPortal: React.FC = () => {
                       <th className="p-2 border-r border-slate-200">Name of Exam/Course/Subject</th>
                       <th className="p-2 border-r border-slate-200 w-32">Roll No.</th>
                       <th className="p-2 border-r border-slate-200 w-24">Year</th>
-                      <th className="p-2 text-center w-24">Proof Sl No</th>
+                      <th className="p-2 border-r border-slate-200 text-center w-24">Proof Sl No</th>
+                      <th className="p-2 text-center w-10">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    <tr className="hover:bg-slate-50/50">
-                      <td className="p-1.5 border-r border-slate-100">
-                        <input type="text" placeholder="e.g. ITI Electrician" className="w-full bg-transparent border-0 focus:ring-0 p-0 text-slate-900" />
-                      </td>
-                      <td className="p-1.5 border-r border-slate-100">
-                        <input type="text" className="w-full bg-transparent border-0 focus:ring-0 p-0 text-slate-700" />
-                      </td>
-                      <td className="p-1.5 border-r border-slate-100">
-                        <input type="number" className="w-full bg-transparent border-0 focus:ring-0 p-0 text-slate-700" />
-                      </td>
-                      <td className="p-1.5 text-center">
-                        <input type="text" className="w-full bg-transparent border-0 focus:ring-0 p-0 text-center text-slate-700" />
-                      </td>
-                    </tr>
+                    {otherQualifications.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="p-4 text-center text-slate-400 italic">
+                          No other exams added. Click &quot;Add more&quot; above to add ITI, Diploma, or Certificate credentials.
+                        </td>
+                      </tr>
+                    ) : (
+                      otherQualifications.map((item, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50/50">
+                          <td className="p-1.5 border-r border-slate-100">
+                            <input
+                              type="text"
+                              placeholder="e.g. ITI Electrician / Polytechnic Diploma / Certificate in GIS"
+                              value={item.examName}
+                              onChange={(e) => {
+                                const copy = [...otherQualifications];
+                                copy[idx].examName = e.target.value;
+                                setOtherQualifications(copy);
+                              }}
+                              className="w-full bg-transparent border-0 focus:ring-0 p-0 text-slate-900 placeholder:text-slate-400"
+                            />
+                          </td>
+                          <td className="p-1.5 border-r border-slate-100">
+                            <input
+                              type="text"
+                              placeholder="Roll Number"
+                              value={item.rollNo || ''}
+                              onChange={(e) => {
+                                const copy = [...otherQualifications];
+                                copy[idx].rollNo = e.target.value;
+                                setOtherQualifications(copy);
+                              }}
+                              className="w-full bg-transparent border-0 focus:ring-0 p-0 text-slate-700 font-mono"
+                            />
+                          </td>
+                          <td className="p-1.5 border-r border-slate-100">
+                            <input
+                              type="number"
+                              placeholder="YYYY"
+                              value={item.year || ''}
+                              onChange={(e) => {
+                                const copy = [...otherQualifications];
+                                copy[idx].year = e.target.value;
+                                setOtherQualifications(copy);
+                              }}
+                              className="w-full bg-transparent border-0 focus:ring-0 p-0 text-slate-700 font-mono"
+                            />
+                          </td>
+                          <td className="p-1.5 border-r border-slate-100 text-center">
+                            <input
+                              type="text"
+                              placeholder="e.g. 03"
+                              value={item.proofSlNo || ''}
+                              onChange={(e) => {
+                                const copy = [...otherQualifications];
+                                copy[idx].proofSlNo = e.target.value;
+                                setOtherQualifications(copy);
+                              }}
+                              className="w-full bg-transparent border-0 focus:ring-0 p-0 text-center text-slate-700"
+                            />
+                          </td>
+                          <td className="p-1.5 text-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (otherQualifications.length === 1) {
+                                  // Clear instead of removing last row, so applicant always has a blank field
+                                  setOtherQualifications([{ examName: '', rollNo: '', year: '', proofSlNo: '' }]);
+                                } else {
+                                  setOtherQualifications(otherQualifications.filter((_, i) => i !== idx));
+                                }
+                              }}
+                              className="text-rose-600 hover:text-rose-800 p-1 rounded hover:bg-rose-50 transition"
+                              title="Delete entry"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -2162,6 +2262,7 @@ export const ApplicantPortal: React.FC = () => {
             referees,
             applicant: profile,
             academics,
+            otherQualifications,
             experience,
             documents,
             postId: selectedPostId,

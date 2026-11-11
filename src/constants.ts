@@ -3,9 +3,9 @@ import { PortalBranding, WeightageConfig, MailConfig } from './types.js';
 export const INITIAL_BRANDING: PortalBranding = {
   title: 'Birla Institute of Technology',
   subtitle: 'Mesra, Ranchi',
-  logoType: 'icon',
+  logoType: 'image',
   logoIconName: 'Building2',
-  logoImageUrl: '',
+  logoImageUrl: 'https://bitmesra.ac.in/SiteLogo/BIT-Mesra.png',
   theme: 'bit_mesra',
   allowDevRoleSelector: true,
   navbarColor: 'bit_mesra',
