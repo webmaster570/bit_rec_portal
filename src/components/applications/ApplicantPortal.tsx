@@ -24,6 +24,7 @@ import {
   ExternalLink,
   Printer,
   RotateCcw,
+  MapPin,
 } from 'lucide-react';
 import { ApplicationPreviewModal } from './ApplicationPreviewModal';
 
@@ -94,16 +95,20 @@ export const ApplicantPortal: React.FC = () => {
     categoryIssuingAuthority: '',
     disabilityPercentage: 0,
     aadhaarNumber: '',
+    correspondenceLine1: '',
+    correspondenceLine2: '',
+    correspondenceLandmark: '',
     correspondenceCity: '',
     correspondenceDistrict: '',
-    correspondenceState: '',
+    correspondenceState: 'Jharkhand',
     correspondencePin: '',
     correspondenceCountry: 'India',
     permanentLine1: '',
     permanentLine2: '',
+    permanentLandmark: '',
     permanentCity: '',
     permanentDistrict: '',
-    permanentState: '',
+    permanentState: 'Jharkhand',
     permanentPin: '',
     permanentCountry: 'India',
   });
@@ -650,7 +655,7 @@ export const ApplicantPortal: React.FC = () => {
                       : 'bg-slate-100 border-slate-200 text-slate-500'
                   }`}
                 >
-                  {isDone ? <CheckCircle2 className="w-4 h-4" /> : s.num}
+                  {isDone ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-3.5 h-3.5" />}
                 </div>
                 <span className="text-xs whitespace-nowrap">{s.label}</span>
               </div>
@@ -740,7 +745,7 @@ export const ApplicantPortal: React.FC = () => {
 
             <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
               <User className="w-5 h-5 text-indigo-600" />
-              Step 1: Applicant Personal Information
+              Applicant Personal Information
             </h3>
 
             {/* Photo & Signature Upload Section */}
@@ -1048,24 +1053,152 @@ export const ApplicantPortal: React.FC = () => {
                 />
               </div>
 
-              <div className="lg:col-span-3">
-                <label className="block font-medium text-slate-700 mb-1">Address Correspondence</label>
-                <textarea
-                  value={profile.correspondenceAddress}
-                  onChange={(e) => setProfile({ ...profile, correspondenceAddress: e.target.value })}
-                  rows={2}
-                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
-                />
+              {/* Correspondence Address */}
+              <div className="lg:col-span-3 space-y-4">
+                <div className="flex items-center gap-2 pb-1 border-b border-slate-100">
+                  <MapPin className="w-3.5 h-3.5 text-indigo-500" />
+                  <h4 className="font-bold text-slate-900">Correspondence Address</h4>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">Address line 1</label>
+                    <input
+                      type="text"
+                      value={profile.correspondenceLine1}
+                      onChange={(e) => setProfile({ ...profile, correspondenceLine1: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">Address line 2</label>
+                    <input
+                      type="text"
+                      value={profile.correspondenceLine2}
+                      onChange={(e) => setProfile({ ...profile, correspondenceLine2: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">Landmark</label>
+                    <input
+                      type="text"
+                      value={profile.correspondenceLandmark}
+                      onChange={(e) => setProfile({ ...profile, correspondenceLandmark: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">City</label>
+                    <input
+                      type="text"
+                      value={profile.correspondenceCity}
+                      onChange={(e) => setProfile({ ...profile, correspondenceCity: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">State</label>
+                    <input
+                      type="text"
+                      value={profile.correspondenceState}
+                      onChange={(e) => setProfile({ ...profile, correspondenceState: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">PIN</label>
+                    <input
+                      type="text"
+                      value={profile.correspondencePin}
+                      onChange={(e) => setProfile({ ...profile, correspondencePin: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 font-mono focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="lg:col-span-3">
-                <label className="block font-medium text-slate-700 mb-1">Address Permanent</label>
-                <textarea
-                  value={profile.permanentAddress}
-                  onChange={(e) => setProfile({ ...profile, permanentAddress: e.target.value })}
-                  rows={2}
-                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
-                />
+              {/* Permanent Address */}
+              <div className="lg:col-span-3 space-y-4 pt-4">
+                <div className="flex items-center justify-between pb-1 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-3.5 h-3.5 text-indigo-500" />
+                    <h4 className="font-bold text-slate-900">Permanent Address</h4>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfile({
+                        ...profile,
+                        permanentLine1: profile.correspondenceLine1,
+                        permanentLine2: profile.correspondenceLine2,
+                        permanentLandmark: profile.correspondenceLandmark,
+                        permanentCity: profile.correspondenceCity,
+                        permanentState: profile.correspondenceState,
+                        permanentPin: profile.correspondencePin,
+                        permanentDistrict: profile.correspondenceDistrict,
+                      });
+                    }}
+                    className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 underline"
+                  >
+                    Same as correspondence
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">Address line 1</label>
+                    <input
+                      type="text"
+                      value={profile.permanentLine1}
+                      onChange={(e) => setProfile({ ...profile, permanentLine1: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">Address line 2</label>
+                    <input
+                      type="text"
+                      value={profile.permanentLine2}
+                      onChange={(e) => setProfile({ ...profile, permanentLine2: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">Landmark</label>
+                    <input
+                      type="text"
+                      value={profile.permanentLandmark}
+                      onChange={(e) => setProfile({ ...profile, permanentLandmark: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">City</label>
+                    <input
+                      type="text"
+                      value={profile.permanentCity}
+                      onChange={(e) => setProfile({ ...profile, permanentCity: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">State</label>
+                    <input
+                      type="text"
+                      value={profile.permanentState}
+                      onChange={(e) => setProfile({ ...profile, permanentState: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">PIN</label>
+                    <input
+                      type="text"
+                      value={profile.permanentPin}
+                      onChange={(e) => setProfile({ ...profile, permanentPin: e.target.value })}
+                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 font-mono focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1094,13 +1227,13 @@ export const ApplicantPortal: React.FC = () => {
           <div className="space-y-6">
             <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-indigo-600" />
-              Step 2: Educational Qualifications & Professional Experience
+              Educational Qualifications & Professional Experience
             </h3>
 
             {/* Academic Qualifications Table */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">11. Educational Qualifications</h4>
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Educational Qualifications</h4>
                 <button
                   onClick={() =>
                     setAcademics([
@@ -1375,7 +1508,7 @@ export const ApplicantPortal: React.FC = () => {
             {/* Experience Table */}
             <div className="space-y-3 pt-4 border-t border-slate-100">
               <div className="flex items-center justify-between">
-                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">12. Chronological list of Experience</h4>
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Chronological list of Experience</h4>
                 <button
                   onClick={() =>
                     setExperience([
@@ -1517,7 +1650,7 @@ export const ApplicantPortal: React.FC = () => {
 
             {/* Nature of Experience Section */}
             <div className="space-y-3 pt-4 border-t border-slate-100">
-              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">13. Nature of Experience</h4>
+              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Nature of Experience</h4>
               <div className="overflow-x-auto border border-slate-200 rounded-xl">
                 <table className="w-full text-[10px] text-left border-collapse">
                   <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
@@ -1608,7 +1741,7 @@ export const ApplicantPortal: React.FC = () => {
           <div className="space-y-6">
             <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
               <FileText className="w-5 h-5 text-indigo-600" />
-              Step 3: Research Publications
+              Research Publications
             </h3>
 
             <div className="space-y-4">
@@ -1663,13 +1796,13 @@ export const ApplicantPortal: React.FC = () => {
           <div className="space-y-6">
             <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-indigo-600" />
-              Step 4: Miscellaneous Information & Disclosures
+              Miscellaneous Information & Disclosures
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
               <div className="space-y-4">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">1. Time required for joining? (in days/months)</label>
+                  <label className="block font-bold text-slate-700 mb-1">Time required for joining? (in days/months)</label>
                   <input
                     type="text"
                     value={extraMisc.joiningTimeRequired}
@@ -1680,7 +1813,7 @@ export const ApplicantPortal: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
-                  <span className="font-bold text-slate-700">2. Do you have computer proficiency certificate?</span>
+                  <span className="font-bold text-slate-700">Do you have computer proficiency certificate?</span>
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-1.5 cursor-pointer">
                       <input type="radio" checked={extraMisc.hasComputerProficiency === true} onChange={() => setExtraMisc({...extraMisc, hasComputerProficiency: true})} />
@@ -1694,7 +1827,7 @@ export const ApplicantPortal: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">3. Kindly describe your contribution to institutions where you have worked?</label>
+                  <label className="block font-bold text-slate-700 mb-1">Kindly describe your contribution to institutions where you have worked?</label>
                   <textarea
                     value={extraMisc.institutionalContribution}
                     onChange={(e) => setExtraMisc({ ...extraMisc, institutionalContribution: e.target.value })}
@@ -1704,7 +1837,7 @@ export const ApplicantPortal: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">4. What makes you suitable for the job?</label>
+                  <label className="block font-bold text-slate-700 mb-1">What makes you suitable for the job?</label>
                   <textarea
                     value={extraMisc.suitabilityStatement}
                     onChange={(e) => setExtraMisc({ ...extraMisc, suitabilityStatement: e.target.value })}
@@ -1714,7 +1847,7 @@ export const ApplicantPortal: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">5. Honours and awards (If Any)?</label>
+                  <label className="block font-bold text-slate-700 mb-1">Honours and awards (If Any)?</label>
                   <textarea
                     value={extraMisc.honoursAndAwards}
                     onChange={(e) => setExtraMisc({ ...extraMisc, honoursAndAwards: e.target.value })}
@@ -1724,7 +1857,7 @@ export const ApplicantPortal: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">13. Languages known?</label>
+                  <label className="block font-bold text-slate-700 mb-1">Languages known?</label>
                   <input
                     type="text"
                     value={pdfExtraFields.languagesKnown}
@@ -1739,13 +1872,13 @@ export const ApplicantPortal: React.FC = () => {
                 <h4 className="font-bold text-slate-800 uppercase tracking-widest text-[10px] mb-2">Legal & Disciplinary Disclosures</h4>
                 
                 {[
-                  { label: '6. Debarred or punished for adopting unfair means in any examination?', key: 'debarredForUnfairMeans' },
-                  { label: '7. Involved in any administrative malpractice?', key: 'administrativeMalpractice' },
-                  { label: '8. Involved in any financial irregularity?', key: 'financialIrregularity' },
-                  { label: '9. Ever discharged or dismissed from previous employment?', key: 'dischargedOrDismissed' },
-                  { label: '10. Pending or contemplated disciplinary proceeding against you?', key: 'pendingDisciplinaryProceeding' },
-                  { label: '11. Declared medically unfit or asked to resign on discharge/dismissed?', key: 'medicallyUnfitResignation' },
-                  { label: '14. No objection certificate available?', key: 'nocAvailable' },
+                  { label: 'Debarred or punished for adopting unfair means in any examination?', key: 'debarredForUnfairMeans' },
+                  { label: 'Involved in any administrative malpractice?', key: 'administrativeMalpractice' },
+                  { label: 'Involved in any financial irregularity?', key: 'financialIrregularity' },
+                  { label: 'Ever discharged or dismissed from previous employment?', key: 'dischargedOrDismissed' },
+                  { label: 'Pending or contemplated disciplinary proceeding against you?', key: 'pendingDisciplinaryProceeding' },
+                  { label: 'Declared medically unfit or asked to resign on discharge/dismissed?', key: 'medicallyUnfitResignation' },
+                  { label: 'No objection certificate available?', key: 'nocAvailable' },
                 ].map((item) => (
                   <div key={item.key} className="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-lg">
                     <span className="text-[11px] text-slate-700 max-w-[70%]">{item.label}</span>
@@ -1765,7 +1898,7 @@ export const ApplicantPortal: React.FC = () => {
             </div>
 
             <div className="pt-4 border-t border-slate-100">
-              <h4 className="font-bold text-slate-900 uppercase tracking-wider text-xs mb-3">12. Two referees familiar with your profile</h4>
+              <h4 className="font-bold text-slate-900 uppercase tracking-wider text-xs mb-3">Two referees familiar with your profile</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {referees.map((ref, idx) => (
                   <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
@@ -1868,7 +2001,7 @@ export const ApplicantPortal: React.FC = () => {
           <div className="space-y-4">
             <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
               <Upload className="w-5 h-5 text-indigo-600" />
-              Step 5: Document Upload & Verification Preparation
+              Document Upload & Verification Preparation
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -1905,7 +2038,7 @@ export const ApplicantPortal: React.FC = () => {
 
             <div className="flex flex-col md:flex-row gap-4 items-stretch">
               <div className="flex-1">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">1. Select Document Category</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Select Document Category</label>
                 <select 
                   id="docTypeSelect"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold focus:outline-none focus:border-indigo-500 transition"
@@ -1923,7 +2056,7 @@ export const ApplicantPortal: React.FC = () => {
               </div>
 
               <div className="flex-[2]">
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">2. Upload File</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Upload File</label>
                 <div 
                   onClick={() => {
                     const type = (document.getElementById('docTypeSelect') as HTMLSelectElement).value;
@@ -1987,7 +2120,7 @@ export const ApplicantPortal: React.FC = () => {
           <div className="space-y-6">
             <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-indigo-600" />
-              Step 6: Application Fee Breakdown & Declaration
+              Application Fee Breakdown & Declaration
             </h3>
 
             <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
@@ -2005,7 +2138,7 @@ export const ApplicantPortal: React.FC = () => {
                       className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition flex items-center gap-2 shadow-sm"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
-                      1. Pay via SBI Collect
+                      Pay via SBI Collect
                     </a>
                     <button
                       onClick={simulatePaymentVerification}
@@ -2029,7 +2162,7 @@ export const ApplicantPortal: React.FC = () => {
                       ) : (
                         <>
                           <RotateCcw className="w-3.5 h-3.5" />
-                          2. Verify & Auto-fill IDs
+                          Verify & Auto-fill IDs
                         </>
                       )}
                     </button>
@@ -2118,7 +2251,7 @@ export const ApplicantPortal: React.FC = () => {
 
 
             <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-4">
-              <h4 className="font-bold text-slate-900 uppercase tracking-widest text-[10px]">19. Declaration</h4>
+              <h4 className="font-bold text-slate-900 uppercase tracking-widest text-[10px]">Declaration</h4>
               <p className="leading-relaxed">
                 I, <span className="font-bold underline px-2">{profile.fullName}</span> son/daughter of <span className="font-bold underline px-2">{profile.fatherName}</span> hereby declare that all the statements and entries made in this application are true, complete and correct to the best of my knowledge and belief. In the event of any information found false or incorrect or ineligibility being detected before or after the Selection Committee and Executive Council/Board of Management meetings, my candidature/appointment may be cancelled by the University.
               </p>

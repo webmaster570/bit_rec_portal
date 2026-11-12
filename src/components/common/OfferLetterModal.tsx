@@ -49,10 +49,10 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({ application,
         <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 bg-white text-xs text-slate-700 flex-1 overflow-y-auto">
           <div className="text-center border-b border-slate-200 pb-3.5 space-y-1">
             <h2 className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight uppercase">
-              National University of Technology & Sciences
+              Birla Institute of Technology
             </h2>
             <p className="text-[10px] sm:text-[11px] text-slate-500">Office of the Registrar & Faculty Recruitment Board</p>
-            <span className="text-[9px] sm:text-[10px] text-slate-500 font-mono">Ref No: NUTS/OFFER/2026/{application.applicationNo}</span>
+            <span className="text-[9px] sm:text-[10px] text-slate-500 font-mono">Ref No: BIT/OFFER/2026/{application.applicationNo}</span>
           </div>
 
           <div className="space-y-3 leading-relaxed text-xs">
@@ -62,7 +62,21 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({ application,
               <strong className="text-slate-900 text-xs sm:text-sm">{application.applicant.fullName}</strong>
               <br />
               <span className="text-slate-600">
-                {application.applicant.address}, {application.applicant.district}, {application.applicant.state}
+                {application.applicant.correspondenceLine1 ? (
+                  <>
+                    {[
+                      application.applicant.correspondenceLine1,
+                      application.applicant.correspondenceLine2,
+                      application.applicant.correspondenceLandmark && `Landmark: ${application.applicant.correspondenceLandmark}`,
+                      application.applicant.correspondenceCity,
+                      application.applicant.correspondenceDistrict,
+                      application.applicant.correspondenceState,
+                    ].filter(Boolean).join(', ')}
+                    {application.applicant.correspondencePin && ` - ${application.applicant.correspondencePin}`}
+                  </>
+                ) : (
+                  `${application.applicant.address}, ${application.applicant.district}, ${application.applicant.state}`
+                )}
               </span>
             </p>
 

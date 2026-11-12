@@ -166,9 +166,9 @@ export const AdmitCardModal: React.FC<AdmitCardModalProps> = ({ application, onC
                     <ShieldCheck className="w-4 h-4 text-emerald-600" /> Instructions for Candidate
                   </h4>
                   <ul className="space-y-1.5 text-[9px] font-bold text-slate-500 leading-tight">
-                    <li className="flex gap-2"><span>1.</span> <span>Candidate must carry this original Hall Ticket and a valid Government Photo ID Proof.</span></li>
-                    <li className="flex gap-2"><span>2.</span> <span>Reporting time is 60 minutes prior to the commencement of the examination.</span></li>
-                    <li className="flex gap-2"><span>3.</span> <span>Electronic gadgets including mobile phones, calculators, and watches are strictly prohibited.</span></li>
+                    <li className="flex gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1 shrink-0" /> <span>Candidate must carry this original Hall Ticket and a valid Government Photo ID Proof.</span></li>
+                    <li className="flex gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1 shrink-0" /> <span>Reporting time is 60 minutes prior to the commencement of the examination.</span></li>
+                    <li className="flex gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1 shrink-0" /> <span>Electronic gadgets including mobile phones, calculators, and watches are strictly prohibited.</span></li>
                   </ul>
                 </div>
 

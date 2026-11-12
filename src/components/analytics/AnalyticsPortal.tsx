@@ -58,13 +58,13 @@ export const AnalyticsPortal: React.FC = () => {
       {/* Recruitment Funnel Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="glass-card border border-slate-200 p-5 rounded-2xl shadow-2xs space-y-1">
-          <span className="text-xs text-slate-500 uppercase font-medium">1. Total Applications Received</span>
+          <span className="text-xs text-slate-500 uppercase font-medium">Total Applications Received</span>
           <div className="text-2xl font-extrabold text-slate-900">{totalApps}</div>
           <p className="text-[10px] text-indigo-600 font-medium">Across all active recruitment drives</p>
         </div>
 
         <div className="glass-card border border-slate-200 p-5 rounded-2xl shadow-2xs space-y-1">
-          <span className="text-xs text-slate-500 uppercase font-medium">2. Screened Eligible</span>
+          <span className="text-xs text-slate-500 uppercase font-medium">Screened Eligible</span>
           <div className="text-2xl font-extrabold text-amber-600">{eligibleApps}</div>
           <p className="text-[10px] text-amber-700 font-medium">
             {totalApps ? Math.round((eligibleApps / totalApps) * 100) : 0}% Qualification Pass Rate
@@ -72,13 +72,13 @@ export const AnalyticsPortal: React.FC = () => {
         </div>
 
         <div className="glass-card border border-slate-200 p-5 rounded-2xl shadow-2xs space-y-1">
-          <span className="text-xs text-slate-500 uppercase font-medium">3. Document Verified</span>
+          <span className="text-xs text-slate-500 uppercase font-medium">Document Verified</span>
           <div className="text-2xl font-extrabold text-cyan-600">{docVerifiedApps}</div>
           <p className="text-[10px] text-cyan-700 font-medium">Clear Transcripts & Certificates</p>
         </div>
 
         <div className="glass-card border border-slate-200 p-5 rounded-2xl shadow-2xs space-y-1">
-          <span className="text-xs text-slate-500 uppercase font-medium">4. Offers / Selected</span>
+          <span className="text-xs text-slate-500 uppercase font-medium">Offers / Selected</span>
           <div className="text-2xl font-extrabold text-emerald-600">{selectedApps}</div>
           <p className="text-[10px] text-emerald-700 font-medium">Appointment Letters Issued</p>
         </div>

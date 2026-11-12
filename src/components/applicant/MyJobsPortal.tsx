@@ -777,11 +777,11 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
             {/* Navigation Tabs Inside Modal (Touch Friendly Scrollable) */}
             <div className="flex border-b border-slate-200 px-3 sm:px-6 bg-white gap-1 sm:gap-2 text-xs font-bold text-slate-600 overflow-x-auto shrink-0 scrollbar-none">
               {[
-                { id: 'profile', label: '1. Profile Details', icon: User },
-                { id: 'academics', label: '2. Qualifications', icon: GraduationCap },
-                { id: 'research', label: '3. Research & Misc', icon: FileText },
-                { id: 'documents', label: '4. Documents & Fee', icon: CreditCard },
-                { id: 'status', label: '5. Evaluation Status', icon: ShieldCheck },
+                { id: 'profile', label: 'Profile Details', icon: User },
+                { id: 'academics', label: 'Qualifications', icon: GraduationCap },
+                { id: 'research', label: 'Research & Misc', icon: FileText },
+                { id: 'documents', label: 'Documents & Fee', icon: CreditCard },
+                { id: 'status', label: 'Evaluation Status', icon: ShieldCheck },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeModalTab === tab.id;
@@ -878,8 +878,22 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                       </div>
                       <div className="sm:col-span-2">
                         <span className="text-slate-500 text-[11px] block">Communication Address</span>
-                        <span className="font-medium text-slate-900">
-                          {selectedAppDetail.applicant.address}, {selectedAppDetail.applicant.district}, {selectedAppDetail.applicant.state} - {selectedAppDetail.applicant.pin}
+                        <span className="font-medium text-slate-900 leading-tight">
+                          {selectedAppDetail.applicant.correspondenceLine1 ? (
+                            <>
+                              {[
+                                selectedAppDetail.applicant.correspondenceLine1,
+                                selectedAppDetail.applicant.correspondenceLine2,
+                                selectedAppDetail.applicant.correspondenceLandmark && `Landmark: ${selectedAppDetail.applicant.correspondenceLandmark}`,
+                                selectedAppDetail.applicant.correspondenceCity,
+                                selectedAppDetail.applicant.correspondenceDistrict,
+                                selectedAppDetail.applicant.correspondenceState,
+                              ].filter(Boolean).join(', ')}
+                              {selectedAppDetail.applicant.correspondencePin && ` - ${selectedAppDetail.applicant.correspondencePin}`}
+                            </>
+                          ) : (
+                            `${selectedAppDetail.applicant.address}, ${selectedAppDetail.applicant.district}, ${selectedAppDetail.applicant.state} - ${selectedAppDetail.applicant.pin}`
+                          )}
                         </span>
                       </div>
                     </div>

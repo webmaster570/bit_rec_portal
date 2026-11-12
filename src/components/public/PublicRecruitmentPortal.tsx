@@ -374,15 +374,15 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
           <div className={`p-4 bg-white/50  ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} space-y-1`}>
-             <span className="font-bold block">1. Online Account Creation</span>
+             <span className="font-bold block">Online Account Creation</span>
              <p className="opacity-70 leading-snug text-[11px]">Applicants must register using their active email and mobile number.</p>
           </div>
           <div className={`p-4 bg-white/50  ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} space-y-1`}>
-             <span className="font-bold block">2. Document Formats</span>
+             <span className="font-bold block">Document Formats</span>
              <p className="opacity-70 leading-snug text-[11px]">Upload JPG/PNG photo (200KB) and signature (100KB). Certificates in PDF.</p>
           </div>
           <div className={`p-4 bg-white/50  ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} space-y-1`}>
-             <span className="font-bold block">3. Payment & Exemption</span>
+             <span className="font-bold block">Payment & Exemption</span>
              <p className="opacity-70 leading-snug text-[11px]">Integrated gateway. SC/ST/PwD/Women are exempted from payment.</p>
           </div>
         </div>

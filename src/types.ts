@@ -239,6 +239,10 @@ export interface ApplicantProfile {
   categoryIssuingAuthority?: string;
   disabilityPercentage?: number;
   aadhaarNumber?: string;
+  // Detailed Address Fields
+  correspondenceLine1?: string;
+  correspondenceLine2?: string;
+  correspondenceLandmark?: string;
   correspondenceCity?: string;
   correspondenceDistrict?: string;
   correspondenceState?: string;
@@ -246,6 +250,7 @@ export interface ApplicantProfile {
   correspondenceCountry?: string;
   permanentLine1?: string;
   permanentLine2?: string;
+  permanentLandmark?: string;
   permanentCity?: string;
   permanentDistrict?: string;
   permanentState?: string;

@@ -311,7 +311,7 @@ export const ApplicationList: React.FC = () => {
               {/* Personal Info Grid */}
               <div className="bg-slate-50 p-4 rounded-xl  space-y-3">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">
-                  1. Applicant Personal Profile
+                  Applicant Personal Profile
                 </h4>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -345,7 +345,23 @@ export const ApplicationList: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-slate-500 block">Address</span>
-                    <span className="font-semibold text-slate-900">{selectedAppDetail.applicant.address}, {selectedAppDetail.applicant.district}, {selectedAppDetail.applicant.state} - {selectedAppDetail.applicant.pin}</span>
+                    <span className="font-semibold text-slate-900">
+                      {selectedAppDetail.applicant.correspondenceLine1 ? (
+                        <>
+                          {[
+                            selectedAppDetail.applicant.correspondenceLine1,
+                            selectedAppDetail.applicant.correspondenceLine2,
+                            selectedAppDetail.applicant.correspondenceLandmark && `Landmark: ${selectedAppDetail.applicant.correspondenceLandmark}`,
+                            selectedAppDetail.applicant.correspondenceCity,
+                            selectedAppDetail.applicant.correspondenceDistrict,
+                            selectedAppDetail.applicant.correspondenceState,
+                          ].filter(Boolean).join(', ')}
+                          {selectedAppDetail.applicant.correspondencePin && ` - ${selectedAppDetail.applicant.correspondencePin}`}
+                        </>
+                      ) : (
+                        `${selectedAppDetail.applicant.address}, ${selectedAppDetail.applicant.district}, ${selectedAppDetail.applicant.state} - ${selectedAppDetail.applicant.pin}`
+                      )}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -353,7 +369,7 @@ export const ApplicationList: React.FC = () => {
               {/* Academic History */}
               <div className="bg-slate-50 p-4 rounded-xl  space-y-3">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">
-                  2. Academic Qualifications
+                  Academic Qualifications
                 </h4>
 
                 <table className="w-full text-left">
@@ -411,7 +427,7 @@ export const ApplicationList: React.FC = () => {
               {/* Uploaded Documents */}
               <div className="bg-slate-50 p-4 rounded-xl  space-y-3">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">
-                  3. Uploaded Certificates & Verification Status
+                  Uploaded Certificates & Verification Status
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -444,7 +460,7 @@ export const ApplicationList: React.FC = () => {
               {selectedAppDetail.screeningRemarks && selectedAppDetail.screeningRemarks.length > 0 && (
                 <div className="bg-slate-50 p-4 rounded-xl  space-y-2">
                   <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">
-                    4. Committee Screening Audit Trail
+                    Committee Screening Audit Trail
                   </h4>
                   {selectedAppDetail.screeningRemarks.map((rem, idx) => (
                     <div key={idx} className="p-2.5 bg-white rounded ">

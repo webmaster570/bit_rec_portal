@@ -223,7 +223,11 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                       <MapPin className="w-3 h-3 text-rose-500" /> Correspondence Address
                     </h4>
                     <p className="font-bold text-slate-700 leading-relaxed italic">
-                      {application.applicant?.correspondenceAddress || application.applicant?.address}<br/>
+                      {[
+                        application.applicant?.correspondenceLine1,
+                        application.applicant?.correspondenceLine2,
+                        application.applicant?.correspondenceLandmark && `Landmark: ${application.applicant.correspondenceLandmark}`,
+                      ].filter(Boolean).join(', ')}<br/>
                       {application.applicant?.correspondenceCity}, {application.applicant?.correspondenceDistrict}<br/>
                       {application.applicant?.correspondenceState} - {application.applicant?.correspondencePin}<br/>
                       {application.applicant?.correspondenceCountry}
@@ -234,7 +238,11 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                       <MapPin className="w-3 h-3 text-rose-500" /> Permanent Address
                     </h4>
                     <p className="font-bold text-slate-700 leading-relaxed italic">
-                      {application.applicant?.permanentAddress || application.applicant?.address}<br/>
+                      {[
+                        application.applicant?.permanentLine1,
+                        application.applicant?.permanentLine2,
+                        application.applicant?.permanentLandmark && `Landmark: ${application.applicant.permanentLandmark}`,
+                      ].filter(Boolean).join(', ')}<br/>
                       {application.applicant?.permanentCity}, {application.applicant?.permanentDistrict}<br/>
                       {application.applicant?.permanentState} - {application.applicant?.permanentPin}<br/>
                       {application.applicant?.permanentCountry}
