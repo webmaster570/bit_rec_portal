@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { PostConfig, RecruitmentDrive } from '../../types';
+import { PostConfig, RecruitmentDrive, RecruitmentCategory, Campus } from '../../types';
 import { THEME_CONFIGS } from '../../themeStyles';
 import {
   Search,
@@ -46,6 +46,8 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
   const [selectedDept, setSelectedDept] = useState('all');
   const [expandedSyllabusPostId, setExpandedSyllabusPostId] = useState<string | null>(null);
   const [activePdfModalDrive, setActivePdfModalDrive] = useState<RecruitmentDrive | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<RecruitmentCategory | 'all'>('all');
+  const [selectedCampus, setSelectedCampus] = useState<Campus | 'all'>('all');
 
   // Filter drives and posts
   const publishedDrives = drives.filter(
@@ -61,6 +63,8 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
 
   const filterPostMatches = (post: PostConfig) => {
     const matchesDept = selectedDept === 'all' || post.departmentId === selectedDept;
+    const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory;
+    const matchesCampus = selectedCampus === 'all' || post.campus === selectedCampus;
     const term = searchTerm.toLowerCase().trim();
     const matchesSearch =
       !term ||
@@ -68,7 +72,7 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
       post.departmentName.toLowerCase().includes(term) ||
       post.minQualification.toLowerCase().includes(term) ||
       post.payScale.toLowerCase().includes(term);
-    return matchesDept && matchesSearch;
+    return matchesDept && matchesCategory && matchesCampus && matchesSearch;
   };
 
   return (
@@ -142,17 +146,48 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
             />
           </div>
 
-          {/* Department Filter */}
-          <div className="w-full sm:w-64">
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            {/* Category Filter Pills */}
+            <div className="flex gap-2 bg-slate-50 p-1 rounded-xl">
+              {['all', 'Teaching', 'Non-Teaching'].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat as any)}
+                  className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition ${
+                    selectedCategory === cat
+                      ? 'bg-white text-indigo-600 shadow-xs'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {cat === 'all' ? 'All' : cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Campus Filter */}
+            <select
+              value={selectedCampus}
+              onChange={(e) => setSelectedCampus(e.target.value as any)}
+              className={`bg-white border border-slate-100 rounded-xl px-3 py-2.5 text-[10px] font-bold uppercase text-slate-800 focus:outline-none ${theme.focusColor} shadow-2xs`}
+            >
+              <option value="all">All Campuses</option>
+              <option value="BIT Mesra">BIT Mesra</option>
+              <option value="BIT Noida">BIT Noida</option>
+              <option value="BIT Jaipur">BIT Jaipur</option>
+              <option value="BIT Patna">BIT Patna</option>
+              <option value="BIT Deoghar">BIT Deoghar</option>
+            </select>
+
+            {/* Department Filter */}
             <select
               value={selectedDept}
               onChange={(e) => setSelectedDept(e.target.value)}
-              className={`w-full bg-white  rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none ${theme.focusColor} shadow-2xs`}
+              className={`bg-white border border-slate-100 rounded-xl px-3 py-2.5 text-[10px] font-bold uppercase text-slate-800 focus:outline-none ${theme.focusColor} shadow-2xs`}
             >
-              <option value="all">All Departments ({departments.length})</option>
+              <option value="all">All Departments</option>
               {departments.map((dept) => (
                 <option key={dept.id} value={dept.id}>
-                  {dept.name} ({dept.code})
+                  {dept.name}
                 </option>
               ))}
             </select>

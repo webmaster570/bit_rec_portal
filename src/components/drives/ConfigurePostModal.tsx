@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { X, Plus, Building2, DollarSign, Layers } from 'lucide-react';
+import { X, Plus, Building2, DollarSign, Layers, MapPin, Briefcase } from 'lucide-react';
+import { Campus, RecruitmentCategory } from '../../types';
 
 interface ConfigurePostModalProps {
   isOpen: boolean;
@@ -24,6 +25,8 @@ export const ConfigurePostModal: React.FC<ConfigurePostModalProps> = ({
   const [minQualification, setMinQualification] = useState('Ph.D. with First Class M.Tech and minimum 6 journal publications');
   const [requiredExperienceYears, setRequiredExperienceYears] = useState(6);
   const [applicationFee, setApplicationFee] = useState(1200);
+  const [campus, setCampus] = useState<Campus>('BIT Mesra');
+  const [category, setCategory] = useState<RecruitmentCategory>('Teaching');
 
   const [vacancies, setVacancies] = useState({
     UR: 3,
@@ -56,6 +59,8 @@ export const ConfigurePostModal: React.FC<ConfigurePostModalProps> = ({
       requiredExperienceYears,
       applicationFee,
       feeExemptCategories: ['SC', 'ST', 'PwD'],
+      campus,
+      category,
     });
 
     onClose();
@@ -142,6 +147,41 @@ export const ConfigurePostModal: React.FC<ConfigurePostModalProps> = ({
                 onChange={(e) => setApplicationFee(Number(e.target.value))}
                 className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-slate-100 pb-2">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1">
+                <Briefcase className="w-3 h-3 text-indigo-600" />
+                Category
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value as RecruitmentCategory)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              >
+                <option value="Teaching">Teaching</option>
+                <option value="Non-Teaching">Non-Teaching</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-indigo-600" />
+                Campus Location
+              </label>
+              <select
+                value={campus}
+                onChange={(e) => setCampus(e.target.value as Campus)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              >
+                <option value="BIT Mesra">BIT Mesra (Main)</option>
+                <option value="BIT Noida">BIT Noida</option>
+                <option value="BIT Jaipur">BIT Jaipur</option>
+                <option value="BIT Patna">BIT Patna</option>
+                <option value="BIT Deoghar">BIT Deoghar</option>
+              </select>
             </div>
           </div>
 

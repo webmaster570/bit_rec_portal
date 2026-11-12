@@ -77,8 +77,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                 <h1 className="text-2xl font-black uppercase tracking-tight text-slate-900 pl-24">Birla Institute of Technology</h1>
                 <p className="text-sm font-bold text-slate-600 pl-24">(A Deemed to be University u/s 3 of UGC Act 1956)</p>
                 <p className="text-xs font-medium text-slate-500 max-w-md mx-auto leading-relaxed pl-24">
-                  Mesra, Ranchi - 835215, Jharkhand, India<br/>
-                  Website: www.bitmesra.ac.in | Email: recruitment@bitmesra.ac.in
+                  Mesra, Ranchi - 835215, Jharkhand, India
                 </p>
                 <div className="pt-4">
                   <span className="px-6 py-1.5 bg-slate-900 text-white text-sm font-black rounded-full uppercase tracking-[0.2em]">Application Form</span>
@@ -378,6 +377,51 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                   </div>
                 </section>
               </div>
+
+              {/* LANGUAGES KNOWN SECTION */}
+              <section className="space-y-4 pt-4">
+                <h3 className="bg-slate-900 text-white px-4 py-1 font-bold uppercase tracking-widest text-[10pt]">Languages Known</h3>
+                <div className="overflow-hidden border border-slate-900 rounded-lg">
+                  <table className="w-full border-collapse text-[9pt] font-sans">
+                    <thead>
+                      <tr className="bg-slate-50 text-slate-700 font-bold uppercase text-[8px] tracking-wider border-b border-slate-300">
+                        <th className="p-2 border-r border-slate-200 text-left">Language</th>
+                        <th className="p-2 border-r border-slate-200 text-center">Read</th>
+                        <th className="p-2 border-r border-slate-200 text-center">Write</th>
+                        <th className="p-2 text-center">Speak</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200">
+                      {application.languages && application.languages.length > 0 ? (
+                        application.languages.map((lang, idx) => (
+                          <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}>
+                            <td className="p-2 border-r border-slate-200 font-bold uppercase">{lang.language || 'N/A'}</td>
+                            <td className="p-2 border-r border-slate-200 text-center">
+                              {lang.read ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mx-auto" /> : <span className="text-slate-300">-</span>}
+                            </td>
+                            <td className="p-2 border-r border-slate-200 text-center">
+                              {lang.write ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mx-auto" /> : <span className="text-slate-300">-</span>}
+                            </td>
+                            <td className="p-2 text-center">
+                              {lang.speak ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mx-auto" /> : <span className="text-slate-300">-</span>}
+                            </td>
+                          </tr>
+                        ))
+                      ) : application.languagesKnown ? (
+                        <tr>
+                          <td colSpan={4} className="p-4 text-slate-700 font-bold">
+                            {application.languagesKnown}
+                          </td>
+                        </tr>
+                      ) : (
+                        <tr>
+                          <td colSpan={4} className="p-4 text-center text-slate-400 italic">No language data provided</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
 
               {/* PART 5: REFEREES */}
               <section className="space-y-4 pt-4">

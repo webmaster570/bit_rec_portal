@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { Application, OtherExamRecord } from '../../types';
+import { Application, OtherExamRecord, RecruitmentCategory, Campus } from '../../types';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import {
   Send,
@@ -50,6 +50,8 @@ export const ApplicantPortal: React.FC = () => {
   const [showAdmitCard, setShowAdmitCard] = useState<Application | null>(null);
   const [currentAppId, setCurrentAppId] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [filterCategory, setFilterCategory] = useState<RecruitmentCategory | 'All'>('All');
+  const [filterCampus, setFilterCampus] = useState<Campus | 'All'>('All');
 
   const activeDrive = drives.find((d) => d.id === selectedDriveId) || drives[0];
   const activePost = activeDrive?.posts.find((p) => p.id === selectedPostId) || activeDrive?.posts[0];
@@ -200,6 +202,7 @@ export const ApplicantPortal: React.FC = () => {
   };
 
   // Auto-calculate age when DOB or active drive closing date changes
+  // Auto-calculate age when DOB or active drive closing date changes
   React.useEffect(() => {
     if (profile.dob && activeDrive?.closingDate) {
       const calculatedAge = calculateAge(profile.dob, activeDrive.closingDate);
@@ -210,6 +213,14 @@ export const ApplicantPortal: React.FC = () => {
       setProfile(prev => ({ ...prev, ageOnLastDate: '' }));
     }
   }, [profile.dob, activeDrive?.closingDate, profile.ageOnLastDate]);
+  
+  // Sync campus unit with active post
+  React.useEffect(() => {
+    if (activePost?.campus) {
+      setProfile(prev => ({ ...prev, campusUnit: activePost.campus }));
+    }
+  }, [activePost?.campus]);
+  
   
 
   const [academics, setAcademics] = useState([
@@ -333,7 +344,6 @@ export const ApplicantPortal: React.FC = () => {
     eGovErpSamarthExperience: 'Worked with ERP for attendance',
     awardsRecognitions: 'Best Teacher Award 2024',
     relevantAchievements: 'Published 5 papers in Q1 journals',
-    languagesKnown: 'English, Hindi, Marathi',
     fulfillsQualifications: true,
     fulfillsExperience: true,
     fulfillsAgeCriteria: true,
@@ -365,6 +375,11 @@ export const ApplicantPortal: React.FC = () => {
   const [referees, setReferees] = useState([
     { name: '', designation: '', address: '', email: '', mobile: '' },
     { name: '', designation: '', address: '', email: '', mobile: '' }
+  ]);
+
+  const [languages, setLanguages] = useState<Application['languages']>([
+    { language: 'English', read: true, write: true, speak: true },
+    { language: 'Hindi', read: true, write: true, speak: true },
   ]);
 
   // Fee Exemption Logic
@@ -440,6 +455,7 @@ export const ApplicantPortal: React.FC = () => {
           setExtraMisc(prev => ({ ...prev, ...miscUpdates }));
         }
         if (draftApp.referees) setReferees(draftApp.referees);
+        if (draftApp.languages) setLanguages(draftApp.languages);
         
         // Only reset to step 1 when first loading the draft
         setActiveStep(1);
@@ -456,6 +472,7 @@ export const ApplicantPortal: React.FC = () => {
       ...miscInfo,
       ...extraMisc,
       referees,
+      languages,
       declarationAccepted,
       orderId: paymentDetails.orderId,
       transactionId: paymentDetails.transactionId,
@@ -500,6 +517,7 @@ export const ApplicantPortal: React.FC = () => {
       ...miscInfo,
       ...extraMisc,
       referees,
+      languages,
       declarationAccepted,
       orderId: paymentDetails.orderId,
       transactionId: paymentDetails.transactionId,
@@ -667,44 +685,111 @@ export const ApplicantPortal: React.FC = () => {
       {/* Step Content Area */}
       <div className="glass-card border border-slate-200 rounded-2xl p-6 shadow-2xs">
         {/* Drive and Post Selection Header */}
+        {/* Drive and Post Selection Header */}
         {activeStep < 6 && (
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Select Recruitment Drive
-              </label>
-              <select
-                value={selectedDriveId}
-                onChange={(e) => {
-                  setSelectedDriveId(e.target.value);
-                  const d = drives.find((dr) => dr.id === e.target.value);
-                  if (d && d.posts[0]) setSelectedPostId(d.posts[0].id);
-                }}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
-              >
-                {drives.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.title} ({d.advtNumber})
-                  </option>
-                ))}
-              </select>
+          <div className="space-y-4 mb-6">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1">
+                  <Briefcase className="w-3.5 h-3.5 text-indigo-500" />
+                  Filter by Category
+                </label>
+                <div className="flex gap-2">
+                  {['All', 'Teaching', 'Non-Teaching'].map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setFilterCategory(cat as any)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                        filterCategory === cat
+                          ? 'bg-indigo-600 text-white shadow-md'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-indigo-500" />
+                  Filter by Campus
+                </label>
+                <select
+                  value={filterCampus}
+                  onChange={(e) => setFilterCampus(e.target.value as any)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+                >
+                  <option value="All">All Campuses</option>
+                  <option value="BIT Mesra">BIT Mesra (Main)</option>
+                  <option value="BIT Noida">BIT Noida</option>
+                  <option value="BIT Jaipur">BIT Jaipur</option>
+                  <option value="BIT Patna">BIT Patna</option>
+                  <option value="BIT Deoghar">BIT Deoghar</option>
+                </select>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Select Position / Post
-              </label>
-              <select
-                value={selectedPostId}
-                onChange={(e) => setSelectedPostId(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 font-semibold"
-              >
-                {activeDrive?.posts.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.title} — {p.departmentName} (Fee: ₹{p.applicationFee})
-                  </option>
-                ))}
-              </select>
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Select Recruitment Drive
+                </label>
+                <select
+                  value={selectedDriveId}
+                  onChange={(e) => {
+                    setSelectedDriveId(e.target.value);
+                    const d = drives.find((dr) => dr.id === e.target.value);
+                    if (d && d.posts[0]) {
+                      // Filtered posts for the selected drive
+                      const filteredPosts = d.posts.filter(p => 
+                        (filterCategory === 'All' || p.category === filterCategory) &&
+                        (filterCampus === 'All' || p.campus === filterCampus)
+                      );
+                      if (filteredPosts.length > 0) {
+                        setSelectedPostId(filteredPosts[0].id);
+                      } else if (d.posts[0]) {
+                        setSelectedPostId(d.posts[0].id);
+                      }
+                    }
+                  }}
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+                >
+                  {drives
+                    .filter(d => 
+                      (filterCategory === 'All' || d.category === filterCategory) &&
+                      (filterCampus === 'All' || d.campus === filterCampus || d.campus === 'All Campuses')
+                    )
+                    .map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.title} ({d.advtNumber})
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Select Position / Post
+                </label>
+                <select
+                  value={selectedPostId}
+                  onChange={(e) => setSelectedPostId(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 font-semibold"
+                >
+                  {activeDrive?.posts
+                    .filter(p => 
+                      (filterCategory === 'All' || p.category === filterCategory) &&
+                      (filterCampus === 'All' || p.campus === filterCampus)
+                    )
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.title} — {p.departmentName} (Fee: ₹{p.applicationFee})
+                      </option>
+                    ))}
+                </select>
+              </div>
             </div>
           </div>
         )}
@@ -1857,14 +1942,94 @@ export const ApplicantPortal: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Languages known?</label>
-                  <input
-                    type="text"
-                    value={pdfExtraFields.languagesKnown}
-                    onChange={(e) => setPdfExtraFields({ ...pdfExtraFields, languagesKnown: e.target.value })}
-                    placeholder="e.g. English, Hindi"
-                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-900 focus:outline-none focus:border-indigo-500"
-                  />
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block font-bold text-slate-700">Languages known?</label>
+                    <button
+                      type="button"
+                      onClick={() => setLanguages([...(languages || []), { language: '', read: false, write: false, speak: false }])}
+                      className="px-2 py-1 text-[10px] font-bold bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 transition flex items-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" /> Add Language
+                    </button>
+                  </div>
+                  
+                  <div className="overflow-hidden border border-slate-200 rounded-lg">
+                    <table className="w-full text-xs text-left border-collapse bg-white">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr className="text-slate-500 font-bold uppercase text-[9px]">
+                          <th className="p-2 border-r border-slate-200">Language</th>
+                          <th className="p-2 border-r border-slate-200 text-center">Read</th>
+                          <th className="p-2 border-r border-slate-200 text-center">Write</th>
+                          <th className="p-2 border-r border-slate-200 text-center">Speak</th>
+                          <th className="p-2 text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {languages?.map((lang, idx) => (
+                          <tr key={idx}>
+                            <td className="p-1 border-r border-slate-200">
+                              <input
+                                type="text"
+                                value={lang.language}
+                                onChange={(e) => {
+                                  const newLangs = [...languages];
+                                  newLangs[idx].language = e.target.value;
+                                  setLanguages(newLangs);
+                                }}
+                                placeholder="e.g. English"
+                                className="w-full bg-transparent px-2 py-1 focus:outline-none font-bold"
+                              />
+                            </td>
+                            <td className="p-1 border-r border-slate-200 text-center">
+                              <input
+                                type="checkbox"
+                                checked={lang.read}
+                                onChange={(e) => {
+                                  const newLangs = [...languages];
+                                  newLangs[idx].read = e.target.checked;
+                                  setLanguages(newLangs);
+                                }}
+                                className="w-4 h-4 rounded text-indigo-600"
+                              />
+                            </td>
+                            <td className="p-1 border-r border-slate-200 text-center">
+                              <input
+                                type="checkbox"
+                                checked={lang.write}
+                                onChange={(e) => {
+                                  const newLangs = [...languages];
+                                  newLangs[idx].write = e.target.checked;
+                                  setLanguages(newLangs);
+                                }}
+                                className="w-4 h-4 rounded text-indigo-600"
+                              />
+                            </td>
+                            <td className="p-1 border-r border-slate-200 text-center">
+                              <input
+                                type="checkbox"
+                                checked={lang.speak}
+                                onChange={(e) => {
+                                  const newLangs = [...languages];
+                                  newLangs[idx].speak = e.target.checked;
+                                  setLanguages(newLangs);
+                                }}
+                                className="w-4 h-4 rounded text-indigo-600"
+                              />
+                            </td>
+                            <td className="p-1 text-center">
+                              <button
+                                type="button"
+                                onClick={() => setLanguages(languages.filter((_, i) => i !== idx))}
+                                className="p-1 text-rose-500 hover:bg-rose-50 rounded transition"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
 
@@ -2401,7 +2566,8 @@ export const ApplicantPortal: React.FC = () => {
             postId: selectedPostId,
             postTitle: activePost?.title,
             departmentName: activePost?.departmentName,
-            applicationNo: applications.find(a => a.id === currentAppId)?.applicationNo || 'DRAFT-PREVIEW'
+            applicationNo: applications.find(a => a.id === currentAppId)?.applicationNo || 'DRAFT-PREVIEW',
+            languages,
           }}
           drive={activeDrive}
           onClose={() => setIsPreviewOpen(false)}

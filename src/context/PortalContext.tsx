@@ -1004,6 +1004,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       postId,
       postTitle: targetPost?.title || 'Position',
       departmentName: targetPost?.departmentName || 'General',
+      campus: targetPost?.campus || 'BIT Mesra',
+      category: targetPost?.category || 'Teaching',
       applicant: applicantProfile,
       academics,
       experience,

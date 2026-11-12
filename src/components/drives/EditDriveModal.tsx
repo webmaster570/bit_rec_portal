@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { RecruitmentDrive, DriveStatus } from '../../types';
-import { X, Calendar, FileText, Building2, Save, AlertCircle, Sparkles, Layers, Users } from 'lucide-react';
+import { X, Calendar, FileText, Building2, Save, AlertCircle, Sparkles, Layers, Users, MapPin, Briefcase } from 'lucide-react';
+import { RecruitmentDrive, DriveStatus, RecruitmentCategory, Campus } from '../../types';
 
 interface EditDriveModalProps {
   isOpen: boolean;
@@ -30,6 +30,8 @@ export const EditDriveModal: React.FC<EditDriveModalProps> = ({ isOpen, drive, o
     notificationPdfName: '',
     syllabusContent: '',
     showCategoryRow: true,
+    category: 'Teaching' as RecruitmentCategory,
+    campus: 'All Campuses' as (Campus | 'All Campuses'),
   });
 
   useEffect(() => {
@@ -52,6 +54,8 @@ export const EditDriveModal: React.FC<EditDriveModalProps> = ({ isOpen, drive, o
         notificationPdfName: drive.notificationPdfName || 'Syllabus_Rules_Instructions.pdf',
         syllabusContent: drive.syllabusContent || '',
         showCategoryRow: drive.showCategoryRow !== undefined ? drive.showCategoryRow : true,
+        category: drive.category || 'Teaching',
+        campus: drive.campus || 'All Campuses',
       });
     }
   }, [drive]);
@@ -160,6 +164,42 @@ export const EditDriveModal: React.FC<EditDriveModalProps> = ({ isOpen, drive, o
                 <option value="interview_phase">Interview Phase</option>
                 <option value="completed">Completed / Merit Issued</option>
                 <option value="archived">Archived</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
+                <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
+                Drive Category
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value as RecruitmentCategory })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              >
+                <option value="Teaching">Teaching</option>
+                <option value="Non-Teaching">Non-Teaching</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-indigo-600" />
+                Primary Campus
+              </label>
+              <select
+                value={formData.campus}
+                onChange={(e) => setFormData({ ...formData, campus: e.target.value as any })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              >
+                <option value="All Campuses">All Campuses</option>
+                <option value="BIT Mesra">BIT Mesra (Main)</option>
+                <option value="BIT Noida">BIT Noida</option>
+                <option value="BIT Jaipur">BIT Jaipur</option>
+                <option value="BIT Patna">BIT Patna</option>
+                <option value="BIT Deoghar">BIT Deoghar</option>
               </select>
             </div>
           </div>

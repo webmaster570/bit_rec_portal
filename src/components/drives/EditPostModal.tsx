@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { PostConfig } from '../../types';
-import { X, Layers, Save, Building2 } from 'lucide-react';
+import { X, Layers, Save, Building2, MapPin, Briefcase } from 'lucide-react';
+import { Campus, RecruitmentCategory, PostConfig } from '../../types';
 
 interface EditPostModalProps {
   isOpen: boolean;
@@ -28,6 +28,8 @@ export const EditPostModal: React.FC<EditPostModalProps> = ({
     minQualification: '',
     requiredExperienceYears: 0,
     applicationFee: 1000,
+    campus: 'BIT Mesra' as Campus,
+    category: 'Teaching' as RecruitmentCategory,
   });
 
   const [vacancies, setVacancies] = useState({
@@ -51,6 +53,8 @@ export const EditPostModal: React.FC<EditPostModalProps> = ({
         minQualification: post.minQualification || '',
         requiredExperienceYears: post.requiredExperienceYears || 0,
         applicationFee: post.applicationFee || 1000,
+        campus: post.campus || 'BIT Mesra',
+        category: post.category || 'Teaching',
       });
       setVacancies({
         UR: post.vacanciesBreakdown?.UR || 0,
@@ -162,6 +166,41 @@ export const EditPostModal: React.FC<EditPostModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, applicationFee: Number(e.target.value) })}
                 className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 font-bold"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-slate-100 pb-2">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1">
+                <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
+                Category
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value as RecruitmentCategory })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              >
+                <option value="Teaching">Teaching</option>
+                <option value="Non-Teaching">Non-Teaching</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-indigo-600" />
+                Campus Location
+              </label>
+              <select
+                value={formData.campus}
+                onChange={(e) => setFormData({ ...formData, campus: e.target.value as Campus })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
+              >
+                <option value="BIT Mesra">BIT Mesra (Main)</option>
+                <option value="BIT Noida">BIT Noida</option>
+                <option value="BIT Jaipur">BIT Jaipur</option>
+                <option value="BIT Patna">BIT Patna</option>
+                <option value="BIT Deoghar">BIT Deoghar</option>
+              </select>
             </div>
           </div>
 

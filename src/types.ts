@@ -23,6 +23,8 @@ export interface RoleInfo {
 
 export type PortalTheme = 'classic' | 'modern' | 'crimson' | 'academic' | 'nature' | 'sapphire' | 'bit_mesra' | 'tech_startup' | 'corporate_pro' | 'creative_studio' | 'industrial_heavy' | 'portal_vibrant' | 'portal_minimal' | 'portal_dark_knight' | 'portal_enterprise';
 export type BrandColor = 'default' | 'green' | 'blue' | 'purple' | 'maroon' | 'bit_mesra' | 'grey' | 'whitish_grey';
+export type RecruitmentCategory = 'Teaching' | 'Non-Teaching';
+export type Campus = 'BIT Mesra' | 'BIT Noida' | 'BIT Jaipur' | 'BIT Patna' | 'BIT Deoghar';
 
 export interface PortalBranding {
   title: string;
@@ -107,6 +109,8 @@ export interface PostConfig {
   requiredExperienceYears: number;
   applicationFee: number;
   feeExemptCategories: string[];
+  campus: Campus;
+  category: RecruitmentCategory;
 }
 
 export type DriveStatus = 'draft' | 'published' | 'applications_open' | 'screening_in_progress' | 'interview_phase' | 'completed' | 'archived';
@@ -132,6 +136,8 @@ export interface RecruitmentDrive {
   syllabusContent?: string;
   showCategoryRow?: boolean;
   totalApplicationsCount: number;
+  category: RecruitmentCategory;
+  campus?: Campus | 'All Campuses';
 }
 
 export interface AcademicRecord {
@@ -153,6 +159,13 @@ export interface OtherExamRecord {
   rollNo?: string;
   year?: string | number;
   proofSlNo?: string;
+}
+
+export interface LanguageProficiency {
+  language: string;
+  read: boolean;
+  write: boolean;
+  speak: boolean;
 }
 
 export interface ExperienceRecord {
@@ -287,6 +300,8 @@ export interface Application {
   postId: string;
   postTitle: string;
   departmentName: string;
+  campus: Campus;
+  category: RecruitmentCategory;
   applicant: ApplicantProfile;
   academics: AcademicRecord[];
   otherQualifications?: OtherExamRecord[];
@@ -398,6 +413,7 @@ export interface Application {
   medicallyUnfitResignation?: boolean;
   referees?: Array<{ name: string; designation: string; address: string; email: string; mobile: string }>;
   nocAvailable?: boolean;
+  languages?: LanguageProficiency[];
 }
 
 export interface AuditLog {
