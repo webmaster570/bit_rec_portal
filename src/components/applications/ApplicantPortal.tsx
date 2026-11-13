@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { Application, OtherExamRecord, RecruitmentCategory, Campus } from '../../types';
+import { Application, OtherExamRecord, PresentEmploymentDetails, ResearchPaperItem, ResearchProjectItem, RecruitmentCategory, Campus } from '../../types';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import {
   Send,
@@ -281,6 +281,15 @@ export const ApplicantPortal: React.FC = () => {
 
   const [researchPapers, setResearchPapers] = useState('');
   const [researchPublications, setResearchPublications] = useState('');
+  const [researchPaperItems, setResearchPaperItems] = useState<ResearchPaperItem[]>([
+    { publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', year: '' }
+  ]);
+  const [researchBookItems, setResearchBookItems] = useState<ResearchPaperItem[]>([
+    { publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', year: '' }
+  ]);
+  const [researchProjectItems, setResearchProjectItems] = useState<ResearchProjectItem[]>([
+    { majorMinor: '', period: '', totalGrants: '', sponsoringBody: '', outcome: '' }
+  ]);
   const [miscInfo, setMiscInfo] = useState({
     punishedDuringService: false,
     medicallyUnfit: false,
@@ -382,6 +391,19 @@ export const ApplicantPortal: React.FC = () => {
     { language: 'Hindi', read: true, write: true, speak: true },
   ]);
 
+  const [presentEmploymentDetails, setPresentEmploymentDetails] = useState<PresentEmploymentDetails>({
+    postName: '',
+    appointmentType: '',
+    dateOfAppointment: '',
+    employerName: '',
+    payBandAndGradePay: '',
+    payLevel: '',
+    grossEmoluments: '',
+    retirementAge: '',
+    retirementDate: '',
+    receivingPension: '',
+  });
+
   // Fee Exemption Logic
   const isFeeExempt = activePost?.feeExemptCategories.includes(profile.category) || profile.isPwD || profile.gender === 'Female';
   const feeToPay = isFeeExempt ? 0 : activePost?.applicationFee || 1000;
@@ -415,6 +437,15 @@ export const ApplicantPortal: React.FC = () => {
         if (draftApp.natureOfExperience) setNatureOfExperience(draftApp.natureOfExperience);
         if (draftApp.researchPapers !== undefined) setResearchPapers(draftApp.researchPapers);
         if (draftApp.researchPublications !== undefined) setResearchPublications(draftApp.researchPublications);
+        if (draftApp.researchPaperItems && draftApp.researchPaperItems.length > 0) {
+          setResearchPaperItems(draftApp.researchPaperItems);
+        }
+        if (draftApp.researchBookItems && draftApp.researchBookItems.length > 0) {
+          setResearchBookItems(draftApp.researchBookItems);
+        }
+        if (draftApp.researchProjectItems && draftApp.researchProjectItems.length > 0) {
+          setResearchProjectItems(draftApp.researchProjectItems);
+        }
         
         setMiscInfo({
           punishedDuringService: draftApp.punishedDuringService || false,
@@ -456,6 +487,12 @@ export const ApplicantPortal: React.FC = () => {
         }
         if (draftApp.referees) setReferees(draftApp.referees);
         if (draftApp.languages) setLanguages(draftApp.languages);
+        if (draftApp.presentEmploymentDetails) {
+          setPresentEmploymentDetails(prev => ({
+            ...prev,
+            ...draftApp.presentEmploymentDetails,
+          }));
+        }
         
         // Only reset to step 1 when first loading the draft
         setActiveStep(1);
@@ -468,11 +505,15 @@ export const ApplicantPortal: React.FC = () => {
       natureOfExperience,
       researchPapers,
       researchPublications,
+      researchPaperItems,
+      researchBookItems,
+      researchProjectItems,
       otherQualifications,
       ...miscInfo,
       ...extraMisc,
       referees,
       languages,
+      presentEmploymentDetails,
       declarationAccepted,
       orderId: paymentDetails.orderId,
       transactionId: paymentDetails.transactionId,
@@ -513,11 +554,15 @@ export const ApplicantPortal: React.FC = () => {
       natureOfExperience,
       researchPapers,
       researchPublications,
+      researchPaperItems,
+      researchBookItems,
+      researchProjectItems,
       otherQualifications,
       ...miscInfo,
       ...extraMisc,
       referees,
       languages,
+      presentEmploymentDetails,
       declarationAccepted,
       orderId: paymentDetails.orderId,
       transactionId: paymentDetails.transactionId,
@@ -684,9 +729,8 @@ export const ApplicantPortal: React.FC = () => {
 
       {/* Step Content Area */}
       <div className="glass-card border border-slate-200 rounded-2xl p-6 shadow-2xs">
-        {/* Drive and Post Selection Header */}
-        {/* Drive and Post Selection Header */}
-        {activeStep < 6 && (
+        {/* Drive and Post Selection Header - Personal Details only */}
+        {activeStep === 1 && (
           <div className="space-y-4 mb-6">
             <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -797,35 +841,6 @@ export const ApplicantPortal: React.FC = () => {
         {/* STEP 1: Personal Profile */}
         {activeStep === 1 && (
           <div className="space-y-6">
-            {/* Auto-generated Registration & Fee Tables from image_b8282c66.png */}
-            <div className="space-y-6 mb-4">
-              <div className="space-y-2">
-                <h4 className="text-sm font-bold text-slate-900">Registration</h4>
-                <div className="overflow-x-auto border border-slate-300 rounded-sm">
-                  <table className="w-full text-[11px] text-left border-collapse bg-white">
-                    <thead className="bg-slate-50 border-b border-slate-300">
-                      <tr className="text-slate-700">
-                        <th className="p-2 border-r border-slate-300">Application Number (auto generated)</th>
-                        <th className="p-2 border-r border-slate-300">Post</th>
-                        <th className="p-2 border-r border-slate-300">Campus/Organizational Unit</th>
-                        <th className="p-2 border-r border-slate-300">Branch/Department</th>
-                        <th className="p-2">Advertisement Number (auto generated)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="text-slate-900">
-                        <td className="p-2 border-r border-slate-300 font-mono">{profile.regNumber}</td>
-                        <td className="p-2 border-r border-slate-300">{activePost?.title}</td>
-                        <td className="p-2 border-r border-slate-300 font-semibold">{profile.campusUnit}</td>
-                        <td className="p-2 border-r border-slate-300">{activePost?.departmentName}</td>
-                        <td className="p-2 font-mono">{activeDrive?.advtNumber}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-            </div>
 
 
             <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
@@ -1590,6 +1605,202 @@ export const ApplicantPortal: React.FC = () => {
               </div>
             </div>
 
+            {/* Present Employment Details */}
+            <div className="space-y-3 pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  Present Employment Details
+                </h4>
+                <span className="text-[10px] text-slate-400 font-medium">
+                  Fill if currently employed
+                </span>
+              </div>
+
+              <div className="overflow-hidden border border-slate-200 rounded-xl bg-white">
+                <datalist id="appointment-type-options">
+                  <option value="Regular" />
+                  <option value="Permanent" />
+                  <option value="Temporarily" />
+                  <option value="Temporary" />
+                  <option value="Contractual" />
+                  <option value="Ad-hoc" />
+                  <option value="Guest Faculty" />
+                  <option value="Visiting" />
+                  <option value="Deputation" />
+                </datalist>
+                <table className="w-full text-xs text-left border-collapse">
+                  <tbody className="divide-y divide-slate-200">
+                    <tr className="hover:bg-slate-50/40">
+                      <td className="w-1/2 p-3 border-r border-slate-200 font-semibold text-slate-700 bg-slate-50/60">
+                        Name of the Post
+                      </td>
+                      <td className="w-1/2 p-2">
+                        <input
+                          type="text"
+                          placeholder="e.g. Guest faculty / Assistant Professor"
+                          value={presentEmploymentDetails.postName}
+                          onChange={(e) =>
+                            setPresentEmploymentDetails(prev => ({ ...prev, postName: e.target.value }))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                        />
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/40">
+                      <td className="w-1/2 p-3 border-r border-slate-200 font-semibold text-slate-700 bg-slate-50/60">
+                        Type of appointment
+                      </td>
+                      <td className="w-1/2 p-2">
+                        <input
+                          type="text"
+                          list="appointment-type-options"
+                          placeholder="e.g. Regular / Temporarily / Contractual"
+                          value={presentEmploymentDetails.appointmentType}
+                          onChange={(e) =>
+                            setPresentEmploymentDetails(prev => ({ ...prev, appointmentType: e.target.value }))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                        />
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/40">
+                      <td className="w-1/2 p-3 border-r border-slate-200 font-semibold text-slate-700 bg-slate-50/60">
+                        Date of Appointment
+                      </td>
+                      <td className="w-1/2 p-2">
+                        <input
+                          type="date"
+                          value={presentEmploymentDetails.dateOfAppointment}
+                          onChange={(e) =>
+                            setPresentEmploymentDetails(prev => ({ ...prev, dateOfAppointment: e.target.value }))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                        />
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/40">
+                      <td className="w-1/2 p-3 border-r border-slate-200 font-semibold text-slate-700 bg-slate-50/60">
+                        Employer&apos;s Name
+                      </td>
+                      <td className="w-1/2 p-2">
+                        <input
+                          type="text"
+                          placeholder="e.g. Gossner College"
+                          value={presentEmploymentDetails.employerName}
+                          onChange={(e) =>
+                            setPresentEmploymentDetails(prev => ({ ...prev, employerName: e.target.value }))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                        />
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/40">
+                      <td className="w-1/2 p-3 border-r border-slate-200 font-semibold text-slate-700 bg-slate-50/60">
+                        Pay Band and Grade Pay(6th CPC)/Equivalent
+                      </td>
+                      <td className="w-1/2 p-2">
+                        <input
+                          type="text"
+                          placeholder="e.g. PB-3 (15600-39100) + GP 6000"
+                          value={presentEmploymentDetails.payBandAndGradePay}
+                          onChange={(e) =>
+                            setPresentEmploymentDetails(prev => ({ ...prev, payBandAndGradePay: e.target.value }))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                        />
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/40">
+                      <td className="w-1/2 p-3 border-r border-slate-200 font-semibold text-slate-700 bg-slate-50/60">
+                        Pay Level/Equivalent
+                      </td>
+                      <td className="w-1/2 p-2">
+                        <input
+                          type="text"
+                          placeholder="e.g. Level 10"
+                          value={presentEmploymentDetails.payLevel}
+                          onChange={(e) =>
+                            setPresentEmploymentDetails(prev => ({ ...prev, payLevel: e.target.value }))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                        />
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/40">
+                      <td className="w-1/2 p-3 border-r border-slate-200 font-semibold text-slate-700 bg-slate-50/60">
+                        Gross Emoluments
+                      </td>
+                      <td className="w-1/2 p-2">
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          placeholder="e.g. 200000"
+                          value={presentEmploymentDetails.grossEmoluments}
+                          onChange={(e) =>
+                            setPresentEmploymentDetails(prev => ({ ...prev, grossEmoluments: e.target.value }))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                        />
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/40">
+                      <td className="w-1/2 p-3 border-r border-slate-200 font-semibold text-slate-700 bg-slate-50/60">
+                        Age of retirement in the Present Post
+                      </td>
+                      <td className="w-1/2 p-2">
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          placeholder="e.g. 65.00"
+                          value={presentEmploymentDetails.retirementAge}
+                          onChange={(e) =>
+                            setPresentEmploymentDetails(prev => ({ ...prev, retirementAge: e.target.value }))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                        />
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/40">
+                      <td className="w-1/2 p-3 border-r border-slate-200 font-semibold text-slate-700 bg-slate-50/60">
+                        Date of retirement in the Present Post
+                      </td>
+                      <td className="w-1/2 p-2">
+                        <input
+                          type="date"
+                          value={presentEmploymentDetails.retirementDate}
+                          onChange={(e) =>
+                            setPresentEmploymentDetails(prev => ({ ...prev, retirementDate: e.target.value }))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                        />
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/40">
+                      <td className="w-1/2 p-3 border-r border-slate-200 font-semibold text-slate-700 bg-slate-50/60">
+                        Whether you are receiving any pension
+                      </td>
+                      <td className="w-1/2 p-2">
+                        <select
+                          value={presentEmploymentDetails.receivingPension}
+                          onChange={(e) =>
+                            setPresentEmploymentDetails(prev => ({
+                              ...prev,
+                              receivingPension: e.target.value as 'Yes' | 'No' | '',
+                            }))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                        >
+                          <option value="">Select</option>
+                          <option value="No">No</option>
+                          <option value="Yes">Yes</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             {/* Experience Table */}
             <div className="space-y-3 pt-4 border-t border-slate-100">
               <div className="flex items-center justify-between">
@@ -1823,37 +2034,466 @@ export const ApplicantPortal: React.FC = () => {
 
         {/* STEP 3: Research Publications */}
         {activeStep === 3 && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
               <FileText className="w-5 h-5 text-indigo-600" />
               Research Publications
             </h3>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">
-                  Research Papers/Review Articles/Conference Proceedings (Optional)
-                </label>
-                <textarea
-                  value={researchPapers}
-                  onChange={(e) => setResearchPapers(e.target.value)}
-                  rows={4}
-                  placeholder="In Related Areas Only. List details if any..."
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
-                />
+            <datalist id="research-paper-pub-types">
+              <option value="Research Paper" />
+              <option value="Review Article" />
+              <option value="Conference Proceeding" />
+            </datalist>
+            <datalist id="research-book-pub-types">
+              <option value="Book" />
+              <option value="Chapter" />
+              <option value="Edited Work" />
+              <option value="Article" />
+            </datalist>
+
+            {/* Table 1: Research Papers/Review Articles/Conference Proceedings */}
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h4 className="text-xs font-bold text-slate-800">
+                  Research Papers/Review Articles/Conference Proceedings (In Related Areas Only) if any (Optional)
+                </h4>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setResearchPaperItems([
+                      ...researchPaperItems,
+                      { publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', year: '' }
+                    ])
+                  }
+                  className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add Row
+                </button>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">
-                  Research Publication – Books, Chapters, Edited Works, Articles (Optional)
-                </label>
-                <textarea
-                  value={researchPublications}
-                  onChange={(e) => setResearchPublications(e.target.value)}
-                  rows={4}
-                  placeholder="In Related Areas Only. List details if any..."
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
-                />
+              <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white">
+                <table className="w-full text-[11px] text-left border-collapse min-w-[780px]">
+                  <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="p-2.5 border-r border-slate-200 w-12 text-center">S.No</th>
+                      <th className="p-2.5 border-r border-slate-200 w-32">Publication type</th>
+                      <th className="p-2.5 border-r border-slate-200">Title of the paper</th>
+                      <th className="p-2.5 border-r border-slate-200">Journal Name /page number</th>
+                      <th className="p-2.5 border-r border-slate-200 w-32">ISSN/ISBN NO.</th>
+                      <th className="p-2.5 border-r border-slate-200 w-24">Refereed</th>
+                      <th className="p-2.5 border-r border-slate-200 w-32">Author</th>
+                      <th className="p-2.5 border-r border-slate-200 w-20">Year</th>
+                      <th className="p-2.5 w-10 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {researchPaperItems.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50/50">
+                        <td className="p-2 border-r border-slate-100 text-center font-semibold text-slate-600">
+                          {idx + 1}
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            list="research-paper-pub-types"
+                            placeholder="Type"
+                            value={item.publicationType}
+                            onChange={(e) => {
+                              const copy = [...researchPaperItems];
+                              copy[idx] = { ...copy[idx], publicationType: e.target.value };
+                              setResearchPaperItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="Title of the paper"
+                            value={item.title}
+                            onChange={(e) => {
+                              const copy = [...researchPaperItems];
+                              copy[idx] = { ...copy[idx], title: e.target.value };
+                              setResearchPaperItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="Journal Name / page no."
+                            value={item.journalNameAndPage}
+                            onChange={(e) => {
+                              const copy = [...researchPaperItems];
+                              copy[idx] = { ...copy[idx], journalNameAndPage: e.target.value };
+                              setResearchPaperItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="ISSN/ISBN"
+                            value={item.issnIsbnNo}
+                            onChange={(e) => {
+                              const copy = [...researchPaperItems];
+                              copy[idx] = { ...copy[idx], issnIsbnNo: e.target.value };
+                              setResearchPaperItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 font-mono focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <select
+                            value={item.refereed}
+                            onChange={(e) => {
+                              const copy = [...researchPaperItems];
+                              copy[idx] = { ...copy[idx], refereed: e.target.value };
+                              setResearchPaperItems(copy);
+                            }}
+                            className="w-full bg-white border border-slate-200 rounded px-1.5 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          >
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="Author"
+                            value={item.author}
+                            onChange={(e) => {
+                              const copy = [...researchPaperItems];
+                              copy[idx] = { ...copy[idx], author: e.target.value };
+                              setResearchPaperItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="YYYY"
+                            value={item.year}
+                            onChange={(e) => {
+                              const copy = [...researchPaperItems];
+                              copy[idx] = { ...copy[idx], year: e.target.value };
+                              setResearchPaperItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 font-mono text-center focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 text-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (researchPaperItems.length === 1) {
+                                setResearchPaperItems([{ publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', year: '' }]);
+                              } else {
+                                setResearchPaperItems(researchPaperItems.filter((_, i) => i !== idx));
+                              }
+                            }}
+                            className="text-rose-600 hover:text-rose-800 p-1 rounded hover:bg-rose-50 transition"
+                            title="Delete row"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Table 2: Research Publication – Books, Chapters, Edited Works, Articles */}
+            <div className="space-y-3 pt-4 border-t border-slate-100">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h4 className="text-xs font-bold text-slate-800">
+                  Research Publication – Books, Chapters, Edited Works, Articles (In Related Areas Only) if any
+                </h4>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setResearchBookItems([
+                      ...researchBookItems,
+                      { publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', year: '' }
+                    ])
+                  }
+                  className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add Row
+                </button>
+              </div>
+
+              <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white">
+                <table className="w-full text-[11px] text-left border-collapse min-w-[780px]">
+                  <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="p-2.5 border-r border-slate-200 w-12 text-center">S.No</th>
+                      <th className="p-2.5 border-r border-slate-200 w-32">Publication type</th>
+                      <th className="p-2.5 border-r border-slate-200">Title of the paper</th>
+                      <th className="p-2.5 border-r border-slate-200">Journal Name /page number</th>
+                      <th className="p-2.5 border-r border-slate-200 w-32">ISSN/ISBN NO.</th>
+                      <th className="p-2.5 border-r border-slate-200 w-24">Refereed</th>
+                      <th className="p-2.5 border-r border-slate-200 w-32">Author</th>
+                      <th className="p-2.5 border-r border-slate-200 w-20">Year</th>
+                      <th className="p-2.5 w-10 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {researchBookItems.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50/50">
+                        <td className="p-2 border-r border-slate-100 text-center font-semibold text-slate-600">
+                          {idx + 1}
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            list="research-book-pub-types"
+                            placeholder="Type"
+                            value={item.publicationType}
+                            onChange={(e) => {
+                              const copy = [...researchBookItems];
+                              copy[idx] = { ...copy[idx], publicationType: e.target.value };
+                              setResearchBookItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="Title"
+                            value={item.title}
+                            onChange={(e) => {
+                              const copy = [...researchBookItems];
+                              copy[idx] = { ...copy[idx], title: e.target.value };
+                              setResearchBookItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="Journal / Publisher / page no."
+                            value={item.journalNameAndPage}
+                            onChange={(e) => {
+                              const copy = [...researchBookItems];
+                              copy[idx] = { ...copy[idx], journalNameAndPage: e.target.value };
+                              setResearchBookItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="ISSN/ISBN"
+                            value={item.issnIsbnNo}
+                            onChange={(e) => {
+                              const copy = [...researchBookItems];
+                              copy[idx] = { ...copy[idx], issnIsbnNo: e.target.value };
+                              setResearchBookItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 font-mono focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <select
+                            value={item.refereed}
+                            onChange={(e) => {
+                              const copy = [...researchBookItems];
+                              copy[idx] = { ...copy[idx], refereed: e.target.value };
+                              setResearchBookItems(copy);
+                            }}
+                            className="w-full bg-white border border-slate-200 rounded px-1.5 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          >
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="Author"
+                            value={item.author}
+                            onChange={(e) => {
+                              const copy = [...researchBookItems];
+                              copy[idx] = { ...copy[idx], author: e.target.value };
+                              setResearchBookItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="YYYY"
+                            value={item.year}
+                            onChange={(e) => {
+                              const copy = [...researchBookItems];
+                              copy[idx] = { ...copy[idx], year: e.target.value };
+                              setResearchBookItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 font-mono text-center focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 text-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (researchBookItems.length === 1) {
+                                setResearchBookItems([{ publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', year: '' }]);
+                              } else {
+                                setResearchBookItems(researchBookItems.filter((_, i) => i !== idx));
+                              }
+                            }}
+                            className="text-rose-600 hover:text-rose-800 p-1 rounded hover:bg-rose-50 transition"
+                            title="Delete row"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Table 3: Research Project, if any optional */}
+            <div className="space-y-3 pt-4 border-t border-slate-100">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h4 className="text-xs font-bold text-slate-800">
+                  Research Project, if any optional
+                </h4>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setResearchProjectItems([
+                      ...researchProjectItems,
+                      { majorMinor: '', period: '', totalGrants: '', sponsoringBody: '', outcome: '' }
+                    ])
+                  }
+                  className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add Row
+                </button>
+              </div>
+
+              <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white">
+                <table className="w-full text-[11px] text-left border-collapse min-w-[700px]">
+                  <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="p-2.5 border-r border-slate-200 w-12 text-center">S.No</th>
+                      <th className="p-2.5 border-r border-slate-200 w-32">Major/Minor</th>
+                      <th className="p-2.5 border-r border-slate-200 w-32">Period</th>
+                      <th className="p-2.5 border-r border-slate-200 w-32">Total grants</th>
+                      <th className="p-2.5 border-r border-slate-200">Name of sponsoring Body/Funding Agency</th>
+                      <th className="p-2.5 border-r border-slate-200">Outcome of the Project</th>
+                      <th className="p-2.5 w-10 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {researchProjectItems.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50/50">
+                        <td className="p-2 border-r border-slate-100 text-center font-semibold text-slate-600">
+                          {idx + 1}
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <select
+                            value={item.majorMinor}
+                            onChange={(e) => {
+                              const copy = [...researchProjectItems];
+                              copy[idx] = { ...copy[idx], majorMinor: e.target.value };
+                              setResearchProjectItems(copy);
+                            }}
+                            className="w-full bg-white border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          >
+                            <option value="">Select</option>
+                            <option value="Major">Major</option>
+                            <option value="Minor">Minor</option>
+                          </select>
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="e.g. 2023-2025"
+                            value={item.period}
+                            onChange={(e) => {
+                              const copy = [...researchProjectItems];
+                              copy[idx] = { ...copy[idx], period: e.target.value };
+                              setResearchProjectItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="Amount"
+                            value={item.totalGrants}
+                            onChange={(e) => {
+                              const copy = [...researchProjectItems];
+                              copy[idx] = { ...copy[idx], totalGrants: e.target.value };
+                              setResearchProjectItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 font-mono focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="Funding Agency"
+                            value={item.sponsoringBody}
+                            onChange={(e) => {
+                              const copy = [...researchProjectItems];
+                              copy[idx] = { ...copy[idx], sponsoringBody: e.target.value };
+                              setResearchProjectItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 border-r border-slate-100">
+                          <input
+                            type="text"
+                            placeholder="Outcome of the Project"
+                            value={item.outcome}
+                            onChange={(e) => {
+                              const copy = [...researchProjectItems];
+                              copy[idx] = { ...copy[idx], outcome: e.target.value };
+                              setResearchProjectItems(copy);
+                            }}
+                            className="w-full bg-transparent border border-slate-200 rounded px-2 py-1 text-slate-900 focus:outline-none focus:border-indigo-500"
+                          />
+                        </td>
+                        <td className="p-1.5 text-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (researchProjectItems.length === 1) {
+                                setResearchProjectItems([{ majorMinor: '', period: '', totalGrants: '', sponsoringBody: '', outcome: '' }]);
+                              } else {
+                                setResearchProjectItems(researchProjectItems.filter((_, i) => i !== idx));
+                              }
+                            }}
+                            className="text-rose-600 hover:text-rose-800 p-1 rounded hover:bg-rose-50 transition"
+                            title="Delete row"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
 
@@ -2555,6 +3195,9 @@ export const ApplicantPortal: React.FC = () => {
             ...pdfExtraFields,
             researchPapers,
             researchPublications,
+            researchPaperItems,
+            researchBookItems,
+            researchProjectItems,
             ...miscInfo,
             ...extraMisc,
             referees,
@@ -2566,8 +3209,11 @@ export const ApplicantPortal: React.FC = () => {
             postId: selectedPostId,
             postTitle: activePost?.title,
             departmentName: activePost?.departmentName,
-            applicationNo: applications.find(a => a.id === currentAppId)?.applicationNo || 'DRAFT-PREVIEW',
+            campus: activePost?.campus,
+            advtNumber: activeDrive?.advtNumber,
+            applicationNo: applications.find(a => a.id === currentAppId)?.applicationNo || profile.regNumber || 'DRAFT-PREVIEW',
             languages,
+            presentEmploymentDetails,
           }}
           drive={activeDrive}
           onClose={() => setIsPreviewOpen(false)}

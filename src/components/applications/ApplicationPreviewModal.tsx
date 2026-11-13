@@ -113,6 +113,45 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                 </div>
               </div>
 
+              {/* REGISTRATION DETAILS */}
+              <div className="space-y-3">
+                <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg] w-fit">
+                  <span className="skew-x-[10deg]">Registration</span>
+                </h3>
+                <div className="overflow-hidden border border-slate-900 rounded-lg shadow-sm">
+                  <table className="w-full border-collapse text-[9pt] font-sans">
+                    <thead>
+                      <tr className="bg-slate-50 text-slate-700 font-bold uppercase text-[8px] tracking-wider border-b border-slate-300">
+                        <th className="p-3 border-r border-slate-200 text-left">Application Number</th>
+                        <th className="p-3 border-r border-slate-200 text-left">Post</th>
+                        <th className="p-3 border-r border-slate-200 text-left">Campus/Organizational Unit</th>
+                        <th className="p-3 border-r border-slate-200 text-left">Branch/Department</th>
+                        <th className="p-3 text-left">Advertisement Number</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="bg-white">
+                        <td className="p-3 border-r border-slate-200 font-mono font-bold text-slate-900">
+                          {application.applicationNo || application.applicant?.regNumber || 'PENDING'}
+                        </td>
+                        <td className="p-3 border-r border-slate-200 font-bold text-slate-900">
+                          {application.postTitle || post?.title || 'N/A'}
+                        </td>
+                        <td className="p-3 border-r border-slate-200 font-semibold text-slate-800">
+                          {application.campus || post?.campus || application.applicant?.campusUnit || 'N/A'}
+                        </td>
+                        <td className="p-3 border-r border-slate-200 text-slate-700">
+                          {application.departmentName || post?.departmentName || 'N/A'}
+                        </td>
+                        <td className="p-3 font-mono text-slate-800">
+                          {application.advtNumber || drive?.advtNumber || 'N/A'}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
               {/* APPLICATION FEE SUMMARY */}
               <div className="space-y-3">
                 <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg] w-fit">
@@ -305,6 +344,36 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                 )}
               </section>
 
+              {/* PRESENT EMPLOYMENT DETAILS */}
+              <section className="space-y-4 pt-4">
+                <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
+                  <span className="skew-x-[10deg]">Present Employment Details</span>
+                </h3>
+                <div className="overflow-hidden border border-slate-900 rounded-lg">
+                  <table className="w-full border-collapse text-[9pt] font-sans">
+                    <tbody className="divide-y divide-slate-200">
+                      {[
+                        { label: 'Name of the Post', val: application.presentEmploymentDetails?.postName },
+                        { label: 'Type of appointment', val: application.presentEmploymentDetails?.appointmentType },
+                        { label: 'Date of Appointment', val: application.presentEmploymentDetails?.dateOfAppointment },
+                        { label: "Employer's Name", val: application.presentEmploymentDetails?.employerName },
+                        { label: 'Pay Band and Grade Pay(6th CPC)/Equivalent', val: application.presentEmploymentDetails?.payBandAndGradePay },
+                        { label: 'Pay Level/Equivalent', val: application.presentEmploymentDetails?.payLevel },
+                        { label: 'Gross Emoluments', val: application.presentEmploymentDetails?.grossEmoluments },
+                        { label: 'Age of retirement in the Present Post', val: application.presentEmploymentDetails?.retirementAge },
+                        { label: 'Date of retirement in the Present Post', val: application.presentEmploymentDetails?.retirementDate },
+                        { label: 'Whether you are receiving any pension', val: application.presentEmploymentDetails?.receivingPension },
+                      ].map((row, idx) => (
+                        <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/40'}>
+                          <td className="w-1/2 p-2.5 border-r border-slate-300 font-bold text-slate-800">{row.label}</td>
+                          <td className="w-1/2 p-2.5 font-semibold text-slate-900">{row.val || ''}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
               {/* PART 3: WORK EXPERIENCE */}
               <section className="space-y-4 pt-4">
                 <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
@@ -344,24 +413,145 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
               </section>
 
               {/* PART 4: RESEARCH & MISC */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-                <section className="space-y-3">
-                  <h3 className="bg-slate-900 text-white px-4 py-1 font-bold uppercase tracking-widest text-[10pt]">Research Works</h3>
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
-                    <div>
-                      <h4 className="text-[8px] font-black uppercase text-slate-400 mb-1 leading-none tracking-widest">Papers & Conference Proceedings</h4>
-                      <p className="text-[9pt] font-bold text-slate-800 whitespace-pre-wrap leading-relaxed">{application.researchPapers || 'Not Provided'}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-[8px] font-black uppercase text-slate-400 mb-1 leading-none tracking-widest">Books & Edited Volumes</h4>
-                      <p className="text-[9pt] font-bold text-slate-800 whitespace-pre-wrap leading-relaxed">{application.researchPublications || 'Not Provided'}</p>
-                    </div>
+              <div className="space-y-6 pt-4">
+                <section className="space-y-4">
+                  <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
+                    <span className="skew-x-[10deg]">Research Publications &amp; Projects</span>
+                  </h3>
+
+                  {/* 1. Research Papers/Review Articles/Conference Proceedings */}
+                  <div className="space-y-1.5">
+                    <h4 className="font-bold text-slate-900 text-[9.5pt]">
+                      Research Papers/Review Articles/Conference Proceedings (In Related Areas Only) if any (Optional)
+                    </h4>
+                    {application.researchPaperItems && application.researchPaperItems.some(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim()) ? (
+                      <div className="overflow-hidden border border-slate-900 rounded-lg">
+                        <table className="w-full border-collapse text-[8pt] font-sans">
+                          <thead>
+                            <tr className="bg-slate-50 text-slate-700 font-bold border-b border-slate-300">
+                              <th className="p-2 border-r border-slate-200 text-center w-10">S.No</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Publication type</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Title of the paper</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Journal Name /page number</th>
+                              <th className="p-2 border-r border-slate-200 text-left">ISSN/ISBN NO.</th>
+                              <th className="p-2 border-r border-slate-200 text-center">Refereed</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Author</th>
+                              <th className="p-2 text-center w-14">Year</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-200">
+                            {application.researchPaperItems
+                              .filter(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim())
+                              .map((item, idx) => (
+                                <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/40'}>
+                                  <td className="p-2 border-r border-slate-200 text-center font-bold">{idx + 1}</td>
+                                  <td className="p-2 border-r border-slate-200">{item.publicationType || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200 font-semibold">{item.title || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200">{item.journalNameAndPage || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200 font-mono">{item.issnIsbnNo || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200 text-center">{item.refereed || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200">{item.author || '-'}</td>
+                                  <td className="p-2 text-center font-mono">{item.year || '-'}</td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : application.researchPapers ? (
+                      <p className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-[9pt] font-bold text-slate-800 whitespace-pre-wrap">{application.researchPapers}</p>
+                    ) : (
+                      <p className="p-2 border border-dashed border-slate-200 rounded-lg text-[8.5pt] text-slate-400 italic">None provided</p>
+                    )}
+                  </div>
+
+                  {/* 2. Research Publication – Books, Chapters, Edited Works, Articles */}
+                  <div className="space-y-1.5">
+                    <h4 className="font-bold text-slate-900 text-[9.5pt]">
+                      Research Publication – Books, Chapters, Edited Works, Articles (In Related Areas Only) if any
+                    </h4>
+                    {application.researchBookItems && application.researchBookItems.some(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim()) ? (
+                      <div className="overflow-hidden border border-slate-900 rounded-lg">
+                        <table className="w-full border-collapse text-[8pt] font-sans">
+                          <thead>
+                            <tr className="bg-slate-50 text-slate-700 font-bold border-b border-slate-300">
+                              <th className="p-2 border-r border-slate-200 text-center w-10">S.No</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Publication type</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Title of the paper</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Journal Name /page number</th>
+                              <th className="p-2 border-r border-slate-200 text-left">ISSN/ISBN NO.</th>
+                              <th className="p-2 border-r border-slate-200 text-center">Refereed</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Author</th>
+                              <th className="p-2 text-center w-14">Year</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-200">
+                            {application.researchBookItems
+                              .filter(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim())
+                              .map((item, idx) => (
+                                <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/40'}>
+                                  <td className="p-2 border-r border-slate-200 text-center font-bold">{idx + 1}</td>
+                                  <td className="p-2 border-r border-slate-200">{item.publicationType || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200 font-semibold">{item.title || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200">{item.journalNameAndPage || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200 font-mono">{item.issnIsbnNo || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200 text-center">{item.refereed || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200">{item.author || '-'}</td>
+                                  <td className="p-2 text-center font-mono">{item.year || '-'}</td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : application.researchPublications ? (
+                      <p className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-[9pt] font-bold text-slate-800 whitespace-pre-wrap">{application.researchPublications}</p>
+                    ) : (
+                      <p className="p-2 border border-dashed border-slate-200 rounded-lg text-[8.5pt] text-slate-400 italic">None provided</p>
+                    )}
+                  </div>
+
+                  {/* 3. Research Project, if any optional */}
+                  <div className="space-y-1.5">
+                    <h4 className="font-bold text-slate-900 text-[9.5pt]">
+                      Research Project, if any optional
+                    </h4>
+                    {application.researchProjectItems && application.researchProjectItems.some(p => p.majorMinor?.trim() || p.sponsoringBody?.trim() || p.outcome?.trim() || p.totalGrants?.trim()) ? (
+                      <div className="overflow-hidden border border-slate-900 rounded-lg">
+                        <table className="w-full border-collapse text-[8pt] font-sans">
+                          <thead>
+                            <tr className="bg-slate-50 text-slate-700 font-bold border-b border-slate-300">
+                              <th className="p-2 border-r border-slate-200 text-center w-10">S.No</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Major/Minor</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Period</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Total grants</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Name of sponsoring Body/Funding Agency</th>
+                              <th className="p-2 text-left">Outcome of the Project</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-200">
+                            {application.researchProjectItems
+                              .filter(p => p.majorMinor?.trim() || p.sponsoringBody?.trim() || p.outcome?.trim() || p.totalGrants?.trim())
+                              .map((item, idx) => (
+                                <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/40'}>
+                                  <td className="p-2 border-r border-slate-200 text-center font-bold">{idx + 1}</td>
+                                  <td className="p-2 border-r border-slate-200 font-semibold">{item.majorMinor || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200">{item.period || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200 font-mono">{item.totalGrants || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200">{item.sponsoringBody || '-'}</td>
+                                  <td className="p-2">{item.outcome || '-'}</td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <p className="p-2 border border-dashed border-slate-200 rounded-lg text-[8.5pt] text-slate-400 italic">None provided</p>
+                    )}
                   </div>
                 </section>
 
                 <section className="space-y-3">
                   <h3 className="bg-slate-900 text-white px-4 py-1 font-bold uppercase tracking-widest text-[10pt]">Disclosures</h3>
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
                     {[
                       { label: 'Time Required to Join', val: application.joiningTimeRequired || '-' },
                       { label: 'Computer Proficiency', val: application.hasComputerProficiency ? 'YES' : 'NO' },

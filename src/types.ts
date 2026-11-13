@@ -168,6 +168,37 @@ export interface LanguageProficiency {
   speak: boolean;
 }
 
+export interface PresentEmploymentDetails {
+  postName: string;
+  appointmentType: string;
+  dateOfAppointment: string;
+  employerName: string;
+  payBandAndGradePay: string;
+  payLevel: string;
+  grossEmoluments: string;
+  retirementAge: string;
+  retirementDate: string;
+  receivingPension: 'Yes' | 'No' | '';
+}
+
+export interface ResearchPaperItem {
+  publicationType: string;
+  title: string;
+  journalNameAndPage: string;
+  issnIsbnNo: string;
+  refereed: string;
+  author: string;
+  year: string;
+}
+
+export interface ResearchProjectItem {
+  majorMinor: string;
+  period: string;
+  totalGrants: string;
+  sponsoringBody: string;
+  outcome: string;
+}
+
 export interface ExperienceRecord {
   organization: string;
   designation: string;
@@ -353,6 +384,9 @@ export interface Application {
   // Research & Publications (Page 3)
   researchPapers?: string;
   researchPublications?: string;
+  researchPaperItems?: ResearchPaperItem[];
+  researchBookItems?: ResearchPaperItem[];
+  researchProjectItems?: ResearchProjectItem[];
 
   // Miscellaneous (Page 3/4)
   punishedDuringService?: boolean;
@@ -414,6 +448,7 @@ export interface Application {
   referees?: Array<{ name: string; designation: string; address: string; email: string; mobile: string }>;
   nocAvailable?: boolean;
   languages?: LanguageProficiency[];
+  presentEmploymentDetails?: PresentEmploymentDetails;
 }
 
 export interface AuditLog {

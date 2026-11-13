@@ -966,6 +966,35 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                     </div>
                   )}
 
+                  {selectedAppDetail.presentEmploymentDetails &&
+                    Object.values(selectedAppDetail.presentEmploymentDetails).some(v => Boolean(v && String(v).trim())) && (
+                      <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 space-y-2.5">
+                        <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                          <Briefcase className="w-4 h-4 text-indigo-600" />
+                          Present Employment Details
+                        </h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[11px]">
+                          {[
+                            { label: 'Name of the Post', val: selectedAppDetail.presentEmploymentDetails.postName },
+                            { label: 'Type of appointment', val: selectedAppDetail.presentEmploymentDetails.appointmentType },
+                            { label: 'Date of Appointment', val: selectedAppDetail.presentEmploymentDetails.dateOfAppointment },
+                            { label: "Employer's Name", val: selectedAppDetail.presentEmploymentDetails.employerName },
+                            { label: 'Pay Band and Grade Pay(6th CPC)/Equivalent', val: selectedAppDetail.presentEmploymentDetails.payBandAndGradePay },
+                            { label: 'Pay Level/Equivalent', val: selectedAppDetail.presentEmploymentDetails.payLevel },
+                            { label: 'Gross Emoluments', val: selectedAppDetail.presentEmploymentDetails.grossEmoluments },
+                            { label: 'Age of retirement in the Present Post', val: selectedAppDetail.presentEmploymentDetails.retirementAge },
+                            { label: 'Date of retirement in the Present Post', val: selectedAppDetail.presentEmploymentDetails.retirementDate },
+                            { label: 'Whether you are receiving any pension', val: selectedAppDetail.presentEmploymentDetails.receivingPension },
+                          ].map((item, idx) => (
+                            <div key={idx} className="p-2 bg-white border border-slate-200 rounded-lg">
+                              <span className="text-[10px] text-slate-500 block">{item.label}</span>
+                              <span className="font-bold text-slate-900">{item.val || '-'}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                   {selectedAppDetail.experience && selectedAppDetail.experience.length > 0 && (
                     <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 space-y-2.5">
                       <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
@@ -994,23 +1023,138 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
               {/* TAB 3: Research & Misc */}
               {activeModalTab === 'research' && (
                 <div className="space-y-4">
-                  <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200 space-y-3">
+                  <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200 space-y-4">
                     <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                       <FileText className="w-4 h-4 text-indigo-600" />
-                      Research Papers & Publications
+                      Research Publications &amp; Projects
                     </h4>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div>
-                        <span className="text-[10px] font-bold text-slate-500 uppercase">Research Papers / Review Articles</span>
-                        <p className="mt-1 p-2 bg-white border border-slate-200 rounded-lg text-[11px] whitespace-pre-wrap min-h-[40px]">
-                          {selectedAppDetail.researchPapers || 'Not Provided'}
-                        </p>
+                        <span className="text-[10px] font-bold text-slate-700 block mb-1.5">
+                          Research Papers/Review Articles/Conference Proceedings (In Related Areas Only) if any (Optional)
+                        </span>
+                        {selectedAppDetail.researchPaperItems && selectedAppDetail.researchPaperItems.some(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim()) ? (
+                          <div className="overflow-x-auto bg-white border border-slate-200 rounded-lg">
+                            <table className="w-full text-left text-[10px] border-collapse min-w-[600px]">
+                              <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                                <tr>
+                                  <th className="p-2 border-r border-slate-200 text-center">S.No</th>
+                                  <th className="p-2 border-r border-slate-200">Publication type</th>
+                                  <th className="p-2 border-r border-slate-200">Title of the paper</th>
+                                  <th className="p-2 border-r border-slate-200">Journal Name /page number</th>
+                                  <th className="p-2 border-r border-slate-200">ISSN/ISBN NO.</th>
+                                  <th className="p-2 border-r border-slate-200">Refereed</th>
+                                  <th className="p-2 border-r border-slate-200">Author</th>
+                                  <th className="p-2 text-center">Year</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {selectedAppDetail.researchPaperItems
+                                  .filter(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim())
+                                  .map((item, idx) => (
+                                    <tr key={idx}>
+                                      <td className="p-2 border-r border-slate-100 text-center font-semibold">{idx + 1}</td>
+                                      <td className="p-2 border-r border-slate-100">{item.publicationType || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100 font-semibold">{item.title || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100">{item.journalNameAndPage || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100 font-mono">{item.issnIsbnNo || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100">{item.refereed || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100">{item.author || '-'}</td>
+                                      <td className="p-2 text-center font-mono">{item.year || '-'}</td>
+                                    </tr>
+                                  ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <p className="p-2 bg-white border border-slate-200 rounded-lg text-[11px] whitespace-pre-wrap">
+                            {selectedAppDetail.researchPapers || 'Not Provided'}
+                          </p>
+                        )}
                       </div>
+
                       <div>
-                        <span className="text-[10px] font-bold text-slate-500 uppercase">Books, Chapters & Edited Works</span>
-                        <p className="mt-1 p-2 bg-white border border-slate-200 rounded-lg text-[11px] whitespace-pre-wrap min-h-[40px]">
-                          {selectedAppDetail.researchPublications || 'Not Provided'}
-                        </p>
+                        <span className="text-[10px] font-bold text-slate-700 block mb-1.5">
+                          Research Publication – Books, Chapters, Edited Works, Articles (In Related Areas Only) if any
+                        </span>
+                        {selectedAppDetail.researchBookItems && selectedAppDetail.researchBookItems.some(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim()) ? (
+                          <div className="overflow-x-auto bg-white border border-slate-200 rounded-lg">
+                            <table className="w-full text-left text-[10px] border-collapse min-w-[600px]">
+                              <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                                <tr>
+                                  <th className="p-2 border-r border-slate-200 text-center">S.No</th>
+                                  <th className="p-2 border-r border-slate-200">Publication type</th>
+                                  <th className="p-2 border-r border-slate-200">Title of the paper</th>
+                                  <th className="p-2 border-r border-slate-200">Journal Name /page number</th>
+                                  <th className="p-2 border-r border-slate-200">ISSN/ISBN NO.</th>
+                                  <th className="p-2 border-r border-slate-200">Refereed</th>
+                                  <th className="p-2 border-r border-slate-200">Author</th>
+                                  <th className="p-2 text-center">Year</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {selectedAppDetail.researchBookItems
+                                  .filter(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim())
+                                  .map((item, idx) => (
+                                    <tr key={idx}>
+                                      <td className="p-2 border-r border-slate-100 text-center font-semibold">{idx + 1}</td>
+                                      <td className="p-2 border-r border-slate-100">{item.publicationType || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100 font-semibold">{item.title || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100">{item.journalNameAndPage || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100 font-mono">{item.issnIsbnNo || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100">{item.refereed || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100">{item.author || '-'}</td>
+                                      <td className="p-2 text-center font-mono">{item.year || '-'}</td>
+                                    </tr>
+                                  ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <p className="p-2 bg-white border border-slate-200 rounded-lg text-[11px] whitespace-pre-wrap">
+                            {selectedAppDetail.researchPublications || 'Not Provided'}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-700 block mb-1.5">
+                          Research Project, if any optional
+                        </span>
+                        {selectedAppDetail.researchProjectItems && selectedAppDetail.researchProjectItems.some(p => p.majorMinor?.trim() || p.sponsoringBody?.trim() || p.outcome?.trim() || p.totalGrants?.trim()) ? (
+                          <div className="overflow-x-auto bg-white border border-slate-200 rounded-lg">
+                            <table className="w-full text-left text-[10px] border-collapse min-w-[540px]">
+                              <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                                <tr>
+                                  <th className="p-2 border-r border-slate-200 text-center">S.No</th>
+                                  <th className="p-2 border-r border-slate-200">Major/Minor</th>
+                                  <th className="p-2 border-r border-slate-200">Period</th>
+                                  <th className="p-2 border-r border-slate-200">Total grants</th>
+                                  <th className="p-2 border-r border-slate-200">Name of sponsoring Body/Funding Agency</th>
+                                  <th className="p-2">Outcome of the Project</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {selectedAppDetail.researchProjectItems
+                                  .filter(p => p.majorMinor?.trim() || p.sponsoringBody?.trim() || p.outcome?.trim() || p.totalGrants?.trim())
+                                  .map((item, idx) => (
+                                    <tr key={idx}>
+                                      <td className="p-2 border-r border-slate-100 text-center font-semibold">{idx + 1}</td>
+                                      <td className="p-2 border-r border-slate-100 font-semibold">{item.majorMinor || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100">{item.period || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100 font-mono">{item.totalGrants || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100">{item.sponsoringBody || '-'}</td>
+                                      <td className="p-2">{item.outcome || '-'}</td>
+                                    </tr>
+                                  ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <p className="p-2 bg-white border border-slate-200 rounded-lg text-[11px] text-slate-500">
+                            Not Provided
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

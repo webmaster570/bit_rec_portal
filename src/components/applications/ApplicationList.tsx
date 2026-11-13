@@ -424,6 +424,58 @@ export const ApplicationList: React.FC = () => {
                 )}
               </div>
 
+              {/* Present Employment Details */}
+              {selectedAppDetail.presentEmploymentDetails &&
+                Object.values(selectedAppDetail.presentEmploymentDetails).some(v => Boolean(v && String(v).trim())) && (
+                  <div className="bg-slate-50 p-4 rounded-xl space-y-3">
+                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">
+                      Present Employment Details
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <span className="text-slate-500 block">Name of the Post</span>
+                        <span className="font-semibold text-slate-900">{selectedAppDetail.presentEmploymentDetails.postName || '-'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">Type of appointment</span>
+                        <span className="font-semibold text-slate-900">{selectedAppDetail.presentEmploymentDetails.appointmentType || '-'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">Date of Appointment</span>
+                        <span className="font-semibold text-slate-900 font-mono">{selectedAppDetail.presentEmploymentDetails.dateOfAppointment || '-'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">Employer's Name</span>
+                        <span className="font-semibold text-slate-900">{selectedAppDetail.presentEmploymentDetails.employerName || '-'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">Pay Band and Grade Pay(6th CPC)/Equivalent</span>
+                        <span className="font-semibold text-slate-900">{selectedAppDetail.presentEmploymentDetails.payBandAndGradePay || '-'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">Pay Level/Equivalent</span>
+                        <span className="font-semibold text-slate-900">{selectedAppDetail.presentEmploymentDetails.payLevel || '-'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">Gross Emoluments</span>
+                        <span className="font-semibold text-slate-900 font-mono">{selectedAppDetail.presentEmploymentDetails.grossEmoluments || '-'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">Age of retirement in the Present Post</span>
+                        <span className="font-semibold text-slate-900 font-mono">{selectedAppDetail.presentEmploymentDetails.retirementAge || '-'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">Date of retirement in the Present Post</span>
+                        <span className="font-semibold text-slate-900 font-mono">{selectedAppDetail.presentEmploymentDetails.retirementDate || '-'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">Whether you are receiving any pension</span>
+                        <span className="font-semibold text-slate-900">{selectedAppDetail.presentEmploymentDetails.receivingPension || '-'}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
               {/* Uploaded Documents */}
               <div className="bg-slate-50 p-4 rounded-xl  space-y-3">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">
