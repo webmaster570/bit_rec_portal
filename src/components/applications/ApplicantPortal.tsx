@@ -25,6 +25,9 @@ import {
   Printer,
   RotateCcw,
   MapPin,
+  Search,
+  Users,
+  ArrowUpDown,
 } from 'lucide-react';
 import { ApplicationPreviewModal } from './ApplicationPreviewModal';
 
@@ -34,7 +37,10 @@ export const ApplicantPortal: React.FC = () => {
     submitApplication, 
     applications, 
     selectedDriveId: ctxDriveId, 
-    selectedPostId: ctxPostId, 
+    selectedPostId: ctxPostId,
+    setSelectedDriveId: setCtxDriveId,
+    setSelectedPostId: setCtxPostId,
+    setActiveTab,
     currentUser, 
     users, 
     updateApplication,
@@ -46,12 +52,33 @@ export const ApplicantPortal: React.FC = () => {
   const [activeStep, setActiveStep] = useState<number>(1);
   const [selectedDriveId, setSelectedDriveId] = useState<string>(ctxDriveId || drives[0]?.id || 'drive-2026-01');
   const [selectedPostId, setSelectedPostId] = useState<string>(ctxPostId || drives[0]?.posts[0]?.id || 'post-101');
+  const [hasSelectedJob, setHasSelectedJob] = useState<boolean>(() => Boolean(editingAppId || ctxPostId));
   const [submittedApp, setSubmittedApp] = useState<Application | null>(null);
   const [showAdmitCard, setShowAdmitCard] = useState<Application | null>(null);
   const [currentAppId, setCurrentAppId] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [filterCategory, setFilterCategory] = useState<RecruitmentCategory | 'All'>('All');
-  const [filterCampus, setFilterCampus] = useState<Campus | 'All'>('All');
+
+  // 2-Tab Apply Online Job Directory state
+  const [jobCategoryTab, setJobCategoryTab] = useState<RecruitmentCategory>('Teaching');
+  const [jobCampusFilter, setJobCampusFilter] = useState<Campus | 'All'>('All');
+  const [jobSortBy, setJobSortBy] = useState<'campus_asc' | 'campus_desc' | 'closing_date' | 'title_asc'>('campus_asc');
+  const [jobSearchTerm, setJobSearchTerm] = useState<string>('');
+
+  // Sync view mode with external navigation (e.g. clicking Apply Online in Sidebar vs Complete Draft vs clicking a specific post)
+  React.useEffect(() => {
+    if (editingAppId) {
+      setHasSelectedJob(true);
+    } else if (ctxPostId) {
+      if (ctxDriveId) setSelectedDriveId(ctxDriveId);
+      setSelectedPostId(ctxPostId);
+      setHasSelectedJob(true);
+    } else {
+      setHasSelectedJob(false);
+      setCurrentAppId(null);
+      setSubmittedApp(null);
+      setActiveStep(1);
+    }
+  }, [ctxPostId, ctxDriveId, editingAppId]);
 
   const activeDrive = drives.find((d) => d.id === selectedDriveId) || drives[0];
   const activePost = activeDrive?.posts.find((p) => p.id === selectedPostId) || activeDrive?.posts[0];
@@ -681,166 +708,383 @@ export const ApplicantPortal: React.FC = () => {
         </div>
       </div>
 
-      {/* Wizard Steps Navigation Bar */}
-      <div className="glass-card border border-slate-200 rounded-xl p-3 shadow-2xs overflow-x-auto">
-        <div className="flex items-center justify-between min-w-[600px]">
-          {[
-            { num: 1, label: 'Personal Details', icon: User },
-            { num: 2, label: 'Education & Experience', icon: GraduationCap },
-            { num: 3, label: 'Research Publications', icon: FileText },
-            { num: 4, label: 'Miscellaneous Info', icon: AlertCircle },
-            { num: 5, label: 'Document Uploads', icon: Upload },
-            { num: 6, label: 'Fee & Declaration', icon: CreditCard },
-            { num: 7, label: 'Summary & Receipt', icon: CheckCircle2 },
-          ].map((s) => {
-            const Icon = s.icon;
-            const isDone = activeStep > s.num;
-            const isCurrent = activeStep === s.num;
+      {!hasSelectedJob ? (
+        /* APPLY ONLINE: 2-TAB JOB SELECTION PAGE (TEACHING & NON-TEACHING) */
+        (() => {
+          const openDrives = drives.filter(
+            (d) => d.status === 'applications_open' || d.status === 'published' || d.status === 'screening_in_progress'
+          );
+          const sourceDrives = openDrives.length > 0 ? openDrives : drives;
 
-            return (
-              <div
-                key={s.num}
-                onClick={() => isDone && setActiveStep(s.num)}
-                className={`flex items-center space-x-2 cursor-pointer transition ${
-                  isCurrent
-                    ? 'text-indigo-600 font-bold'
-                    : isDone
-                    ? 'text-emerald-600 font-medium'
-                    : 'text-slate-400'
-                }`}
-              >
-                <div
-                  className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center border ${
-                    isCurrent
-                      ? 'bg-indigo-600 border-indigo-600 text-white shadow-2xs'
-                      : isDone
-                      ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                      : 'bg-slate-100 border-slate-200 text-slate-500'
-                  }`}
-                >
-                  {isDone ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-3.5 h-3.5" />}
-                </div>
-                <span className="text-xs whitespace-nowrap">{s.label}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+          const allOpenJobs = sourceDrives.flatMap((drive) =>
+            (drive.posts || []).map((post) => ({
+              drive,
+              post,
+              category: (post.category || drive.category || 'Teaching') as RecruitmentCategory,
+              campus: (post.campus || (drive.campus && drive.campus !== 'All Campuses' ? drive.campus : 'BIT Mesra')) as string,
+            }))
+          );
 
-      {/* Step Content Area */}
-      <div className="glass-card border border-slate-200 rounded-2xl p-6 shadow-2xs">
-        {/* Drive and Post Selection Header - Personal Details only */}
-        {activeStep === 1 && (
-          <div className="space-y-4 mb-6">
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                  <Briefcase className="w-3.5 h-3.5 text-indigo-500" />
-                  Filter by Category
-                </label>
-                <div className="flex gap-2">
-                  {['All', 'Teaching', 'Non-Teaching'].map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setFilterCategory(cat as any)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-                        filterCategory === cat
-                          ? 'bg-indigo-600 text-white shadow-md'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          const teachingCount = allOpenJobs.filter((j) => j.category === 'Teaching').length;
+          const nonTeachingCount = allOpenJobs.filter((j) => j.category === 'Non-Teaching').length;
+
+          const campusOptions = Array.from(
+            new Set([
+              'BIT Mesra',
+              'BIT Noida',
+              'BIT Jaipur',
+              'BIT Patna',
+              'BIT Deoghar',
+              ...allOpenJobs.map((j) => j.campus).filter(Boolean),
+            ])
+          );
+
+          const myUserApps = applications.filter((app) => {
+            if (!currentUser) return false;
+            const matchesEmail = currentUser.email && app.applicant.email.toLowerCase() === currentUser.email.toLowerCase();
+            const matchesReg = currentUser.regNumber && app.applicant.regNumber === currentUser.regNumber;
+            return !!(matchesEmail || matchesReg);
+          });
+
+          const term = jobSearchTerm.toLowerCase().trim();
+          const filteredJobs = allOpenJobs
+            .filter((item) => item.category === jobCategoryTab)
+            .filter((item) => jobCampusFilter === 'All' || item.campus === jobCampusFilter)
+            .filter((item) => {
+              if (!term) return true;
+              return (
+                item.post.title.toLowerCase().includes(term) ||
+                item.post.postCode.toLowerCase().includes(term) ||
+                item.post.departmentName.toLowerCase().includes(term) ||
+                item.drive.title.toLowerCase().includes(term) ||
+                item.drive.advtNumber.toLowerCase().includes(term) ||
+                item.campus.toLowerCase().includes(term)
+              );
+            })
+            .sort((a, b) => {
+              if (jobSortBy === 'campus_asc') {
+                const cmp = a.campus.localeCompare(b.campus);
+                return cmp !== 0 ? cmp : a.post.title.localeCompare(b.post.title);
+              }
+              if (jobSortBy === 'campus_desc') {
+                const cmp = b.campus.localeCompare(a.campus);
+                return cmp !== 0 ? cmp : a.post.title.localeCompare(b.post.title);
+              }
+              if (jobSortBy === 'closing_date') {
+                return new Date(a.drive.closingDate).getTime() - new Date(b.drive.closingDate).getTime();
+              }
+              return a.post.title.localeCompare(b.post.title);
+            });
+
+          const handleSelectJobToApply = (driveId: string, postId: string, campusVal: string) => {
+            setEditingAppId(null);
+            setCurrentAppId(null);
+            setSubmittedApp(null);
+            setSelectedDriveId(driveId);
+            setSelectedPostId(postId);
+            setCtxDriveId(driveId);
+            setCtxPostId(postId);
+            setProfile((prev) => ({ ...prev, campusUnit: campusVal }));
+            setActiveStep(1);
+            setHasSelectedJob(true);
+          };
+
+          return (
+            <div className="glass-card border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-6">
+              {/* 2 Tabs: Teaching & Non-Teaching */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setJobCategoryTab('Teaching')}
+                    className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition ${
+                      jobCategoryTab === 'Teaching'
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    <GraduationCap className="w-4 h-4" />
+                    <span>Teaching</span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                        jobCategoryTab === 'Teaching' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
                       }`}
                     >
-                      {cat}
-                    </button>
-                  ))}
+                      {teachingCount}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setJobCategoryTab('Non-Teaching')}
+                    className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition ${
+                      jobCategoryTab === 'Non-Teaching'
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    <Briefcase className="w-4 h-4" />
+                    <span>Non-Teaching</span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                        jobCategoryTab === 'Non-Teaching' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                      }`}
+                    >
+                      {nonTeachingCount}
+                    </span>
+                  </button>
+                </div>
+
+                <div className="text-xs text-slate-500 font-medium">
+                  Showing <strong className="text-slate-900">{filteredJobs.length}</strong> open {jobCategoryTab} position{filteredJobs.length === 1 ? '' : 's'}
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-indigo-500" />
-                  Filter by Campus
-                </label>
-                <select
-                  value={filterCampus}
-                  onChange={(e) => setFilterCampus(e.target.value as any)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
-                >
-                  <option value="All">All Campuses</option>
-                  <option value="BIT Mesra">BIT Mesra (Main)</option>
-                  <option value="BIT Noida">BIT Noida</option>
-                  <option value="BIT Jaipur">BIT Jaipur</option>
-                  <option value="BIT Patna">BIT Patna</option>
-                  <option value="BIT Deoghar">BIT Deoghar</option>
-                </select>
+              {/* Search, Campus Filter & Sort by Campus Bar */}
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-12 gap-3">
+                <div className="md:col-span-5 relative">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  <input
+                    type="text"
+                    placeholder={`Search ${jobCategoryTab} posts, departments, advt no...`}
+                    value={jobSearchTerm}
+                    onChange={(e) => setJobSearchTerm(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+
+                <div className="md:col-span-4">
+                  <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2">
+                    <MapPin className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span className="text-[11px] font-semibold text-slate-500 whitespace-nowrap">Campus:</span>
+                    <select
+                      value={jobCampusFilter}
+                      onChange={(e) => setJobCampusFilter(e.target.value as Campus | 'All')}
+                      className="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none"
+                    >
+                      <option value="All">All Campuses</option>
+                      {campusOptions.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="md:col-span-3">
+                  <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2">
+                    <ArrowUpDown className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <select
+                      value={jobSortBy}
+                      onChange={(e) => setJobSortBy(e.target.value as any)}
+                      className="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none"
+                    >
+                      <option value="campus_asc">Sort: Campus (A–Z)</option>
+                      <option value="campus_desc">Sort: Campus (Z–A)</option>
+                      <option value="closing_date">Sort: Closing Date</option>
+                      <option value="title_asc">Sort: Post Title (A–Z)</option>
+                    </select>
+                  </div>
+                </div>
               </div>
+
+              {/* Jobs Listing */}
+              {filteredJobs.length === 0 ? (
+                <div className="p-12 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50 space-y-2">
+                  <Briefcase className="w-9 h-9 text-slate-300 mx-auto" />
+                  <h4 className="text-sm font-bold text-slate-800">
+                    No {jobCategoryTab} positions found
+                  </h4>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    Try changing the selected campus filter or search keyword, or switch between Teaching and Non-Teaching tabs.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {filteredJobs.map(({ drive, post, category, campus }) => {
+                    const existingApp = myUserApps.find(
+                      (a) => a.driveId === drive.id && a.postId === post.id
+                    );
+
+                    return (
+                      <div
+                        key={`${drive.id}-${post.id}`}
+                        className="bg-white border border-slate-200 hover:border-indigo-300 rounded-xl p-4 sm:p-5 shadow-2xs transition flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+                      >
+                        <div className="space-y-2 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 text-[10px] font-bold uppercase tracking-wider">
+                              {category}
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-bold flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              {campus}
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[10px] font-bold">
+                              {drive.advtNumber}
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-mono text-[10px] font-semibold">
+                              Code: {post.postCode}
+                            </span>
+                          </div>
+
+                          <div>
+                            <h4 className="text-base font-extrabold text-slate-900 leading-snug">
+                              {post.title}
+                            </h4>
+                            <p className="text-xs text-slate-500 font-medium mt-0.5">
+                              {drive.title} • <span className="text-slate-700 font-semibold">{post.departmentName}</span>
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[11px] text-slate-600 pt-1">
+                            <span className="flex items-center gap-1.5">
+                              <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                              Pay Scale: <strong className="text-slate-800">{post.payScale}</strong>
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <Users className="w-3.5 h-3.5 text-slate-400" />
+                              Vacancies: <strong className="text-slate-800">{post.vacanciesTotal}</strong>
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+                              Fee: <strong className="text-slate-800">₹{post.applicationFee}</strong>
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <Calendar className="w-3.5 h-3.5 text-rose-500" />
+                              Closing Date: <strong className="text-rose-600">{new Date(drive.closingDate).toLocaleDateString()}</strong>
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end justify-center gap-2 shrink-0">
+                          {existingApp ? (
+                            existingApp.stage === 'draft' ? (
+                              <button
+                                type="button"
+                                onClick={() => setEditingAppId(existingApp.id)}
+                                className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition"
+                              >
+                                <ArrowRight className="w-4 h-4" />
+                                <span>Continue Draft</span>
+                              </button>
+                            ) : (
+                              <>
+                                <span className="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold text-center">
+                                  Applied ({existingApp.applicationNo})
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveTab('my_jobs')}
+                                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition"
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                  <span>View My Application</span>
+                                </button>
+                              </>
+                            )
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleSelectJobToApply(drive.id, post.id, campus)}
+                              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition active:scale-98"
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                              <span>Apply Online</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
+          );
+        })()
+      ) : (
+        <>
+          {/* Wizard Steps Navigation Bar */}
+          <div className="glass-card border border-slate-200 rounded-xl p-3 shadow-2xs overflow-x-auto">
+            <div className="flex items-center justify-between min-w-[600px]">
+              {[
+                { num: 1, label: 'Personal Details', icon: User },
+                { num: 2, label: 'Education & Experience', icon: GraduationCap },
+                { num: 3, label: 'Research Publications', icon: FileText },
+                { num: 4, label: 'Miscellaneous Info', icon: AlertCircle },
+                { num: 5, label: 'Document Uploads', icon: Upload },
+                { num: 6, label: 'Fee & Declaration', icon: CreditCard },
+                { num: 7, label: 'Summary & Receipt', icon: CheckCircle2 },
+              ].map((s) => {
+                const Icon = s.icon;
+                const isDone = activeStep > s.num;
+                const isCurrent = activeStep === s.num;
 
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Select Recruitment Drive
-                </label>
-                <select
-                  value={selectedDriveId}
-                  onChange={(e) => {
-                    setSelectedDriveId(e.target.value);
-                    const d = drives.find((dr) => dr.id === e.target.value);
-                    if (d && d.posts[0]) {
-                      // Filtered posts for the selected drive
-                      const filteredPosts = d.posts.filter(p => 
-                        (filterCategory === 'All' || p.category === filterCategory) &&
-                        (filterCampus === 'All' || p.campus === filterCampus)
-                      );
-                      if (filteredPosts.length > 0) {
-                        setSelectedPostId(filteredPosts[0].id);
-                      } else if (d.posts[0]) {
-                        setSelectedPostId(d.posts[0].id);
-                      }
-                    }
-                  }}
-                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
-                >
-                  {drives
-                    .filter(d => 
-                      (filterCategory === 'All' || d.category === filterCategory) &&
-                      (filterCampus === 'All' || d.campus === filterCampus || d.campus === 'All Campuses')
-                    )
-                    .map((d) => (
-                      <option key={d.id} value={d.id}>
-                        {d.title} ({d.advtNumber})
-                      </option>
-                    ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Select Position / Post
-                </label>
-                <select
-                  value={selectedPostId}
-                  onChange={(e) => setSelectedPostId(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 font-semibold"
-                >
-                  {activeDrive?.posts
-                    .filter(p => 
-                      (filterCategory === 'All' || p.category === filterCategory) &&
-                      (filterCampus === 'All' || p.campus === filterCampus)
-                    )
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.title} — {p.departmentName} (Fee: ₹{p.applicationFee})
-                      </option>
-                    ))}
-                </select>
-              </div>
+                return (
+                  <div
+                    key={s.num}
+                    onClick={() => isDone && setActiveStep(s.num)}
+                    className={`flex items-center space-x-2 cursor-pointer transition ${
+                      isCurrent
+                        ? 'text-indigo-600 font-bold'
+                        : isDone
+                        ? 'text-emerald-600 font-medium'
+                        : 'text-slate-400'
+                    }`}
+                  >
+                    <div
+                      className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center border ${
+                        isCurrent
+                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-2xs'
+                          : isDone
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                          : 'bg-slate-100 border-slate-200 text-slate-500'
+                      }`}
+                    >
+                      {isDone ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-3.5 h-3.5" />}
+                    </div>
+                    <span className="text-xs whitespace-nowrap">{s.label}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        )}
 
-        {/* STEP 1: Personal Profile */}
-        {activeStep === 1 && (
-          <div className="space-y-6">
+          {/* Step Content Area */}
+          <div className="glass-card border border-slate-200 rounded-2xl p-6 shadow-2xs">
+            {/* Compact Selected Position Banner with option to return to Teaching / Non-Teaching job selector */}
+            {activeStep < 7 && activePost && (
+              <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span className="font-bold text-slate-900">{activePost.title}</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="font-semibold text-indigo-700">{activePost.campus || profile.campusUnit}</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-600">{activePost.departmentName}</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="font-mono text-slate-500">{activeDrive?.advtNumber}</span>
+                </div>
+                {!editingAppId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCtxPostId(null);
+                      setEditingAppId(null);
+                      setHasSelectedJob(false);
+                    }}
+                    className="text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 shrink-0"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Change Position</span>
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* STEP 1: Personal Profile */}
+            {activeStep === 1 && (
+              <div className="space-y-6">
 
 
             <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
@@ -3183,6 +3427,8 @@ export const ApplicantPortal: React.FC = () => {
           </div>
         )}
       </div>
+        </>
+      )}
 
       {showAdmitCard && (
         <AdmitCardModal application={showAdmitCard} onClose={() => setShowAdmitCard(null)} />

@@ -43,7 +43,7 @@ interface MyJobsPortalProps {
 }
 
 export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
-  const { applications, currentUser, drives, setEditingAppId, setActiveTab } = usePortal();
+  const { applications, currentUser, drives, setEditingAppId, setSelectedPostId, setActiveTab } = usePortal();
 
   // Filter applications strictly for current applicant
   const myApplications = applications.filter((app) => {
@@ -358,7 +358,11 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
             )}
             {onNavigate && (
               <button
-                onClick={() => onNavigate('applicant_portal')}
+                onClick={() => {
+                  setSelectedPostId(null);
+                  setEditingAppId(null);
+                  onNavigate('applicant_portal');
+                }}
                 className="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition"
               >
                 Apply Online Now

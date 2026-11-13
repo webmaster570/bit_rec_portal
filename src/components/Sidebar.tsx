@@ -47,7 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenLogin,
   onOpenRegister,
 }) => {
-  const { currentRole, roles, isLoggedIn, currentUser, branding, logout, mongoStatus } = usePortal();
+  const { currentRole, roles, isLoggedIn, currentUser, branding, logout, mongoStatus, setSelectedPostId, setEditingAppId } = usePortal();
 
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
   const currentRoleInfo = roles.find((r) => r.id === currentRole);
@@ -208,6 +208,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   });
 
   const handleItemClick = (id: string) => {
+    if (id === 'applicant_portal') {
+      setSelectedPostId(null);
+      setEditingAppId(null);
+    }
     setActiveTab(id);
     if (setIsMobileMenuOpen) {
       setIsMobileMenuOpen(false);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { Application } from '../../types';
+import { Application, Campus, RecruitmentCategory } from '../../types';
 import { THEME_CONFIGS } from '../../themeStyles';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import {
@@ -21,6 +21,12 @@ import {
   Send,
   Building2,
   FileText,
+  GraduationCap,
+  MapPin,
+  Search,
+  ArrowUpDown,
+  Eye,
+  Calendar,
 } from 'lucide-react';
 
 export const OverviewDashboard: React.FC<{
@@ -35,10 +41,14 @@ export const OverviewDashboard: React.FC<{
     }
   };
 
-  const { currentRole, currentUser, drives, applications, auditLogs, roles, branding } = usePortal();
+  const { currentRole, currentUser, drives, applications, auditLogs, roles, branding, setSelectedDriveId, setSelectedPostId, setEditingAppId } = usePortal();
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
 
   const [selectedAdmitCardApp, setSelectedAdmitCardApp] = useState<Application | null>(null);
+  const [vacCategoryTab, setVacCategoryTab] = useState<RecruitmentCategory>('Teaching');
+  const [vacCampusFilter, setVacCampusFilter] = useState<Campus | 'All'>('All');
+  const [vacSortBy, setVacSortBy] = useState<'campus_asc' | 'campus_desc' | 'closing_date' | 'title_asc'>('campus_asc');
+  const [vacSearchTerm, setVacSearchTerm] = useState<string>('');
 
   // Applicant-tailored Dashboard Overview View
   if (currentRole === 'applicant') {
@@ -49,8 +59,17 @@ export const OverviewDashboard: React.FC<{
       return !!(matchesEmail || matchesReg);
     });
 
-    const totalVacanciesPosted = drives.reduce(
-      (sum, drive) => sum + drive.posts.reduce((pSum, post) => pSum + post.vacanciesTotal, 0),
+    const activeDrives = drives.filter(
+      (d) => d.status === 'applications_open' || d.status === 'published' || d.status === 'screening_in_progress'
+    );
+
+    const totalPositionsCount = activeDrives.reduce(
+      (sum, drive) => sum + (drive.posts?.length || 0),
+      0
+    );
+
+    const totalVacanciesPosted = activeDrives.reduce(
+      (sum, drive) => sum + (drive.posts || []).reduce((pSum, post) => pSum + (Number(post.vacanciesTotal) || 0), 0),
       0
     );
 
@@ -84,7 +103,11 @@ export const OverviewDashboard: React.FC<{
 
           <div className="flex flex-wrap items-center gap-3 shrink-0 relative z-10">
             <button
-              onClick={() => navigate('applicant_portal')}
+              onClick={() => {
+                setSelectedPostId(null);
+                setEditingAppId(null);
+                navigate('applicant_portal');
+              }}
               className={`${theme.primaryButton} px-6 py-3 flex items-center space-x-2`}
             >
               <Send className="w-4 h-4" />
@@ -105,11 +128,13 @@ export const OverviewDashboard: React.FC<{
           <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 flex items-center justify-between`}>
             <div>
               <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1">
-                Vacancies Posted
+                Open Positions
               </span>
-              <div className={`text-2xl font-black ${isBitTheme ? 'text-stone-900' : 'text-slate-900'}`}>{totalVacanciesPosted} Positions</div>
+              <div className={`text-2xl font-black ${isBitTheme ? 'text-stone-900' : 'text-slate-900'}`}>
+                {totalPositionsCount} {totalPositionsCount === 1 ? 'Position' : 'Positions'}
+              </div>
               <span className={`text-[10px] ${isBitTheme ? 'text-[#800000]' : 'text-indigo-600'} font-bold uppercase mt-1 flex items-center gap-1`}>
-                <Building2 className="w-3 h-3" /> Across {drives.length} Active Drives
+                <Building2 className="w-3 h-3" /> {totalVacanciesPosted} Vacancies • {activeDrives.length} Active {activeDrives.length === 1 ? 'Drive' : 'Drives'}
               </span>
             </div>
             <div className={`p-3 ${isBitTheme ? 'bg-stone-50 text-[#800000]' : 'bg-indigo-50 text-indigo-600'} rounded-none shadow-sm`}>
@@ -199,7 +224,11 @@ export const OverviewDashboard: React.FC<{
                     Browse current recruitment drives and submit your online application to view status tracking here.
                   </p>
                   <button
-                    onClick={() => navigate('applicant_portal')}
+                    onClick={() => {
+                      setSelectedPostId(null);
+                      setEditingAppId(null);
+                      navigate('applicant_portal');
+                    }}
                     className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md"
                   >
                     Apply Online Now
@@ -301,67 +330,301 @@ export const OverviewDashboard: React.FC<{
           )}
         </div>
 
-        {/* Vacancies Posted Section */}
-        <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6`}>
-          <div className="flex items-center justify-between pb-4  mb-4">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <Megaphone className="w-5 h-5 text-indigo-600" />
-                Active Advertised Vacancies Posted
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Explore sanctioned faculty and staff positions currently open across university departments.
-              </p>
-            </div>
-            <button
-              onClick={() => navigate('public_recruitment')}
-              className="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 transition-colors"
-            >
-              View Public Advertisements <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
+        {/* Vacancies Posted Section - Matching Apply Online 2-Tab & Campus Filter/Sort View */}
+        {(() => {
+          const allActiveJobs = activeDrives.flatMap((drive) =>
+            (drive.posts || []).map((post) => ({
+              drive,
+              post,
+              category: (post.category || drive.category || 'Teaching') as RecruitmentCategory,
+              campus: (post.campus || (drive.campus && drive.campus !== 'All Campuses' ? drive.campus : 'BIT Mesra')) as string,
+            }))
+          );
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {drives.flatMap((d) =>
-              d.posts.map((p) => (
-                <div key={p.id} className="bg-slate-50 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs">
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-bold">
-                        {d.advtNumber}
-                      </span>
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 ">
-                        {p.vacanciesTotal} Sanctioned Vacancies
-                      </span>
-                    </div>
+          const teachingCount = allActiveJobs.filter((j) => j.category === 'Teaching').length;
+          const nonTeachingCount = allActiveJobs.filter((j) => j.category === 'Non-Teaching').length;
 
-                    <h4 className="text-sm font-extrabold text-slate-900 mb-1">{p.title}</h4>
-                    <p className="text-xs text-slate-500 font-semibold mb-3">{p.departmentName}</p>
+          const campusOptions = Array.from(
+            new Set([
+              'BIT Mesra',
+              'BIT Noida',
+              'BIT Jaipur',
+              'BIT Patna',
+              'BIT Deoghar',
+              ...allActiveJobs.map((j) => j.campus).filter(Boolean),
+            ])
+          );
 
-                    <div className="grid grid-cols-5 gap-1 text-[10px] text-center font-bold bg-white p-2 rounded-xl my-2">
-                      <div className="bg-slate-50 p-1 rounded">UR: {p.vacanciesBreakdown.UR}</div>
-                      <div className="bg-slate-50 p-1 rounded">OBC: {p.vacanciesBreakdown.OBC}</div>
-                      <div className="bg-slate-50 p-1 rounded">SC: {p.vacanciesBreakdown.SC}</div>
-                      <div className="bg-slate-50 p-1 rounded">ST: {p.vacanciesBreakdown.ST}</div>
-                      <div className="bg-slate-50 p-1 rounded">EWS: {p.vacanciesBreakdown.EWS}</div>
-                    </div>
-                  </div>
+          const term = vacSearchTerm.toLowerCase().trim();
+          const filteredJobs = allActiveJobs
+            .filter((item) => item.category === vacCategoryTab)
+            .filter((item) => vacCampusFilter === 'All' || item.campus === vacCampusFilter)
+            .filter((item) => {
+              if (!term) return true;
+              return (
+                item.post.title.toLowerCase().includes(term) ||
+                item.post.postCode.toLowerCase().includes(term) ||
+                item.post.departmentName.toLowerCase().includes(term) ||
+                item.drive.title.toLowerCase().includes(term) ||
+                item.drive.advtNumber.toLowerCase().includes(term) ||
+                item.campus.toLowerCase().includes(term)
+              );
+            })
+            .sort((a, b) => {
+              if (vacSortBy === 'campus_asc') {
+                const cmp = a.campus.localeCompare(b.campus);
+                return cmp !== 0 ? cmp : a.post.title.localeCompare(b.post.title);
+              }
+              if (vacSortBy === 'campus_desc') {
+                const cmp = b.campus.localeCompare(a.campus);
+                return cmp !== 0 ? cmp : a.post.title.localeCompare(b.post.title);
+              }
+              if (vacSortBy === 'closing_date') {
+                return new Date(a.drive.closingDate).getTime() - new Date(b.drive.closingDate).getTime();
+              }
+              return a.post.title.localeCompare(b.post.title);
+            });
 
-                  <div className="flex items-center justify-between pt-3  mt-2">
-                    <span className="text-[11px] font-mono font-bold text-slate-700">{p.payScale}</span>
-                    <button
-                      onClick={() => navigate('applicant_portal')}
-                      className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition flex items-center gap-1"
+          return (
+            <div className={`${theme.cardBase} ${branding.showCardShadow ? '' : 'shadow-none'} p-6 space-y-5`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <Megaphone className="w-5 h-5 text-indigo-600" />
+                    Active Advertised Vacancies Posted
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Browse open Teaching and Non-Teaching positions across university campuses.
+                  </p>
+                </div>
+                <button
+                  onClick={() => navigate('public_recruitment')}
+                  className="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 transition-colors shrink-0"
+                >
+                  View Public Advertisements <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* 2 Category Tabs: Teaching & Non-Teaching */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setVacCategoryTab('Teaching')}
+                    className={`flex-1 sm:flex-initial px-5 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition ${
+                      vacCategoryTab === 'Teaching'
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    <GraduationCap className="w-4 h-4" />
+                    <span>Teaching</span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                        vacCategoryTab === 'Teaching' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                      }`}
                     >
-                      <span>Apply Now</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
+                      {teachingCount}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setVacCategoryTab('Non-Teaching')}
+                    className={`flex-1 sm:flex-initial px-5 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition ${
+                      vacCategoryTab === 'Non-Teaching'
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    <Briefcase className="w-4 h-4" />
+                    <span>Non-Teaching</span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                        vacCategoryTab === 'Non-Teaching' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                      }`}
+                    >
+                      {nonTeachingCount}
+                    </span>
+                  </button>
+                </div>
+
+                <div className="text-xs text-slate-500 font-medium">
+                  Showing <strong className="text-slate-900">{filteredJobs.length}</strong> open {vacCategoryTab} position{filteredJobs.length === 1 ? '' : 's'}
+                </div>
+              </div>
+
+              {/* Search, Campus Filter & Campus Sort Bar */}
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-12 gap-3">
+                <div className="md:col-span-5 relative">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  <input
+                    type="text"
+                    placeholder={`Search ${vacCategoryTab} posts, departments, advt no...`}
+                    value={vacSearchTerm}
+                    onChange={(e) => setVacSearchTerm(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+
+                <div className="md:col-span-4">
+                  <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2">
+                    <MapPin className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span className="text-[11px] font-semibold text-slate-500 whitespace-nowrap">Campus:</span>
+                    <select
+                      value={vacCampusFilter}
+                      onChange={(e) => setVacCampusFilter(e.target.value as Campus | 'All')}
+                      className="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none"
+                    >
+                      <option value="All">All Campuses</option>
+                      {campusOptions.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
+
+                <div className="md:col-span-3">
+                  <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2">
+                    <ArrowUpDown className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <select
+                      value={vacSortBy}
+                      onChange={(e) => setVacSortBy(e.target.value as any)}
+                      className="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none"
+                    >
+                      <option value="campus_asc">Sort: Campus (A–Z)</option>
+                      <option value="campus_desc">Sort: Campus (Z–A)</option>
+                      <option value="closing_date">Sort: Closing Date</option>
+                      <option value="title_asc">Sort: Post Title (A–Z)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Job Cards Matching Apply Online Page */}
+              {filteredJobs.length === 0 ? (
+                <div className="p-10 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50 space-y-2">
+                  <Briefcase className="w-8 h-8 text-slate-300 mx-auto" />
+                  <h4 className="text-sm font-bold text-slate-800">
+                    No {vacCategoryTab} positions found
+                  </h4>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    Try changing the selected campus filter or search keyword, or switch between Teaching and Non-Teaching tabs.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {filteredJobs.map(({ drive, post, category, campus }) => {
+                    const existingApp = myApplications.find(
+                      (a) => a.driveId === drive.id && a.postId === post.id
+                    );
+
+                    return (
+                      <div
+                        key={`${drive.id}-${post.id}`}
+                        className="bg-white border border-slate-200 hover:border-indigo-300 rounded-xl p-4 sm:p-5 shadow-2xs transition flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+                      >
+                        <div className="space-y-2 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 text-[10px] font-bold uppercase tracking-wider">
+                              {category}
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-bold flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              {campus}
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[10px] font-bold">
+                              {drive.advtNumber}
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-mono text-[10px] font-semibold">
+                              Code: {post.postCode}
+                            </span>
+                          </div>
+
+                          <div>
+                            <h4 className="text-base font-extrabold text-slate-900 leading-snug">
+                              {post.title}
+                            </h4>
+                            <p className="text-xs text-slate-500 font-medium mt-0.5">
+                              {drive.title} • <span className="text-slate-700 font-semibold">{post.departmentName}</span>
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[11px] text-slate-600 pt-1">
+                            <span className="flex items-center gap-1.5">
+                              <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                              Pay Scale: <strong className="text-slate-800">{post.payScale}</strong>
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <Users className="w-3.5 h-3.5 text-slate-400" />
+                              Vacancies: <strong className="text-slate-800">{Number(post.vacanciesTotal) || 0}</strong>
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+                              Fee: <strong className="text-slate-800">₹{post.applicationFee}</strong>
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <Calendar className="w-3.5 h-3.5 text-rose-500" />
+                              Closing Date: <strong className="text-rose-600">{new Date(drive.closingDate).toLocaleDateString()}</strong>
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end justify-center gap-2 shrink-0">
+                          {existingApp ? (
+                            existingApp.stage === 'draft' ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingAppId(existingApp.id);
+                                  navigate('applicant_portal');
+                                }}
+                                className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition"
+                              >
+                                <ArrowRight className="w-4 h-4" />
+                                <span>Continue Draft</span>
+                              </button>
+                            ) : (
+                              <>
+                                <span className="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold text-center">
+                                  Applied ({existingApp.applicationNo})
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => navigate('my_jobs')}
+                                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition"
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                  <span>View My Application</span>
+                                </button>
+                              </>
+                            )
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingAppId(null);
+                                setSelectedDriveId(drive.id);
+                                setSelectedPostId(post.id);
+                                navigate('applicant_portal');
+                              }}
+                              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition active:scale-98"
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                              <span>Apply Online</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Admit Card Modal */}
         {selectedAdmitCardApp && (

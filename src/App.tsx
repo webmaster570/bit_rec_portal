@@ -27,7 +27,7 @@ import { SystemStatusPortal } from './components/public/SystemStatusPortal';
 import { PublicNoticeDetail } from './components/public/PublicNoticeDetail';
 
 const MainAppContent: React.FC = () => {
-  const { currentRole, isLoggedIn, branding, activeTab, setActiveTab } = usePortal();
+  const { currentRole, isLoggedIn, branding, activeTab, setActiveTab, setSelectedDriveId, setSelectedPostId, setEditingAppId } = usePortal();
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
   
   // Apply global shadow intensity and dynamic favicon from branding
@@ -58,14 +58,19 @@ const MainAppContent: React.FC = () => {
     setIsMobileMenuOpen(false); // Auto close mobile drawer on tab navigation
   };
 
-  const handleApplyClick = (driveId: string, postId: string, postTitle: string) => {
+  const handleApplyClick = (driveId: string, postId: string, _postTitle: string) => {
     if (isLoggedIn) {
       if (currentRole === 'applicant') {
+        setSelectedDriveId(driveId);
+        setSelectedPostId(postId);
+        setEditingAppId(null);
         handleTabChange('applicant_portal');
       } else {
         handleTabChange('overview');
       }
     } else {
+      setSelectedDriveId(driveId);
+      setSelectedPostId(postId);
       setIsLoginModalOpen(true);
     }
   };
@@ -83,6 +88,8 @@ const MainAppContent: React.FC = () => {
     }
 
     if (role === 'applicant') {
+      setSelectedPostId(null);
+      setEditingAppId(null);
       handleTabChange('applicant_portal');
     } else {
       handleTabChange('overview');
@@ -90,7 +97,9 @@ const MainAppContent: React.FC = () => {
   };
 
   const handleRegisterSuccess = () => {
-    // Once applicant registers, land them on applicant portal
+    // Once applicant registers, land them on applicant portal (Teaching / Non-Teaching jobs)
+    setSelectedPostId(null);
+    setEditingAppId(null);
     handleTabChange('applicant_portal');
   };
 

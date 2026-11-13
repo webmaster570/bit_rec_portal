@@ -39,7 +39,7 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
   onRequestLogin,
   onRequestRegister,
 }) => {
-  const { drives, departments, isLoggedIn, branding, setSelectedDriveId, setSelectedPostId, setActiveTab } = usePortal();
+  const { drives, departments, isLoggedIn, branding, setSelectedDriveId, setSelectedPostId, setEditingAppId, setActiveTab } = usePortal();
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,11 +55,11 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
   );
 
   const totalVacanciesAll = publishedDrives.reduce(
-    (acc, drive) => acc + drive.posts.reduce((pAcc, post) => pAcc + post.vacanciesTotal, 0),
+    (acc, drive) => acc + (drive.posts || []).reduce((pAcc, post) => pAcc + (Number(post.vacanciesTotal) || 0), 0),
     0
   );
 
-  const totalPostsCount = publishedDrives.reduce((acc, drive) => acc + drive.posts.length, 0);
+  const totalPostsCount = publishedDrives.reduce((acc, drive) => acc + (drive.posts?.length || 0), 0);
 
   const filterPostMatches = (post: PostConfig) => {
     const matchesDept = selectedDept === 'all' || post.departmentId === selectedDept;
@@ -274,13 +274,14 @@ export const PublicRecruitmentPortal: React.FC<PublicRecruitmentPortalProps> = (
 
                     <button
                       onClick={() => {
-                        if (!isExpanded) setExpandedSyllabusPostId(drive.id);
-                        const firstPost = matchingPosts[0];
-                        if (firstPost) {
-                           if (isLoggedIn) onApplyForPost(drive.id, firstPost.id, firstPost.title);
-                           else onRequestLogin(firstPost.title);
+                        if (isLoggedIn) {
+                          setSelectedDriveId(drive.id);
+                          setSelectedPostId(null);
+                          setEditingAppId(null);
+                          setActiveTab('applicant_portal');
                         } else {
-                           setActiveTab('applicant_portal');
+                          const firstPost = matchingPosts[0];
+                          onRequestLogin(firstPost?.title || drive.title);
                         }
                       }}
                       className="w-full py-3 rounded-xl bg-[#1e293b] text-white text-xs font-black flex items-center justify-center gap-2 shadow-md hover:bg-slate-900 transition active:scale-95"
