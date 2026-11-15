@@ -958,7 +958,7 @@ export const ApplicantPortal: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end justify-center gap-2 shrink-0">
+                        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-center justify-center gap-2 shrink-0">
                           {existingApp ? (
                             existingApp.stage === 'draft' ? (
                               <button
@@ -994,6 +994,19 @@ export const ApplicantPortal: React.FC = () => {
                               <span>Apply Online</span>
                             </button>
                           )}
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCtxDriveId(drive.id);
+                              setCtxPostId(post.id);
+                              setActiveTab('notice_detail');
+                            }}
+                            className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center justify-center gap-1 py-0.5 transition"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>View Detailed Advertisement</span>
+                          </button>
                         </div>
                       </div>
                     );

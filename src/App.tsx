@@ -76,24 +76,11 @@ const MainAppContent: React.FC = () => {
   };
 
   const handleLoginSuccess = (role: string) => {
-    // Once applicant/user logs in, land them on their appropriate dashboard
-    // unless they were looking at a specific job notice detail
-    if (activeTab === 'notice_detail') {
-      // If it's an applicant, take them to the portal to finish applying
-      if (role === 'applicant') {
-        handleTabChange('applicant_portal');
-      }
-      // Otherwise stay on the detail page
-      return;
-    }
-
     if (role === 'applicant') {
       setSelectedPostId(null);
       setEditingAppId(null);
-      handleTabChange('applicant_portal');
-    } else {
-      handleTabChange('overview');
     }
+    handleTabChange('overview');
   };
 
   const handleRegisterSuccess = () => {

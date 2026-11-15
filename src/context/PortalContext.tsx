@@ -608,8 +608,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setIsLoggedIn(true);
     setCurrentUser(session);
     setCurrentRole(role);
-    if (role === 'applicant') setActiveTabState('applicant_portal');
-    else setActiveTabState('overview');
+    setActiveTabState('overview');
     
     // Immediate persistence
     try {
@@ -617,7 +616,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         isLoggedIn: true,
         currentUser: session,
         currentRole: role,
-        activeTab: role === 'applicant' ? 'applicant_portal' : 'overview',
+        activeTab: 'overview',
       }));
     } catch (e) {
       console.warn('Failed to persist login state:', e);
@@ -656,6 +655,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsLoggedIn(true);
       setCurrentUser(session);
       setCurrentRole(user.role);
+      setActiveTabState('overview');
       
       // Immediate persistence
       try {
@@ -663,7 +663,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           isLoggedIn: true,
           currentUser: session,
           currentRole: user.role,
-          activeTab: user.role === 'applicant' ? 'applicant_portal' : 'overview',
+          activeTab: 'overview',
         }));
       } catch (e) {
         console.warn('Failed to persist secure login state:', e);

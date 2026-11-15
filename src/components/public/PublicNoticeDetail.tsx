@@ -1,23 +1,24 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
 import { THEME_CONFIGS } from '../../themeStyles';
 import {
-  Briefcase,
-  Building2,
-  GraduationCap,
-  Clock,
-  DollarSign,
-  Users,
-  ShieldCheck,
-  BookOpen,
-  Info,
-  MapPin,
-  Calendar,
-  Send,
-  Download,
   ArrowLeft,
-  Share2,
+  ArrowRight,
+  Building2,
+  Calendar,
+  Check,
+  CheckCircle2,
+  Download,
+  Eye,
   FileText,
+  GraduationCap,
+  Info,
+  Mail,
+  MapPin,
+  Printer,
+  Send,
+  Share2,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface PublicNoticeDetailProps {
@@ -25,331 +26,562 @@ interface PublicNoticeDetailProps {
   onRequestRegister?: () => void;
 }
 
+const formatDisplayDate = (dateStr?: string) => {
+  if (!dateStr) return 'To be notified';
+  const parsed = new Date(dateStr);
+  if (Number.isNaN(parsed.getTime())) return dateStr;
+  return parsed.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
 export const PublicNoticeDetail: React.FC<PublicNoticeDetailProps> = ({
   onRequestLogin,
-  onRequestRegister,
 }) => {
-  const { 
-    drives, 
-    selectedDriveId, 
-    selectedPostId, 
-    setActiveTab, 
-    isLoggedIn, 
+  const {
+    drives,
+    applications,
+    currentUser,
+    selectedDriveId,
+    selectedPostId,
+    setActiveTab,
+    isLoggedIn,
+    currentRole,
     branding,
-    setSelectedPostId,
-    setSelectedDriveId
+    setEditingAppId,
   } = usePortal();
-  
-  const theme = THEME_CONFIGS[branding.theme || 'classic'];
 
-  // Scroll to top on mount
+  const theme = THEME_CONFIGS[branding.theme || 'classic'];
+  const [copiedNotice, setCopiedNotice] = useState(false);
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [selectedDriveId, selectedPostId]);
 
-  const drive = drives.find(d => d.id === selectedDriveId);
-  const post = drive?.posts.find(p => p.id === selectedPostId);
+  const drive = drives.find((d) => d.id === selectedDriveId);
+  const post = drive?.posts.find((p) => p.id === selectedPostId);
+
+  const handleBack = () => {
+    setActiveTab(isLoggedIn && currentRole === 'applicant' ? 'overview' : 'public_recruitment');
+  };
 
   if (!drive || !post) {
     return (
-      <div className="text-center py-20 space-y-4">
-        <Info className="w-12 h-12 text-slate-300 mx-auto" />
-        <h2 className="text-xl font-bold text-slate-800">Notice Not Found</h2>
-        <p className="text-slate-500">The recruitment notice you are looking for does not exist or has been removed.</p>
-        <button 
-          onClick={() => setActiveTab('public_recruitment')}
-          className={`${theme.primaryButton} px-6 py-2 rounded-xl text-xs font-bold`}
-        >
-          Return to Public Notices
-        </button>
+      <div className="max-w-3xl mx-auto my-12 bg-white border border-slate-200 rounded-xl p-10 text-center space-y-4">
+        <Info className="w-10 h-10 text-slate-400 mx-auto" />
+        <div className="space-y-1">
+          <h2 className="text-lg font-semibold text-slate-900">Recruitment Notice Unavailable</h2>
+          <p className="text-sm text-slate-500 max-w-md mx-auto">
+            The requested advertisement or position record could not be located or is no longer active.
+          </p>
+        </div>
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition whitespace-nowrap shrink-0"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>{isLoggedIn && currentRole === 'applicant' ? 'Return to Dashboard' : 'Return to Public Notices'}</span>
+          </button>
+        </div>
       </div>
     );
   }
 
-  const handleBack = () => {
-    setActiveTab('public_recruitment');
-    // We keep selected IDs in case user comes back, or we could clear them
-  };
+  const displayCampus =
+    post.campus || (drive.campus && drive.campus !== 'All Campuses' ? drive.campus : 'BIT Mesra');
+  const displayCategory = post.category || drive.category || 'Teaching';
+  const organizationName = drive.organization || 'Birla Institute of Technology, Mesra';
+
+  const existingApp =
+    isLoggedIn && currentUser
+      ? applications.find((app) => {
+          const matchesEmail =
+            currentUser.email && app.applicant.email.toLowerCase() === currentUser.email.toLowerCase();
+          const matchesReg = currentUser.regNumber && app.applicant.regNumber === currentUser.regNumber;
+          return (matchesEmail || matchesReg) && app.driveId === drive.id && app.postId === post.id;
+        })
+      : undefined;
+
+  const closingDateObj = new Date(drive.closingDate);
+  const now = new Date();
+  const daysRemaining = Number.isNaN(closingDateObj.getTime())
+    ? null
+    : Math.ceil((closingDateObj.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+  const statusLabel =
+    drive.status === 'applications_open' || drive.status === 'published'
+      ? 'Applications Open'
+      : drive.status === 'screening_in_progress'
+      ? 'Screening In Progress'
+      : drive.status.replace(/_/g, ' ');
 
   const handleApply = () => {
     if (isLoggedIn) {
-      setActiveTab('applicant_portal');
-    } else {
-      if (onRequestLogin) {
-        onRequestLogin();
+      if (existingApp?.stage === 'draft') {
+        setEditingAppId(existingApp.id);
       } else {
-        // Fallback: search for login button in header or similar, 
-        // but since we are in App.tsx we know it's passed.
-        // If not, at least don't navigate away.
-        console.warn('onRequestLogin not provided to PublicNoticeDetail');
+        setEditingAppId(null);
       }
+      setActiveTab('applicant_portal');
+    } else if (onRequestLogin) {
+      onRequestLogin();
     }
   };
 
+  const handleShareNotice = () => {
+    if (navigator.clipboard && window.location) {
+      navigator.clipboard.writeText(window.location.href).catch(() => {});
+    }
+    setCopiedNotice(true);
+    setTimeout(() => setCopiedNotice(false), 2500);
+  };
+
+  const vacancyColumns = [
+    { code: 'UR', label: 'Unreserved', count: Number(post.vacanciesBreakdown?.UR) || 0 },
+    { code: 'OBC', label: 'OBC (NCL)', count: Number(post.vacanciesBreakdown?.OBC) || 0 },
+    { code: 'SC', label: 'SC', count: Number(post.vacanciesBreakdown?.SC) || 0 },
+    { code: 'ST', label: 'ST', count: Number(post.vacanciesBreakdown?.ST) || 0 },
+    { code: 'EWS', label: 'EWS', count: Number(post.vacanciesBreakdown?.EWS) || 0 },
+    { code: 'PwD', label: 'PwD', count: Number(post.vacanciesBreakdown?.PwD) || 0 },
+  ];
+
+  const scheduleRows = [
+    { label: 'Advertisement Date', value: formatDisplayDate(drive.startDate) },
+    { label: 'Closing Date (Online Form)', value: formatDisplayDate(drive.closingDate), emphasize: true },
+    { label: 'Fee Payment Deadline', value: formatDisplayDate(drive.feeDeadline) },
+    ...(drive.correctionDate ? [{ label: 'Form Correction Window', value: formatDisplayDate(drive.correctionDate) }] : []),
+    ...(drive.examDate ? [{ label: 'Written / Skill Test', value: formatDisplayDate(drive.examDate) }] : []),
+    ...(drive.interviewPeriod ? [{ label: 'Selection Interview', value: drive.interviewPeriod }] : []),
+  ];
+
   return (
-    <div className={`space-y-6 animate-fadeIn pb-20 ${theme.rootContainer}`}>
-      {/* Navigation Header */}
-      <div className="flex items-center justify-between gap-4">
-        <button 
+    <div className={`max-w-6xl mx-auto pb-16 space-y-6 ${theme.rootContainer}`}>
+      {/* Top Utility Navigation Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <button
+          type="button"
           onClick={handleBack}
-          className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition font-bold text-sm"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap shrink-0"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to All Notices</span>
+          <span>{isLoggedIn && currentRole === 'applicant' ? 'Back to Applicant Dashboard' : 'Back to All Notices'}</span>
         </button>
+
         <div className="flex items-center gap-2">
-          <button 
-            className="p-2 rounded-xl bg-white text-slate-500 hover:bg-slate-50 transition shadow-sm"
-            title="Share Notice"
-            onClick={() => alert('Notice link copied to clipboard.')}
+          <button
+            type="button"
+            onClick={handleShareNotice}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 transition-colors whitespace-nowrap shrink-0"
           >
-            <Share2 className="w-4 h-4" />
+            {copiedNotice ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5 text-slate-500" />}
+            <span>{copiedNotice ? 'Link Copied' : 'Share Notice'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 transition-colors whitespace-nowrap shrink-0"
+          >
+            <Printer className="w-3.5 h-3.5 text-slate-500" />
+            <span>Print Advertisement</span>
           </button>
         </div>
       </div>
 
-      {/* Main Hero Card */}
-      <div className={`${theme.cardBase} ${branding.showCardShadow ? 'shadow-xl' : 'shadow-none'} overflow-hidden flex flex-col lg:flex-row`}>
-        {/* Left Side: Notice Content */}
-        <div className="flex-1 p-6 sm:p-10 lg:p-12 space-y-10 border-r border-slate-50">
-          <div className="space-y-6">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="px-3 py-1 rounded-md bg-slate-100 text-slate-700 font-mono text-[10px] font-bold uppercase tracking-widest">
-                Advt No: {drive.advtNumber}
-              </span>
-              <span className="px-3 py-1 rounded-md bg-slate-100 text-slate-700 font-mono text-[10px] font-bold uppercase tracking-widest">
-                Post Code: {post.postCode}
-              </span>
-              <span className="px-3 py-1 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider">
-                Applications Open
-              </span>
-            </div>
+      {/* Institutional Masthead & Key Terms Strip */}
+      <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+        <div className="p-6 sm:p-8 space-y-4">
+          {/* Unboxed Typographic Metadata Line */}
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-medium text-slate-500">
+            <span className="font-semibold text-slate-800">{organizationName}</span>
+            <span aria-hidden="true">·</span>
+            <span>{displayCategory} Recruitment</span>
+            <span aria-hidden="true">·</span>
+            <span className="font-mono tabular-nums text-slate-700">Advt. {drive.advtNumber}</span>
+            <span aria-hidden="true">·</span>
+            <span className="font-mono tabular-nums text-slate-700">Post Code {post.postCode}</span>
+            <span aria-hidden="true">·</span>
+            <span className="text-emerald-700 font-semibold">{statusLabel}</span>
+          </div>
 
-            <h1 className={`text-3xl sm:text-4xl lg:text-5xl ${theme.headingFont} leading-tight tracking-tight text-slate-900`}>
+          {/* Dominant Headline & Organizational Context */}
+          <div className="space-y-2 max-w-4xl">
+            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-tight text-slate-900 leading-tight text-balance">
               {post.title}
             </h1>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-slate-600">
+              <span className="inline-flex items-center gap-1.5 font-medium text-slate-800">
+                <Building2 className="w-4 h-4 text-slate-400 shrink-0" />
+                {post.departmentName}
+              </span>
+              <span className="text-slate-300" aria-hidden="true">|</span>
+              <span className="inline-flex items-center gap-1.5 font-medium text-slate-800">
+                <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                {displayCampus}
+              </span>
+              <span className="text-slate-300" aria-hidden="true">|</span>
+              <span className="text-slate-500">{drive.title}</span>
+            </div>
+          </div>
+        </div>
 
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-slate-500 font-bold text-sm sm:text-base">
-              <div className="flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-indigo-400" />
-                <span>{post.departmentName}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-rose-400" />
-                <span>Main University Campus</span>
-              </div>
+        {/* 4-Column Key Terms Matrix */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-slate-200 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 bg-slate-50/70">
+          <div className="p-4 sm:px-6 sm:py-4 space-y-1">
+            <div className="text-xs font-medium text-slate-500">Pay Matrix & Scale</div>
+            <div className="text-sm font-semibold text-slate-900 tabular-nums">{post.payScale}</div>
+          </div>
+
+          <div className="p-4 sm:px-6 sm:py-4 space-y-1">
+            <div className="text-xs font-medium text-slate-500">Total Sanctioned Posts</div>
+            <div className="text-sm font-semibold text-slate-900 tabular-nums">
+              {Number(post.vacanciesTotal) || 0} {Number(post.vacanciesTotal) === 1 ? 'Vacancy' : 'Vacancies'}
             </div>
           </div>
 
-
-          {/* Quick Stats Matrix */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className={`p-5 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-3xl'} bg-slate-50 space-y-2`}>
-              <div className="flex items-center gap-2 text-[10px] opacity-40 font-black uppercase tracking-widest">
-                <DollarSign className="w-4 h-4" />
-                <span>Pay Scale</span>
-              </div>
-              <span className="text-base sm:text-lg font-black block">{post.payScale}</span>
-            </div>
-            <div className={`p-5 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-3xl'} bg-slate-50 space-y-2`}>
-              <div className="flex items-center gap-2 text-[10px] opacity-40 font-black uppercase tracking-widest">
-                <Users className="w-4 h-4" />
-                <span>Total Vacancies</span>
-              </div>
-              <span className={`text-base sm:text-lg font-black block ${theme.accentColor}`}>{post.vacanciesTotal} Posts</span>
-            </div>
-            <div className={`p-5 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-3xl'} bg-slate-50 space-y-2`}>
-              <div className="flex items-center gap-2 text-[10px] opacity-40 font-black uppercase tracking-widest">
-                <Clock className="w-4 h-4" />
-                <span>Closing Date</span>
-              </div>
-              <span className="text-base sm:text-lg font-black block text-rose-600">{new Date(drive.closingDate).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-            </div>
-            <div className={`p-5 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-3xl'} bg-slate-50 space-y-2`}>
-              <div className="flex items-center gap-2 text-[10px] opacity-40 font-black uppercase tracking-widest">
-                <Info className="w-4 h-4" />
-                <span>Application Fee</span>
-              </div>
-              <span className="text-base sm:text-lg font-black block">₹{post.applicationFee}</span>
+          <div className="p-4 sm:px-6 sm:py-4 space-y-1">
+            <div className="text-xs font-medium text-slate-500">Application Fee</div>
+            <div className="text-sm font-semibold text-slate-900 tabular-nums">
+              ₹{Number(post.applicationFee) || 0}
+              <span className="text-xs font-normal text-slate-500 ml-1.5">
+                ({post.feeExemptCategories?.length ? `${post.feeExemptCategories.join('/')} Exempt` : 'Standard'})
+              </span>
             </div>
           </div>
 
-          {/* Section: Category Distribution */}
+          <div className="p-4 sm:px-6 sm:py-4 space-y-1">
+            <div className="text-xs font-medium text-slate-500">Application Deadline</div>
+            <div className="text-sm font-semibold text-slate-900 tabular-nums flex items-center gap-2">
+              <span>{formatDisplayDate(drive.closingDate)}</span>
+              {daysRemaining !== null && daysRemaining >= 0 && (
+                <span className="text-xs font-medium text-amber-700">
+                  ({daysRemaining === 0 ? 'Closes today' : `${daysRemaining}d left`})
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main 2-Column Specification & Action Rail */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Primary Column: Detailed Specification */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* 1. Position Summary & Official Details */}
+          <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 space-y-6">
+            <div className="space-y-1 border-b border-slate-200 pb-4">
+              <h2 className="text-base font-semibold text-slate-900">Position Overview & Notification Scope</h2>
+              <p className="text-xs text-slate-500">Official terms of recruitment issued by {organizationName}</p>
+            </div>
+
+            <p className="text-sm text-slate-700 leading-relaxed max-w-prose">
+              {drive.description ||
+                `Online applications are invited from eligible Indian nationals and qualified professionals for the post of ${post.title} in the Department of ${post.departmentName} at ${displayCampus}. Appointments shall be governed by Institute statutes and UGC / AICTE norms where applicable.`}
+            </p>
+
+            {/* Structured Specification Definition List */}
+            <dl className="grid grid-cols-1 sm:grid-cols-2 border-t border-slate-200 pt-5 gap-x-8 gap-y-4 text-sm">
+              <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
+                <dt className="text-xs font-medium text-slate-500">Recruitment Drive</dt>
+                <dd className="font-medium text-slate-900">{drive.title}</dd>
+              </div>
+              <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
+                <dt className="text-xs font-medium text-slate-500">Drive & Advertisement Reference</dt>
+                <dd className="font-mono text-xs font-medium text-slate-900 tabular-nums">
+                  {drive.driveCode} / {drive.advtNumber}
+                </dd>
+              </div>
+              <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
+                <dt className="text-xs font-medium text-slate-500">Department / Academic Unit</dt>
+                <dd className="font-medium text-slate-900">{post.departmentName}</dd>
+              </div>
+              <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
+                <dt className="text-xs font-medium text-slate-500">Place of Posting (Campus)</dt>
+                <dd className="font-medium text-slate-900">{displayCampus}</dd>
+              </div>
+              <div className="flex flex-col space-y-0.5 pb-1">
+                <dt className="text-xs font-medium text-slate-500">Position Category</dt>
+                <dd className="font-medium text-slate-900">{displayCategory}</dd>
+              </div>
+              <div className="flex flex-col space-y-0.5 pb-1">
+                <dt className="text-xs font-medium text-slate-500">Probation & Appointment Terms</dt>
+                <dd className="font-medium text-slate-900">Regular / 24 Months Probation</dd>
+              </div>
+            </dl>
+          </section>
+
+          {/* 2. Category-wise Vacancy Breakdown Table */}
           {drive.showCategoryRow !== false && (
-            <div className="space-y-4">
-              <h3 className={`text-sm font-black uppercase tracking-widest flex items-center gap-3 ${theme.headingFont}`}>
-                <div className={`w-8 h-1 ${theme.accentColor} rounded-full`}></div>
-                <span>Category-wise Vacancy Breakdown</span>
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                {[
-                  { label: 'Unreserved (UR)', count: post.vacanciesBreakdown.UR, color: 'bg-slate-100' },
-                  { label: 'OBC (NCL)', count: post.vacanciesBreakdown.OBC, color: 'bg-blue-50' },
-                  { label: 'Scheduled Caste', count: post.vacanciesBreakdown.SC, color: 'bg-purple-50' },
-                  { label: 'Scheduled Tribe', count: post.vacanciesBreakdown.ST, color: 'bg-orange-50' },
-                  { label: 'Economical (EWS)', count: post.vacanciesBreakdown.EWS, color: 'bg-teal-50' },
-                  { label: 'PwD Category', count: post.vacanciesBreakdown.PwD, color: 'bg-rose-50' },
-                ].map((cat) => (
-                  <div key={cat.label} className={`p-4 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-2xl'} ${cat.color} text-center transition hover:scale-105 duration-200`}>
-                    <div className="text-[10px] font-bold opacity-50 uppercase mb-1">{cat.label}</div>
-                    <div className="text-xl font-black">{cat.count}</div>
-                  </div>
-                ))}
+            <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 space-y-5">
+              <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-slate-200 pb-4">
+                <div>
+                  <h2 className="text-base font-semibold text-slate-900">Category-Wise Vacancy Distribution</h2>
+                  <p className="text-xs text-slate-500">Reservation roster applicable as per Government of India & Institute guidelines</p>
+                </div>
+                <span className="text-xs font-mono font-semibold text-slate-700 tabular-nums">
+                  Total: {Number(post.vacanciesTotal) || 0} Posts
+                </span>
               </div>
-            </div>
+
+              <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600">
+                      {vacancyColumns.map((col) => (
+                        <th key={col.code} className="px-4 py-3 text-center whitespace-nowrap">
+                          <div>{col.code}</div>
+                          <div className="text-[11px] font-normal text-slate-400">{col.label}</div>
+                        </th>
+                      ))}
+                      <th className="px-4 py-3 text-center bg-slate-100/80 text-slate-900 whitespace-nowrap">
+                        <div>Total</div>
+                        <div className="text-[11px] font-normal text-slate-500">Sanctioned</div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="text-sm font-semibold text-slate-900 font-mono tabular-nums">
+                      {vacancyColumns.map((col) => (
+                        <td key={col.code} className="px-4 py-3.5 text-center border-r border-slate-100 last:border-r-0">
+                          {col.count}
+                        </td>
+                      ))}
+                      <td className="px-4 py-3.5 text-center bg-slate-50 text-indigo-700 font-bold">
+                        {Number(post.vacanciesTotal) || 0}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
           )}
 
-          {/* Section: Detailed Requirements */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Left: Academic */}
+          {/* 3. Eligibility, Qualification & Age Criteria */}
+          <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 space-y-6">
+            <div className="space-y-1 border-b border-slate-200 pb-4">
+              <h2 className="text-base font-semibold text-slate-900">Eligibility & Qualification Criteria</h2>
+              <p className="text-xs text-slate-500">Mandatory academic, professional experience, and age requirements</p>
+            </div>
+
             <div className="space-y-6">
-              <h3 className={`text-sm font-black uppercase tracking-widest flex items-center gap-3 ${theme.headingFont}`}>
-                <div className={`w-8 h-1 ${theme.accentColor} rounded-full`}></div>
-                <span>Academic & Professional Qualifications</span>
-              </h3>
-              <div className={`p-8 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-3xl'} bg-slate-50 space-y-6 relative overflow-hidden`}>
-                <GraduationCap className="absolute -right-8 -bottom-8 w-40 h-40 text-slate-200/50 -rotate-12" />
-                <div className="relative z-10 space-y-4">
-                  <div className="space-y-2">
-                    <span className={`text-xs font-black ${theme.accentColor} uppercase tracking-widest block`}>Essential Qualification</span>
-                    <p className="text-sm font-bold leading-relaxed text-slate-700 italic border-l-4 border-slate-200 pl-4 bg-white/50 py-3 rounded-r-xl">
-                      &ldquo;{post.minQualification}&rdquo;
-                    </p>
-                  </div>
-                  <div className="space-y-2 pt-4 border-t border-slate-100">
-                    <span className={`text-xs font-black ${theme.accentColor} uppercase tracking-widest block`}>Experience Requirement</span>
-                    <div className="flex items-start gap-3 bg-white/50 p-4 rounded-xl">
-                      <Briefcase className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
-                      <p className="text-sm font-semibold text-slate-600 leading-relaxed">
-                        Minimum <span className="text-slate-900 font-black">{post.requiredExperienceYears} years</span> of relevant post-qualification professional experience as per university guidelines.
-                      </p>
-                    </div>
-                  </div>
+              {/* Essential Qualification */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                  <GraduationCap className="w-4 h-4 text-slate-500" />
+                  <span>Essential Educational Qualification</span>
+                </div>
+                <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 text-sm text-slate-800 leading-relaxed">
+                  {post.minQualification}
                 </div>
               </div>
-            </div>
 
-            {/* Right: General & Eligibility */}
-            <div className="space-y-6">
-              <h3 className={`text-sm font-black uppercase tracking-widest flex items-center gap-3 ${theme.headingFont}`}>
-                <div className={`w-8 h-1 ${theme.accentColor} rounded-full`}></div>
-                <span>General Eligibility & Age Criteria</span>
-              </h3>
-              <div className={`p-8 ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800' : 'rounded-3xl'} bg-slate-50 space-y-5 relative overflow-hidden`}>
-                <ShieldCheck className="absolute -right-8 -bottom-8 w-40 h-40 text-slate-200/50 rotate-12" />
-                <div className="relative z-10 space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white/70 p-4 rounded-2xl">
-                      <span className="text-[10px] font-bold opacity-40 uppercase block mb-1">Minimum Age</span>
-                      <span className="text-lg font-black">{post.minAge} Years</span>
-                    </div>
-                    <div className="bg-white/70 p-4 rounded-2xl">
-                      <span className="text-[10px] font-bold opacity-40 uppercase block mb-1">Maximum Age</span>
-                      <span className="text-lg font-black">{post.maxAge} Years</span>
-                    </div>
+              {/* Experience & Age Limits */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+                <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
+                  <div className="text-xs font-medium text-slate-500">Minimum Experience</div>
+                  <div className="text-base font-semibold text-slate-900 tabular-nums">
+                    {post.requiredExperienceYears} {post.requiredExperienceYears === 1 ? 'Year' : 'Years'}
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-white/50 rounded-xl">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-slate-400" />
-                        <span className="text-xs font-bold text-slate-600">Probation Period</span>
-                      </div>
-                      <span className="text-xs font-black">24 Months</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-white/50 rounded-xl">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-slate-400" />
-                        <span className="text-xs font-bold text-slate-600">Place of Posting</span>
-                      </div>
-                      <span className="text-xs font-black">Main University Campus</span>
-                    </div>
+                  <p className="text-xs text-slate-500">Post-qualification relevant service</p>
+                </div>
+
+                <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
+                  <div className="text-xs font-medium text-slate-500">Minimum Age Limit</div>
+                  <div className="text-base font-semibold text-slate-900 tabular-nums">
+                    {post.minAge} Years
                   </div>
+                  <p className="text-xs text-slate-500">As on closing date of notice</p>
+                </div>
+
+                <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
+                  <div className="text-xs font-medium text-slate-500">Maximum Age Limit</div>
+                  <div className="text-base font-semibold text-slate-900 tabular-nums">
+                    {post.maxAge} Years
+                  </div>
+                  <p className="text-xs text-slate-500">Age relaxation as per GoI norms</p>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Section: Selection Methodology */}
-          <div className="space-y-6">
-            <h3 className={`text-sm font-black uppercase tracking-widest flex items-center gap-3 ${theme.headingFont}`}>
-              <div className={`w-8 h-1 ${theme.accentColor} rounded-full`}></div>
-              <span>Selection Methodology & Evaluation Pattern</span>
-            </h3>
-            <div className={`p-8 bg-white ${branding.theme === 'industrial_heavy' ? 'rounded-none border-2 border-slate-800 shadow-none' : 'rounded-3xl shadow-sm'} grid grid-cols-1 md:grid-cols-3 gap-8 relative`}>
-               <div className="space-y-3 relative">
-                 <div className={`w-10 h-10 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} bg-slate-100 ${theme.accentColor} flex items-center justify-center text-sm font-black shadow-inner`}>1</div>
-                 <h4 className="font-black text-sm text-slate-900 uppercase tracking-tight">Screening & Shortlisting</h4>
-                 <p className="text-xs text-slate-500 leading-relaxed font-medium">Initial scrutiny of academic API scores, experience weightage, and supporting document verification against essential criteria.</p>
-               </div>
-               <div className="space-y-3 relative">
-                 <div className="hidden md:block absolute -left-4 top-5 w-px h-12 bg-slate-50"></div>
-                 <div className={`w-10 h-10 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} bg-slate-100 ${theme.accentColor} flex items-center justify-center text-sm font-black shadow-inner`}>2</div>
-                 <h4 className="font-black text-sm text-slate-900 uppercase tracking-tight">Written / Skill Assessment</h4>
-                 <p className="text-xs text-slate-500 leading-relaxed font-medium">Domain competency written examination followed by practical skill evaluation for technical positions where applicable.</p>
-               </div>
-               <div className="space-y-3 relative">
-                 <div className="hidden md:block absolute -left-4 top-5 w-px h-12 bg-slate-50"></div>
-                 <div className={`w-10 h-10 ${branding.theme === 'industrial_heavy' ? 'rounded-none' : 'rounded-xl'} bg-slate-100 ${theme.accentColor} flex items-center justify-center text-sm font-black shadow-inner`}>3</div>
-                 <h4 className="font-black text-sm text-slate-900 uppercase tracking-tight">Personal Interview</h4>
-                 <p className="text-xs text-slate-500 leading-relaxed font-medium">Final evaluation by the university expert selection committee to assess suitability, leadership, and domain expertise.</p>
-               </div>
+              {/* Syllabus / Additional Notes if present */}
+              {drive.syllabusContent && (
+                <div className="pt-4 border-t border-slate-100 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                    <FileText className="w-4 h-4 text-slate-500" />
+                    <span>Syllabus & Assessment Scope</span>
+                  </div>
+                  <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                    {drive.syllabusContent}
+                  </p>
+                </div>
+              )}
             </div>
-          </div>
+          </section>
 
+          {/* 4. Selection Methodology */}
+          <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 space-y-6">
+            <div className="space-y-1 border-b border-slate-200 pb-4">
+              <h2 className="text-base font-semibold text-slate-900">Selection Process & Evaluation Pattern</h2>
+              <p className="text-xs text-slate-500">Multi-stage merit evaluation and verification workflow</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
+                <div className="text-xs font-mono font-semibold text-indigo-700">Stage 01</div>
+                <h3 className="text-sm font-semibold text-slate-900">Screening & Shortlisting</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Scrutiny of academic credentials, API/research records, and supporting certificates against essential eligibility benchmarks.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
+                <div className="text-xs font-mono font-semibold text-indigo-700">Stage 02</div>
+                <h3 className="text-sm font-semibold text-slate-900">Written / Skill Assessment</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Subject-domain written examination and practical skill/trade proficiency test conducted where prescribed for the cadre.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
+                <div className="text-xs font-mono font-semibold text-indigo-700">Stage 03</div>
+                <h3 className="text-sm font-semibold text-slate-900">Selection Committee Interview</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Personal interview and seminar/presentation before the duly constituted expert selection committee for final merit ranking.
+                </p>
+              </div>
+            </div>
+          </section>
         </div>
 
-        {/* Right Side: Action Sidebar (Image 1 Style) */}
-        <div className="w-full lg:w-96 bg-slate-50/40 p-8 sm:p-12 flex flex-col items-center justify-start gap-6">
-          <div className="w-full space-y-4">
-            <div className="text-center space-y-1 pb-4 border-b border-slate-100">
-               <div className="flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest text-emerald-600">
-                 <Calendar className="w-4 h-4" />
-                 <span>Deadline: {new Date(drive.closingDate).toLocaleDateString()}</span>
-               </div>
-               <p className="text-[10px] text-slate-400 font-bold">Applications Close at 11:59 PM</p>
+        {/* Right Sticky Action & Schedule Rail */}
+        <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-6">
+          {/* Primary Application CTA Card */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-5">
+            <div className="space-y-1 pb-4 border-b border-slate-200">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-medium text-slate-500">Submission Cutoff</span>
+                <span className="font-mono font-semibold text-slate-900 tabular-nums">
+                  {formatDisplayDate(drive.closingDate)}
+                </span>
+              </div>
+              <p className="text-xs text-slate-500">Online portal closes at 11:59 PM IST on the closing date.</p>
             </div>
 
-            <button 
-              onClick={handleApply}
-              className={`w-full py-4 rounded-2xl ${theme.primaryButton} text-xs font-black transition flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/10 active:scale-95`}
-            >
-              <Send className="w-4 h-4" />
-              <span>Apply Online Now</span>
-            </button>
+            {existingApp ? (
+              existingApp.stage === 'draft' ? (
+                <div className="space-y-3">
+                  <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 font-medium">
+                    Saved draft available ({existingApp.applicationNo}). Continue completing your submission before the deadline.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleApply}
+                    className="w-full py-2.5 px-4 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold flex items-center justify-center gap-2 transition whitespace-nowrap shrink-0"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                    <span>Continue Saved Draft</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-semibold">Application Submitted</div>
+                      <div className="text-emerald-700 font-mono text-[11px] mt-0.5">{existingApp.applicationNo}</div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('my_jobs')}
+                    className="w-full py-2.5 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center justify-center gap-2 transition whitespace-nowrap shrink-0"
+                  >
+                    <Eye className="w-4 h-4" />
+                    <span>Track Application Status</span>
+                  </button>
+                </div>
+              )
+            ) : (
+              <button
+                type="button"
+                onClick={handleApply}
+                className={`w-full py-3 px-4 rounded-lg ${theme.primaryButton} text-xs font-semibold flex items-center justify-center gap-2 transition whitespace-nowrap shrink-0`}
+              >
+                <Send className="w-4 h-4" />
+                <span>{isLoggedIn ? 'Apply Online Now' : 'Sign In & Apply Online'}</span>
+              </button>
+            )}
 
-            <button 
-              onClick={() => alert('Simulated Gazatte Download')}
-              className="w-full py-3.5 rounded-2xl bg-white text-slate-900 text-xs font-black transition flex items-center justify-center gap-2 shadow-sm border border-slate-100 hover:bg-slate-50"
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="w-full py-2.5 px-4 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center justify-center gap-2 transition whitespace-nowrap shrink-0"
             >
-              <Download className="w-4 h-4 text-slate-400" />
-              <span>Download Official Notice</span>
+              <Download className="w-4 h-4 text-slate-500" />
+              <span>Download / Print Notice</span>
             </button>
-            
-            <div className="pt-8 space-y-6">
-               <div className="flex items-start gap-4">
-                 <div className={`w-10 h-10 rounded-xl bg-white shadow-xs flex items-center justify-center shrink-0`}>
-                   <Info className="w-5 h-5 text-amber-500" />
-                 </div>
-                 <div className="space-y-0.5">
-                   <h4 className="font-black text-[10px] text-slate-900 uppercase tracking-wider">Helpdesk</h4>
-                   <p className="text-[10px] text-slate-500 leading-tight">Technical queries? Contact recruitment@university.edu</p>
-                 </div>
-               </div>
-               <div className="flex items-start gap-4">
-                 <div className={`w-10 h-10 rounded-xl bg-white shadow-xs flex items-center justify-center shrink-0`}>
-                   <FileText className="w-5 h-5 text-indigo-500" />
-                 </div>
-                 <div className="space-y-0.5">
-                   <h4 className="font-black text-[10px] text-slate-900 uppercase tracking-wider">Checklist</h4>
-                   <p className="text-[10px] text-slate-500 leading-tight">Keep scans of all academic & experience proofs ready.</p>
-                 </div>
-               </div>
+          </div>
+
+          {/* Key Recruitment Dates */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
+            <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+              <Calendar className="w-4 h-4 text-slate-500" />
+              <h3 className="text-sm font-semibold text-slate-900">Important Dates</h3>
+            </div>
+
+            <dl className="divide-y divide-slate-100 text-xs">
+              {scheduleRows.map((row) => (
+                <div key={row.label} className="py-2.5 flex items-center justify-between gap-4">
+                  <dt className="text-slate-500">{row.label}</dt>
+                  <dd
+                    className={`font-mono tabular-nums text-right ${
+                      row.emphasize ? 'font-semibold text-rose-700' : 'font-medium text-slate-900'
+                    }`}
+                  >
+                    {row.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          {/* Fee Concession & Applicant Checklist */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-5">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-900">
+                <ShieldCheck className="w-4 h-4 text-slate-500" />
+                <span>Fee Exemption & Documents</span>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Application fee is ₹{Number(post.applicationFee) || 0}.{' '}
+                {post.feeExemptCategories?.length
+                  ? `Candidates belonging to ${post.feeExemptCategories.join(', ')} categories are exempted from fee payment upon uploading valid category certificates.`
+                  : 'Exemptions apply strictly as per Institute and Government of India norms.'}
+              </p>
+              <ul className="text-xs text-slate-600 space-y-1.5 pt-1 list-disc pl-4">
+                <li>Scanned passport photograph & signature</li>
+                <li>Matriculation, UG, PG & Ph.D. degree certificates</li>
+                <li>Experience certificates, NOC (if employed) & category proofs</li>
+              </ul>
+            </div>
+
+            <div className="pt-4 border-t border-slate-200 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-900">
+                <Mail className="w-4 h-4 text-slate-500" />
+                <span>Recruitment Helpdesk</span>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                For clarifications regarding advertisement {drive.advtNumber}, write to{' '}
+                <span className="font-medium text-slate-900">recruitment@bitmesra.ac.in</span> citing Post Code{' '}
+                <span className="font-mono">{post.postCode}</span>.
+              </p>
             </div>
           </div>
-        </div>
+        </aside>
       </div>
-
-
     </div>
   );
 };
