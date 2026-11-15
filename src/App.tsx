@@ -27,7 +27,7 @@ import { SystemStatusPortal } from './components/public/SystemStatusPortal';
 import { PublicNoticeDetail } from './components/public/PublicNoticeDetail';
 
 const MainAppContent: React.FC = () => {
-  const { currentRole, isLoggedIn, branding, activeTab, setActiveTab, setSelectedDriveId, setSelectedPostId, setEditingAppId } = usePortal();
+  const { currentRole, isLoggedIn, branding, activeTab, setActiveTab, selectedDriveId, selectedPostId, setSelectedDriveId, setSelectedPostId, setEditingAppId } = usePortal();
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
   
   // Apply global shadow intensity and dynamic favicon from branding
@@ -94,7 +94,8 @@ const MainAppContent: React.FC = () => {
     // PUBLIC ROUTES (accessible without login)
 
     // Unauthenticated visitor guard: restrict access to protected admin/dashboard tabs
-    if (!isLoggedIn && activeTab !== 'public_recruitment' && activeTab !== 'applicant_portal' && activeTab !== 'notice_detail') {
+    const hasNoticeSelection = Boolean(selectedDriveId && selectedPostId);
+    if (!isLoggedIn && activeTab !== 'public_recruitment' && activeTab !== 'applicant_portal' && !(activeTab === 'notice_detail' && hasNoticeSelection)) {
       return (
         <PublicRecruitmentPortal
           onApplyForPost={handleApplyClick}
@@ -114,6 +115,15 @@ const MainAppContent: React.FC = () => {
           />
         );
       case 'notice_detail':
+        if (!hasNoticeSelection) {
+          return (
+            <PublicRecruitmentPortal
+              onApplyForPost={handleApplyClick}
+              onRequestLogin={() => setIsLoginModalOpen(true)}
+              onRequestRegister={() => setIsRegisterModalOpen(true)}
+            />
+          );
+        }
         return (
           <PublicNoticeDetail
             onRequestLogin={() => setIsLoginModalOpen(true)}

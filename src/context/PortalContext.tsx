@@ -192,7 +192,12 @@ const loadInitialState = <T,>(key: string, fallback: T, storageKey = LOCAL_STORA
 export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => loadInitialState('isLoggedIn', false, AUTH_STORAGE_KEY));
   const [currentUser, setCurrentUser] = useState<UserSession | null>(() => loadInitialState('currentUser', null, AUTH_STORAGE_KEY));
-  const [activeTab, setActiveTabState] = useState<string>(() => loadInitialState('activeTab', 'public_recruitment', AUTH_STORAGE_KEY));
+  const [activeTab, setActiveTabState] = useState<string>(() => {
+    const loggedIn = loadInitialState('isLoggedIn', false, AUTH_STORAGE_KEY);
+    if (!loggedIn) return 'public_recruitment';
+    const savedTab = loadInitialState<string>('activeTab', 'overview', AUTH_STORAGE_KEY);
+    return savedTab === 'notice_detail' ? 'overview' : savedTab;
+  });
   const [currentRole, setCurrentRole] = useState<UserRole>(() => loadInitialState('currentRole', 'super_admin', AUTH_STORAGE_KEY));
   const [roles, setRoles] = useState<RoleInfo[]>(INITIAL_ROLES);
   const [drives, setDrives] = useState<RecruitmentDrive[]>([]);
@@ -208,10 +213,15 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const setActiveTab = useCallback((tab: string) => {
     setActiveTabState(tab);
     
-    // Immediate persistence
+    // Persist active tab only for authenticated sessions (never persist transient notice_detail)
     try {
-      const authData = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || '{}');
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ ...authData, activeTab: tab }));
+      const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (raw) {
+        const authData = JSON.parse(raw);
+        if (authData?.isLoggedIn && tab !== 'notice_detail') {
+          localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ ...authData, activeTab: tab }));
+        }
+      }
     } catch (e) {
       console.warn('Failed to persist active tab:', e);
     }
@@ -681,6 +691,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     logAudit('USER_LOGOUT', 'Security', `User ${currentUser?.email || ''} logged out.`);
     setIsLoggedIn(false);
     setCurrentUser(null);
+    setSelectedPostId(null);
+    setEditingAppId(null);
+    setActiveTabState('public_recruitment');
     
     // Immediate persistence
     try {
