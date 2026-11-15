@@ -46,6 +46,7 @@ export interface ThemeConfig {
   sidebarBase: string;
   headerBase: string;
   accentColor: string;
+  titleColor: string;
   primaryButton: string;
   headingFont: string;
   secondaryButton: string;
@@ -62,6 +63,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-white border-r border-slate-200',
     headerBase: 'bg-white border-b border-slate-200',
     accentColor: 'text-indigo-600',
+    titleColor: 'text-indigo-700',
     primaryButton: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm',
     headingFont: 'font-bold tracking-tight',
     secondaryButton: 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50',
@@ -76,6 +78,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-zinc-50 border-r border-zinc-200',
     headerBase: 'bg-white/80 backdrop-blur-md border-b border-zinc-200',
     accentColor: 'text-violet-600',
+    titleColor: 'text-violet-700',
     primaryButton: 'bg-violet-600 hover:bg-violet-700 text-white rounded-full shadow-md',
     headingFont: 'font-extrabold tracking-tight',
     secondaryButton: 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200',
@@ -90,6 +93,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-rose-900 text-white border-r border-rose-800',
     headerBase: 'bg-white border-b border-rose-200',
     accentColor: 'text-rose-600',
+    titleColor: 'text-rose-900',
     primaryButton: 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm',
     headingFont: 'font-bold tracking-tight text-rose-900',
     secondaryButton: 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100',
@@ -104,6 +108,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-[#1a365d] text-white border-r border-blue-900',
     headerBase: 'bg-[#fdfcf8] border-b border-stone-200',
     accentColor: 'text-amber-700',
+    titleColor: 'text-blue-900',
     primaryButton: 'bg-amber-700 hover:bg-amber-800 text-white rounded-md',
     headingFont: 'font-serif font-bold text-blue-900',
     secondaryButton: 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100',
@@ -118,6 +123,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-emerald-800 text-white border-r border-emerald-900',
     headerBase: 'bg-white border-b border-emerald-100',
     accentColor: 'text-emerald-700',
+    titleColor: 'text-emerald-900',
     primaryButton: 'bg-emerald-600 hover:bg-emerald-700 text-white',
     headingFont: 'font-bold text-emerald-900',
     secondaryButton: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
@@ -132,6 +138,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-slate-900 text-white border-r border-slate-800',
     headerBase: 'bg-white border-b border-sky-200 shadow-sm',
     accentColor: 'text-sky-700',
+    titleColor: 'text-sky-800',
     primaryButton: 'bg-sky-600 hover:bg-sky-700 text-white rounded-lg shadow-sky-200/50',
     headingFont: 'font-bold tracking-tight text-slate-900',
     secondaryButton: 'bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100',
@@ -146,6 +153,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-[#142D4E] text-white border-r border-[#10243E]',
     headerBase: 'bg-white border-b border-[#E2E8F0]',
     accentColor: 'text-[#A77B32]',
+    titleColor: 'text-[#142D4E]',
     primaryButton: 'bg-[#142D4E] hover:bg-[#0F223B] text-white rounded-none shadow-sm font-bold uppercase tracking-wider',
     headingFont: 'font-sans font-extrabold tracking-tight text-[#142D4E]',
     secondaryButton: 'bg-[#F8FAFC] text-[#142D4E] border-[#E2E8F0] hover:bg-[#F1F5F9] rounded-none uppercase tracking-wider font-bold',
@@ -160,6 +168,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-black text-slate-300 border-r border-slate-900',
     headerBase: 'bg-black/80 backdrop-blur-xl border-b border-slate-900',
     accentColor: 'text-indigo-400',
+    titleColor: 'text-indigo-600',
     primaryButton: 'bg-indigo-500 hover:bg-indigo-400 text-white rounded-2xl shadow-lg shadow-indigo-500/20 font-black',
     headingFont: 'font-black tracking-tighter uppercase italic',
     secondaryButton: 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700',
@@ -174,6 +183,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-[#0f172a] text-slate-300 border-r border-slate-800',
     headerBase: 'bg-white border-b border-slate-300 shadow-xs',
     accentColor: 'text-blue-800',
+    titleColor: 'text-[#0f172a]',
     primaryButton: 'bg-[#1e293b] hover:bg-[#0f172a] text-white rounded-md font-bold tracking-wide',
     headingFont: 'font-bold tracking-normal text-slate-900',
     secondaryButton: 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200',
@@ -188,6 +198,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-gradient-to-b from-purple-900 to-indigo-950 text-white border-r border-purple-800',
     headerBase: 'bg-white/80 backdrop-blur-md border-b border-orange-100 shadow-sm',
     accentColor: 'text-orange-600',
+    titleColor: 'text-purple-700',
     primaryButton: 'bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-full font-black px-8',
     headingFont: 'font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600',
     secondaryButton: 'bg-stone-100 text-stone-700 hover:bg-stone-200 rounded-full border border-stone-200',
@@ -202,6 +213,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-slate-800 text-slate-100 border-r-2 border-slate-900',
     headerBase: 'bg-white border-b-2 border-slate-800 shadow-none',
     accentColor: 'text-amber-600',
+    titleColor: 'text-slate-900',
     primaryButton: 'bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-none border-2 border-slate-900 font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
     headingFont: 'font-black tracking-tight text-slate-900 uppercase',
     secondaryButton: 'bg-white text-slate-800 border-2 border-slate-900 hover:bg-slate-100 rounded-none font-bold',
@@ -216,6 +228,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-indigo-900 text-white border-r border-indigo-800',
     headerBase: 'bg-white/80 backdrop-blur-md border-b border-indigo-100',
     accentColor: 'text-pink-600',
+    titleColor: 'text-indigo-900',
     primaryButton: 'bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white rounded-2xl font-black shadow-lg',
     headingFont: 'font-black tracking-tight text-indigo-950',
     secondaryButton: 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 rounded-2xl',
@@ -230,6 +243,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-slate-50 border-r border-slate-100',
     headerBase: 'bg-white border-b border-slate-100',
     accentColor: 'text-slate-900',
+    titleColor: 'text-slate-900',
     primaryButton: 'bg-slate-900 hover:bg-black text-white rounded-none font-medium',
     headingFont: 'font-light tracking-widest uppercase',
     secondaryButton: 'bg-white text-slate-500 border-slate-200 hover:text-slate-900 rounded-none',
@@ -244,6 +258,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-black text-amber-200 border-r border-amber-900/30',
     headerBase: 'bg-black border-b border-amber-900/30',
     accentColor: 'text-amber-500',
+    titleColor: 'text-amber-700',
     primaryButton: 'bg-amber-600 hover:bg-amber-700 text-black font-black rounded-sm shadow-[0_0_15px_rgba(217,119,6,0.3)]',
     headingFont: 'font-serif italic tracking-wide text-amber-500',
     secondaryButton: 'bg-zinc-700 text-amber-200 border-amber-900/40 hover:bg-zinc-600',
@@ -258,6 +273,7 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     sidebarBase: 'bg-[#1e293b] text-slate-300 border-r border-slate-700',
     headerBase: 'bg-white border-b border-slate-300 shadow-xs',
     accentColor: 'text-[#0f172a]',
+    titleColor: 'text-[#0f172a]',
     primaryButton: 'bg-[#0f172a] hover:bg-black text-white rounded-md font-bold tracking-wide uppercase text-[10px]',
     headingFont: 'font-bold tracking-tight text-slate-900',
     secondaryButton: 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200',
@@ -266,3 +282,29 @@ export const THEME_CONFIGS: Record<PortalTheme, ThemeConfig> = {
     focusColor: 'focus:border-slate-900 focus:ring-slate-900',
   },
 };
+
+const BRAND_TITLE_COLORS: Partial<Record<BrandColor, string>> = {
+  green: 'text-emerald-900',
+  blue: 'text-blue-900',
+  purple: 'text-purple-900',
+  maroon: 'text-[#5c0505]',
+  bit_mesra: 'text-[#142D4E]',
+  grey: 'text-slate-800',
+};
+
+export function getThemeTitleColor(branding?: {
+  theme?: PortalTheme;
+  navbarColor?: BrandColor;
+  sidebarColor?: BrandColor;
+}): string {
+  const themeKey = branding?.theme || 'classic';
+  if (themeKey === 'classic') {
+    const brandColor = branding?.navbarColor && branding.navbarColor !== 'default'
+      ? branding.navbarColor
+      : branding?.sidebarColor;
+    if (brandColor && BRAND_TITLE_COLORS[brandColor]) {
+      return BRAND_TITLE_COLORS[brandColor]!;
+    }
+  }
+  return THEME_CONFIGS[themeKey]?.titleColor || 'text-indigo-700';
+}

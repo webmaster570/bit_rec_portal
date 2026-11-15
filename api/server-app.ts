@@ -15,6 +15,7 @@ import {
   deletePostFromDriveDb,
   createApplicationDb,
   updateApplicationDb,
+  deleteApplicationDb,
   createDepartmentDb,
   createAuditLogDb,
   markNotificationReadDb,
@@ -323,6 +324,15 @@ apiRouter.post('/applications', async (req, res) => {
 apiRouter.put('/applications/:id', async (req, res) => {
   try {
     await updateApplicationDb(req.params.id, req.body);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(200).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.delete('/applications/:id', async (req, res) => {
+  try {
+    await deleteApplicationDb(req.params.id);
     res.json({ success: true });
   } catch (err: any) {
     res.status(200).json({ success: false, error: err.message });

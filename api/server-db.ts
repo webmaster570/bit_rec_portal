@@ -441,6 +441,31 @@ export async function updateApplicationDb(appId: string, updates: Partial<Applic
   } catch (e) { throw e; }
 }
 
+export async function deleteApplicationDb(appId: string) {
+  const existing = memoryState.applications.find((a) => a.id === appId);
+  memoryState.applications = memoryState.applications.filter((a) => a.id !== appId);
+  if (existing?.driveId) {
+    memoryState.drives = memoryState.drives.map((d) =>
+      d.id === existing.driveId
+        ? { ...d, totalApplicationsCount: Math.max(0, (d.totalApplicationsCount || 0) - 1) }
+        : d
+    );
+  }
+  try {
+    const database = await ensureDb();
+    const dbApp = existing || await database.collection('applications').findOne({ $or: [{ id: appId }, { _id: appId as any }] });
+    await database.collection('applications').deleteOne({ $or: [{ id: appId }, { _id: appId as any }] });
+    const driveId = dbApp?.driveId;
+    if (driveId) {
+      await database.collection('drives').updateOne(
+        { $or: [{ id: driveId }, { _id: driveId as any }], totalApplicationsCount: { $gt: 0 } },
+        { $inc: { totalApplicationsCount: -1 } }
+      );
+    }
+  } catch (e) { throw e; }
+  return true;
+}
+
 export async function createDepartmentDb(dept: Department) {
   memoryState.departments = [...memoryState.departments, dept];
   try {

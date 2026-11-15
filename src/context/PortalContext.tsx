@@ -152,6 +152,7 @@ interface PortalContextType {
   respondToOffer: (appId: string, response: 'Accepted' | 'Declined') => void;
   reconcilePayment: (appId: string, newStatus: 'Paid' | 'Refunded') => void;
   updateApplication: (appId: string, updates: Partial<Application>) => void;
+  deleteApplication: (appId: string) => void;
   
   editingAppId: string | null;
   setEditingAppId: (id: string | null) => void;
@@ -1098,6 +1099,45 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const deleteApplication = (appId: string) => {
+    const targetApp = applications.find((a) => a.id === appId);
+    if (!targetApp || targetApp.stage !== 'draft') return;
+
+    setApplications((prev) => prev.filter((a) => a.id !== appId));
+
+    if (targetApp.driveId) {
+      setDrives((prev) =>
+        prev.map((d) =>
+          d.id === targetApp.driveId
+            ? { ...d, totalApplicationsCount: Math.max(0, (d.totalApplicationsCount || 0) - 1) }
+            : d
+        )
+      );
+    }
+
+    if (editingAppId === appId) {
+      setEditingAppId(null);
+    }
+
+    runDbTransaction(
+      'Delete Draft Application Transaction',
+      `DELETE /api/applications/${appId}`,
+      `Deleting incomplete application #${targetApp.applicationNo} from MongoDB...`,
+      `Incomplete application #${targetApp.applicationNo} deleted.`,
+      async () => {
+        const res = await fetch(`/api/applications/${appId}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
+        return await res.json();
+      }
+    );
+
+    logAudit(
+      'DRAFT_APPLICATION_DELETED',
+      'Application',
+      `Deleted incomplete application ${targetApp.applicationNo} for post ${targetApp.postTitle}`
+    );
+  };
+
   const updateScreening = (
     appId: string,
     decision: 'Eligible' | 'Provisionally Eligible' | 'Ineligible',
@@ -1766,6 +1806,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         respondToOffer,
         reconcilePayment,
         updateApplication,
+        deleteApplication,
         editingAppId,
         setEditingAppId,
         addDepartment,

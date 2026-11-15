@@ -36,6 +36,7 @@ import {
   Hash,
   ArrowRight,
   AlertCircle,
+  Trash2,
 } from 'lucide-react';
 
 interface MyJobsPortalProps {
@@ -43,7 +44,7 @@ interface MyJobsPortalProps {
 }
 
 export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
-  const { applications, currentUser, drives, setEditingAppId, setSelectedPostId, setActiveTab } = usePortal();
+  const { applications, currentUser, drives, setEditingAppId, setSelectedPostId, setActiveTab, deleteApplication } = usePortal();
 
   // Filter applications strictly for current applicant
   const myApplications = applications.filter((app) => {
@@ -65,6 +66,7 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
   const [activeModalTab, setActiveModalTab] = useState<'profile' | 'academics' | 'documents' | 'status'>('profile');
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewApp, setPreviewApp] = useState<Application | null>(null);
+  const [appToDelete, setAppToDelete] = useState<Application | null>(null);
 
   // Filter logic
   const filteredApps = myApplications.filter((app) => {
@@ -447,19 +449,29 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                       <span>View Details</span>
                     </button>
 
-                    {/* Complete Draft Button */}
+                    {/* Complete & Delete Draft Buttons */}
                     {app.stage === 'draft' && (
-                      <button
-                        onClick={() => {
-                          setEditingAppId(app.id);
-                          if (onNavigate) onNavigate('applicant_portal');
-                          else setActiveTab('applicant_portal');
-                        }}
-                        className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-98 text-white text-xs font-bold shadow-2xs flex items-center justify-center gap-1.5 transition"
-                      >
-                        <ArrowRight className="w-3.5 h-3.5" />
-                        <span>Complete Application</span>
-                      </button>
+                      <>
+                        <button
+                          onClick={() => {
+                            setEditingAppId(app.id);
+                            if (onNavigate) onNavigate('applicant_portal');
+                            else setActiveTab('applicant_portal');
+                          }}
+                          className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-98 text-white text-xs font-bold shadow-2xs flex items-center justify-center gap-1.5 transition"
+                        >
+                          <ArrowRight className="w-3.5 h-3.5" />
+                          <span>Complete Application</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAppToDelete(app)}
+                          className="w-full py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 active:scale-98 text-rose-700 border border-rose-200 text-xs font-bold flex items-center justify-center gap-1.5 transition"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete Draft</span>
+                        </button>
+                      </>
                     )}
 
                     {/* Download Admit Card */}
@@ -621,20 +633,31 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                             <span>View Details</span>
                           </button>
 
-                          {/* Complete Draft Button */}
+                          {/* Complete & Delete Draft Buttons */}
                           {app.stage === 'draft' && (
-                            <button
-                              onClick={() => {
-                                setEditingAppId(app.id);
-                                if (onNavigate) onNavigate('applicant_portal');
-                                else setActiveTab('applicant_portal');
-                              }}
-                              className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-2xs inline-flex items-center gap-1.5 transition hover:scale-102"
-                              title="Resume and Complete Draft Application"
-                            >
-                              <ArrowRight className="w-3.5 h-3.5" />
-                              <span>Complete</span>
-                            </button>
+                            <>
+                              <button
+                                onClick={() => {
+                                  setEditingAppId(app.id);
+                                  if (onNavigate) onNavigate('applicant_portal');
+                                  else setActiveTab('applicant_portal');
+                                }}
+                                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-2xs inline-flex items-center gap-1.5 transition hover:scale-102"
+                                title="Resume and Complete Draft Application"
+                              >
+                                <ArrowRight className="w-3.5 h-3.5" />
+                                <span>Complete</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setAppToDelete(app)}
+                                className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold inline-flex items-center gap-1 transition"
+                                title="Delete Incomplete Form"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span className="hidden xl:inline">Delete</span>
+                              </button>
+                            </>
                           )}
 
                           {/* Download Hall Ticket */}
@@ -714,6 +737,17 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
               </div>
 
               <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+                {selectedAppDetail.stage === 'draft' && (
+                  <button
+                    type="button"
+                    onClick={() => setAppToDelete(selectedAppDetail)}
+                    className="p-1.5 sm:p-2 rounded-xl text-rose-700 hover:bg-rose-50 border border-rose-200 text-xs font-semibold flex items-center gap-1 transition"
+                    title="Delete Incomplete Form"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Delete Draft</span>
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setPreviewApp(selectedAppDetail);
@@ -1419,6 +1453,79 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
             setPreviewApp(null);
           }}
         />
+      )}
+
+      {appToDelete && appToDelete.stage === 'draft' && (
+        <div
+          className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-draft-modal-title"
+        >
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full overflow-hidden">
+            <div className="p-5 sm:p-6">
+              <div className="flex items-start gap-3.5">
+                <div className="w-11 h-11 rounded-xl bg-rose-100 border border-rose-200 flex items-center justify-center shrink-0">
+                  <Trash2 className="w-5 h-5 text-rose-600" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 id="delete-draft-modal-title" className="text-base font-extrabold text-slate-900">
+                    Delete Incomplete Application Form?
+                  </h3>
+                  <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                    This action permanently deletes your saved draft and cannot be undone. You can always start a fresh application from Current Openings or Apply Online.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-slate-500 font-medium">Application No.</span>
+                  <span className="font-mono font-bold text-slate-800">{appToDelete.applicationNo}</span>
+                </div>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-slate-500 font-medium shrink-0">Position</span>
+                  <span className="font-bold text-slate-900 text-right">{appToDelete.postTitle}</span>
+                </div>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-slate-500 font-medium shrink-0">Department</span>
+                  <span className="text-slate-700 font-semibold text-right">{appToDelete.departmentName}</span>
+                </div>
+                {appToDelete.driveTitle && (
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-slate-500 font-medium shrink-0">Recruitment Drive</span>
+                    <span className="text-slate-700 text-right">{appToDelete.driveTitle}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setAppToDelete(null)}
+                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-bold text-xs transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const targetId = appToDelete.id;
+                  deleteApplication(targetId);
+                  if (selectedAppDetail?.id === targetId) {
+                    setSelectedAppDetail(null);
+                  }
+                  setAppToDelete(null);
+                }}
+                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 transition"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete Incomplete Form</span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

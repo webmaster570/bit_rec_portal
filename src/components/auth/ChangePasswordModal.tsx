@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
+import { THEME_CONFIGS, getThemeTitleColor } from '../../themeStyles';
 import { X, Lock, Key, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface ChangePasswordModalProps {
@@ -8,7 +9,9 @@ interface ChangePasswordModalProps {
 }
 
 export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, onClose }) => {
-  const { changePassword } = usePortal();
+  const { changePassword, branding } = usePortal();
+  const theme = THEME_CONFIGS[branding.theme || 'classic'];
+  const titleColorClass = getThemeTitleColor(branding);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,10 +54,10 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
       <div className="bg-white border border-slate-200 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-fadeIn">
         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
-              <Key className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
+              <Key className={`w-4 h-4 ${theme.accentColor}`} />
             </div>
-            <h3 className="font-bold text-slate-900">Change Login Password</h3>
+            <h3 className={`font-bold ${titleColorClass}`}>Change Login Password</h3>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
             <X className="w-5 h-5" />
@@ -78,7 +81,9 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
               )}
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">New Password</label>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                  New Password <span className="text-rose-500">*</span>
+                </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                   <input
@@ -93,7 +98,9 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">Confirm New Password</label>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                  Confirm New Password <span className="text-rose-500">*</span>
+                </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                   <input
