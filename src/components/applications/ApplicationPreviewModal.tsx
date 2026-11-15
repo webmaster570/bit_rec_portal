@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { usePortal } from '../../context/PortalContext';
 import { X, Printer, Download, CheckCircle2, ShieldCheck, MapPin, Phone, Mail, Globe } from 'lucide-react';
 import { Application, RecruitmentDrive } from '../../types';
@@ -15,9 +16,16 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
   const isFeeExempt = post?.feeExemptCategories.includes(application.applicant?.category || '') || application.applicant?.isPwD || application.applicant?.gender === 'Female';
   const feeToPay = isFeeExempt ? 0 : post?.applicationFee || 0;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-5xl max-h-[95vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-200">
+  useEffect(() => {
+    document.body.classList.add('has-application-preview-modal');
+    return () => {
+      document.body.classList.remove('has-application-preview-modal');
+    };
+  }, []);
+
+  return createPortal(
+    <div className="application-preview-print-root fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="application-preview-dialog bg-white w-full max-w-5xl max-h-[95vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-200">
         {/* Web Header (Actions) */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-20 shadow-sm print:hidden">
           <div className="flex items-center gap-3">
@@ -50,8 +58,8 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
         </div>
 
         {/* Professional Document Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-100/50 print:bg-white print:p-0">
-          <div className="bg-white shadow-xl border border-slate-200 mx-auto print:shadow-none print:border-0 print:m-0 w-full max-w-[210mm] relative">
+        <div className="application-preview-scroll flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-100/50 print:bg-white print:p-0">
+          <div className="application-preview-paper bg-white shadow-xl border border-slate-200 mx-auto print:shadow-none print:border-0 print:m-0 w-full max-w-[210mm] relative">
             
             {/* Watermark for Web view only */}
             <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none rotate-[-45deg] select-none overflow-hidden print:hidden">
@@ -59,7 +67,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
             </div>
 
             {/* Document Body */}
-            <div className="p-8 sm:p-12 space-y-8 text-slate-800 leading-normal font-serif relative z-10">
+            <div className="p-8 sm:p-12 space-y-8 text-slate-800 leading-normal font-serif relative z-10 print:p-2 print:space-y-5">
               
               {/* UNIVERSITY HEADER */}
               <div className="text-center space-y-2 border-b-2 border-slate-900 pb-6 mb-8 relative">
@@ -206,7 +214,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                 
                 <div className="grid grid-cols-12 gap-6 pt-2">
                   {/* Bio Data */}
-                  <div className="col-span-12 md:col-span-9 grid grid-cols-2 gap-y-3 gap-x-6 text-[10pt]">
+                  <div className="col-span-12 md:col-span-9 print:col-span-9 grid grid-cols-2 gap-y-3 gap-x-6 text-[10pt]">
                     <div className="flex flex-col border-b border-slate-100 pb-1">
                       <span className="text-[9px] font-bold text-slate-400 uppercase leading-none mb-1">Full Name (Capital Letters)</span>
                       <span className="font-black text-slate-900 uppercase tracking-tight">{application.applicant?.fullName || 'N/A'}</span>
@@ -241,7 +249,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                   </div>
 
                   {/* Photo Section */}
-                  <div className="col-span-12 md:col-span-3 space-y-4">
+                  <div className="col-span-12 md:col-span-3 print:col-span-3 space-y-4">
                     <div className="w-full aspect-[3/4] border-2 border-slate-900 rounded-lg overflow-hidden bg-slate-50 p-1">
                       <div className="w-full h-full border border-slate-200 rounded flex items-center justify-center overflow-hidden">
                         {application.applicant?.photoUrl ? (
@@ -551,7 +559,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
 
                 <section className="space-y-3">
                   <h3 className="bg-slate-900 text-white px-4 py-1 font-bold uppercase tracking-widest text-[10pt]">Disclosures</h3>
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-2">
                     {[
                       { label: 'Time Required to Join', val: application.joiningTimeRequired || '-' },
                       { label: 'Computer Proficiency', val: application.hasComputerProficiency ? 'YES' : 'NO' },
@@ -635,7 +643,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
               </section>
 
               {/* PART 6: DECLARATION & SIGNATURE */}
-              <section className="pt-8 border-t-2 border-slate-900">
+              <section className="print-keep-together pt-8 border-t-2 border-slate-900">
                 <div className="flex flex-col gap-6">
                   <div className="space-y-4">
                     <h4 className="font-black uppercase text-[10pt] text-slate-900 flex items-center gap-2">
@@ -696,6 +704,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

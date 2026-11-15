@@ -100,4 +100,74 @@ textarea:disabled,
   background: #94a3b8;
 }
 
+/* Dedicated print isolation for Application Preview Form */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm;
+  }
+
+  html:has(body.has-application-preview-modal),
+  body.has-application-preview-modal {
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body.has-application-preview-modal > *:not(.application-preview-print-root) {
+    display: none !important;
+  }
+
+  .application-preview-print-root {
+    position: static !important;
+    inset: auto !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+  }
+
+  .application-preview-print-root .application-preview-dialog,
+  .application-preview-print-root .application-preview-scroll,
+  .application-preview-print-root .application-preview-paper {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .application-preview-print-root .overflow-hidden {
+    overflow: visible !important;
+  }
+
+  .application-preview-print-root h3,
+  .application-preview-print-root h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .application-preview-print-root tr,
+  .application-preview-print-root .print-keep-together {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
 

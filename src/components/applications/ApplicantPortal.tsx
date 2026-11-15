@@ -1237,10 +1237,10 @@ export const ApplicantPortal: React.FC = () => {
                 </div>
 
                 {/* Photo & Signature Upload Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/70 p-5 rounded-xl border border-slate-200">
-                  <div className="space-y-2.5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/70 p-4 sm:p-5 rounded-xl border border-slate-200 overflow-hidden">
+                  <div className="space-y-2.5 min-w-0">
                     <label className={formLabelClass}>Candidate Recent Photograph (Passport Size)</label>
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4">
                       <div className="w-24 h-32 bg-white border border-slate-300 rounded-lg overflow-hidden flex items-center justify-center relative shrink-0">
                         {profile.photoUrl ? (
                           <img src={profile.photoUrl} alt="Candidate photograph" className="w-full h-full object-cover" />
@@ -1256,7 +1256,7 @@ export const ApplicantPortal: React.FC = () => {
                           </div>
                         )}
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 min-w-0 flex-1">
                         <input
                           type="file"
                           ref={photoInputRef}
@@ -1278,10 +1278,10 @@ export const ApplicantPortal: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-2.5">
+                  <div className="space-y-2.5 min-w-0">
                     <label className={formLabelClass}>Candidate Specimen Signature</label>
-                    <div className="flex items-center gap-4">
-                      <div className="w-48 h-24 bg-white border border-slate-300 rounded-lg overflow-hidden flex items-center justify-center relative shrink-0">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                      <div className="w-full max-w-[12rem] sm:w-48 h-24 bg-white border border-slate-300 rounded-lg overflow-hidden flex items-center justify-center relative shrink-0">
                         {profile.signatureUrl ? (
                           <img src={profile.signatureUrl} alt="Candidate signature" className="w-full h-full object-contain p-2" />
                         ) : (
@@ -1296,7 +1296,7 @@ export const ApplicantPortal: React.FC = () => {
                           </div>
                         )}
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 min-w-0 w-full sm:w-auto sm:flex-1">
                         <input
                           type="file"
                           ref={sigInputRef}
