@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { usePortal } from '../../context/PortalContext';
 import { THEME_CONFIGS } from '../../themeStyles';
 import {
@@ -56,12 +57,21 @@ export const PublicNoticeDetail: React.FC<PublicNoticeDetailProps> = ({
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
   const [copiedNotice, setCopiedNotice] = useState(false);
 
+  const drive = drives.find((d) => d.id === selectedDriveId);
+  const post = drive?.posts.find((p) => p.id === selectedPostId);
+  const hasValidNotice = Boolean(drive && post);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [selectedDriveId, selectedPostId]);
 
-  const drive = drives.find((d) => d.id === selectedDriveId);
-  const post = drive?.posts.find((p) => p.id === selectedPostId);
+  useEffect(() => {
+    if (!hasValidNotice) return;
+    document.body.classList.add('has-public-notice-detail');
+    return () => {
+      document.body.classList.remove('has-public-notice-detail');
+    };
+  }, [hasValidNotice]);
 
   const handleBack = () => {
     setActiveTab(isLoggedIn && currentRole === 'applicant' ? 'overview' : 'public_recruitment');
@@ -158,302 +168,379 @@ export const PublicNoticeDetail: React.FC<PublicNoticeDetailProps> = ({
     ...(drive.interviewPeriod ? [{ label: 'Selection Interview', value: drive.interviewPeriod }] : []),
   ];
 
-  return (
-    <div className={`max-w-6xl mx-auto pb-16 space-y-6 ${theme.rootContainer}`}>
-      {/* Top Utility Navigation Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
-        <button
-          type="button"
-          onClick={handleBack}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap shrink-0"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>{isLoggedIn && currentRole === 'applicant' ? 'Back to Applicant Dashboard' : 'Back to All Notices'}</span>
-        </button>
+  const mastheadSection = (
+    <section className="bg-white border border-slate-200 rounded-xl overflow-hidden print-keep-together">
+      <div className="p-6 sm:p-8 print:p-5 space-y-4">
+        {/* Unboxed Typographic Metadata Line */}
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-medium text-slate-500">
+          <span className="font-semibold text-slate-800">{organizationName}</span>
+          <span aria-hidden="true">·</span>
+          <span>{displayCategory} Recruitment</span>
+          <span aria-hidden="true">·</span>
+          <span className="font-mono tabular-nums text-slate-700">Advt. {drive.advtNumber}</span>
+          <span aria-hidden="true">·</span>
+          <span className="font-mono tabular-nums text-slate-700">Post Code {post.postCode}</span>
+          <span aria-hidden="true">·</span>
+          <span className="text-emerald-700 font-semibold">{statusLabel}</span>
+        </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleShareNotice}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 transition-colors whitespace-nowrap shrink-0"
-          >
-            {copiedNotice ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5 text-slate-500" />}
-            <span>{copiedNotice ? 'Link Copied' : 'Share Notice'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 transition-colors whitespace-nowrap shrink-0"
-          >
-            <Printer className="w-3.5 h-3.5 text-slate-500" />
-            <span>Print Advertisement</span>
-          </button>
+        {/* Dominant Headline & Organizational Context */}
+        <div className="space-y-2 max-w-4xl">
+          <h1 className="text-2xl sm:text-3xl lg:text-[34px] print:text-2xl font-bold tracking-tight text-slate-900 leading-tight text-balance">
+            {post.title}
+          </h1>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-slate-600">
+            <span className="inline-flex items-center gap-1.5 font-medium text-slate-800">
+              <Building2 className="w-4 h-4 text-slate-400 shrink-0" />
+              {post.departmentName}
+            </span>
+            <span className="text-slate-300" aria-hidden="true">|</span>
+            <span className="inline-flex items-center gap-1.5 font-medium text-slate-800">
+              <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+              {displayCampus}
+            </span>
+            <span className="text-slate-300" aria-hidden="true">|</span>
+            <span className="text-slate-500">{drive.title}</span>
+          </div>
         </div>
       </div>
 
-      {/* Institutional Masthead & Key Terms Strip */}
-      <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-        <div className="p-6 sm:p-8 space-y-4">
-          {/* Unboxed Typographic Metadata Line */}
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-medium text-slate-500">
-            <span className="font-semibold text-slate-800">{organizationName}</span>
-            <span aria-hidden="true">·</span>
-            <span>{displayCategory} Recruitment</span>
-            <span aria-hidden="true">·</span>
-            <span className="font-mono tabular-nums text-slate-700">Advt. {drive.advtNumber}</span>
-            <span aria-hidden="true">·</span>
-            <span className="font-mono tabular-nums text-slate-700">Post Code {post.postCode}</span>
-            <span aria-hidden="true">·</span>
-            <span className="text-emerald-700 font-semibold">{statusLabel}</span>
-          </div>
+      {/* 4-Column Key Terms Matrix */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 print:grid-cols-4 border-t border-slate-200 divide-y sm:divide-y-0 sm:divide-x print:divide-y-0 print:divide-x divide-slate-200 bg-slate-50/70">
+        <div className="p-4 sm:px-6 sm:py-4 print:p-3 space-y-1">
+          <div className="text-xs font-medium text-slate-500">Pay Matrix & Scale</div>
+          <div className="text-sm font-semibold text-slate-900 tabular-nums">{post.payScale}</div>
+        </div>
 
-          {/* Dominant Headline & Organizational Context */}
-          <div className="space-y-2 max-w-4xl">
-            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-tight text-slate-900 leading-tight text-balance">
-              {post.title}
-            </h1>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-slate-600">
-              <span className="inline-flex items-center gap-1.5 font-medium text-slate-800">
-                <Building2 className="w-4 h-4 text-slate-400 shrink-0" />
-                {post.departmentName}
-              </span>
-              <span className="text-slate-300" aria-hidden="true">|</span>
-              <span className="inline-flex items-center gap-1.5 font-medium text-slate-800">
-                <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
-                {displayCampus}
-              </span>
-              <span className="text-slate-300" aria-hidden="true">|</span>
-              <span className="text-slate-500">{drive.title}</span>
-            </div>
+        <div className="p-4 sm:px-6 sm:py-4 print:p-3 space-y-1">
+          <div className="text-xs font-medium text-slate-500">Total Sanctioned Posts</div>
+          <div className="text-sm font-semibold text-slate-900 tabular-nums">
+            {Number(post.vacanciesTotal) || 0} {Number(post.vacanciesTotal) === 1 ? 'Vacancy' : 'Vacancies'}
           </div>
         </div>
 
-        {/* 4-Column Key Terms Matrix */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-slate-200 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 bg-slate-50/70">
-          <div className="p-4 sm:px-6 sm:py-4 space-y-1">
-            <div className="text-xs font-medium text-slate-500">Pay Matrix & Scale</div>
-            <div className="text-sm font-semibold text-slate-900 tabular-nums">{post.payScale}</div>
-          </div>
-
-          <div className="p-4 sm:px-6 sm:py-4 space-y-1">
-            <div className="text-xs font-medium text-slate-500">Total Sanctioned Posts</div>
-            <div className="text-sm font-semibold text-slate-900 tabular-nums">
-              {Number(post.vacanciesTotal) || 0} {Number(post.vacanciesTotal) === 1 ? 'Vacancy' : 'Vacancies'}
-            </div>
-          </div>
-
-          <div className="p-4 sm:px-6 sm:py-4 space-y-1">
-            <div className="text-xs font-medium text-slate-500">Application Fee</div>
-            <div className="text-sm font-semibold text-slate-900 tabular-nums">
-              ₹{Number(post.applicationFee) || 0}
-              <span className="text-xs font-normal text-slate-500 ml-1.5">
-                ({post.feeExemptCategories?.length ? `${post.feeExemptCategories.join('/')} Exempt` : 'Standard'})
-              </span>
-            </div>
-          </div>
-
-          <div className="p-4 sm:px-6 sm:py-4 space-y-1">
-            <div className="text-xs font-medium text-slate-500">Application Deadline</div>
-            <div className="text-sm font-semibold text-slate-900 tabular-nums flex items-center gap-2">
-              <span>{formatDisplayDate(drive.closingDate)}</span>
-              {daysRemaining !== null && daysRemaining >= 0 && (
-                <span className="text-xs font-medium text-amber-700">
-                  ({daysRemaining === 0 ? 'Closes today' : `${daysRemaining}d left`})
-                </span>
-              )}
-            </div>
+        <div className="p-4 sm:px-6 sm:py-4 print:p-3 space-y-1">
+          <div className="text-xs font-medium text-slate-500">Application Fee</div>
+          <div className="text-sm font-semibold text-slate-900 tabular-nums">
+            ₹{Number(post.applicationFee) || 0}
+            <span className="text-xs font-normal text-slate-500 ml-1.5">
+              ({post.feeExemptCategories?.length ? `${post.feeExemptCategories.join('/')} Exempt` : 'Standard'})
+            </span>
           </div>
         </div>
-      </section>
+
+        <div className="p-4 sm:px-6 sm:py-4 print:p-3 space-y-1">
+          <div className="text-xs font-medium text-slate-500">Application Deadline</div>
+          <div className="text-sm font-semibold text-slate-900 tabular-nums flex items-center gap-2">
+            <span>{formatDisplayDate(drive.closingDate)}</span>
+            {daysRemaining !== null && daysRemaining >= 0 && (
+              <span className="text-xs font-medium text-amber-700">
+                ({daysRemaining === 0 ? 'Closes today' : `${daysRemaining}d left`})
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+
+  const overviewSection = (
+    <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 print:p-5 space-y-6 print:space-y-4">
+      <div className="space-y-1 border-b border-slate-200 pb-4 print:pb-3">
+        <h2 className="text-base font-semibold text-slate-900">Position Overview & Notification Scope</h2>
+        <p className="text-xs text-slate-500">Official terms of recruitment issued by {organizationName}</p>
+      </div>
+
+      <p className="text-sm text-slate-700 leading-relaxed max-w-prose">
+        {drive.description ||
+          `Online applications are invited from eligible Indian nationals and qualified professionals for the post of ${post.title} in the Department of ${post.departmentName} at ${displayCampus}. Appointments shall be governed by Institute statutes and UGC / AICTE norms where applicable.`}
+      </p>
+
+      {/* Structured Specification Definition List */}
+      <dl className="grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 border-t border-slate-200 pt-5 print:pt-4 gap-x-8 gap-y-4 text-sm">
+        <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
+          <dt className="text-xs font-medium text-slate-500">Recruitment Drive</dt>
+          <dd className="font-medium text-slate-900">{drive.title}</dd>
+        </div>
+        <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
+          <dt className="text-xs font-medium text-slate-500">Drive & Advertisement Reference</dt>
+          <dd className="font-mono text-xs font-medium text-slate-900 tabular-nums">
+            {drive.driveCode} / {drive.advtNumber}
+          </dd>
+        </div>
+        <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
+          <dt className="text-xs font-medium text-slate-500">Department / Academic Unit</dt>
+          <dd className="font-medium text-slate-900">{post.departmentName}</dd>
+        </div>
+        <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
+          <dt className="text-xs font-medium text-slate-500">Place of Posting (Campus)</dt>
+          <dd className="font-medium text-slate-900">{displayCampus}</dd>
+        </div>
+        <div className="flex flex-col space-y-0.5 pb-1">
+          <dt className="text-xs font-medium text-slate-500">Position Category</dt>
+          <dd className="font-medium text-slate-900">{displayCategory}</dd>
+        </div>
+        <div className="flex flex-col space-y-0.5 pb-1">
+          <dt className="text-xs font-medium text-slate-500">Probation & Appointment Terms</dt>
+          <dd className="font-medium text-slate-900">Regular / 24 Months Probation</dd>
+        </div>
+      </dl>
+    </section>
+  );
+
+  const vacancyTableSection = drive.showCategoryRow !== false ? (
+    <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 print:p-5 space-y-5 print-keep-together">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-slate-200 pb-4 print:pb-3">
+        <div>
+          <h2 className="text-base font-semibold text-slate-900">Category-Wise Vacancy Distribution</h2>
+          <p className="text-xs text-slate-500">Reservation roster applicable as per Government of India & Institute guidelines</p>
+        </div>
+        <span className="text-xs font-mono font-semibold text-slate-700 tabular-nums">
+          Total: {Number(post.vacanciesTotal) || 0} Posts
+        </span>
+      </div>
+
+      <div className="overflow-x-auto border border-slate-200 rounded-lg">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600">
+              {vacancyColumns.map((col) => (
+                <th key={col.code} className="px-4 py-3 text-center whitespace-nowrap">
+                  <div>{col.code}</div>
+                  <div className="text-[11px] font-normal text-slate-400">{col.label}</div>
+                </th>
+              ))}
+              <th className="px-4 py-3 text-center bg-slate-100/80 text-slate-900 whitespace-nowrap">
+                <div>Total</div>
+                <div className="text-[11px] font-normal text-slate-500">Sanctioned</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="text-sm font-semibold text-slate-900 font-mono tabular-nums">
+              {vacancyColumns.map((col) => (
+                <td key={col.code} className="px-4 py-3.5 text-center border-r border-slate-100 last:border-r-0">
+                  {col.count}
+                </td>
+              ))}
+              <td className="px-4 py-3.5 text-center bg-slate-50 text-indigo-700 font-bold">
+                {Number(post.vacanciesTotal) || 0}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  ) : null;
+
+  const eligibilitySection = (
+    <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 print:p-5 space-y-6 print:space-y-4 print-keep-together">
+      <div className="space-y-1 border-b border-slate-200 pb-4 print:pb-3">
+        <h2 className="text-base font-semibold text-slate-900">Eligibility & Qualification Criteria</h2>
+        <p className="text-xs text-slate-500">Mandatory academic, professional experience, and age requirements</p>
+      </div>
+
+      <div className="space-y-6 print:space-y-4">
+        {/* Essential Qualification */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+            <GraduationCap className="w-4 h-4 text-slate-500" />
+            <span>Essential Educational Qualification</span>
+          </div>
+          <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 text-sm text-slate-800 leading-relaxed">
+            {post.minQualification}
+          </div>
+        </div>
+
+        {/* Experience & Age Limits */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 print:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+          <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
+            <div className="text-xs font-medium text-slate-500">Minimum Experience</div>
+            <div className="text-base font-semibold text-slate-900 tabular-nums">
+              {post.requiredExperienceYears} {post.requiredExperienceYears === 1 ? 'Year' : 'Years'}
+            </div>
+            <p className="text-xs text-slate-500">Post-qualification relevant service</p>
+          </div>
+
+          <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
+            <div className="text-xs font-medium text-slate-500">Minimum Age Limit</div>
+            <div className="text-base font-semibold text-slate-900 tabular-nums">
+              {post.minAge} Years
+            </div>
+            <p className="text-xs text-slate-500">As on closing date of notice</p>
+          </div>
+
+          <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
+            <div className="text-xs font-medium text-slate-500">Maximum Age Limit</div>
+            <div className="text-base font-semibold text-slate-900 tabular-nums">
+              {post.maxAge} Years
+            </div>
+            <p className="text-xs text-slate-500">Age relaxation as per GoI norms</p>
+          </div>
+        </div>
+
+        {/* Syllabus / Additional Notes if present */}
+        {drive.syllabusContent && (
+          <div className="pt-4 border-t border-slate-100 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+              <FileText className="w-4 h-4 text-slate-500" />
+              <span>Syllabus & Assessment Scope</span>
+            </div>
+            <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+              {drive.syllabusContent}
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+
+  const selectionSection = (
+    <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 print:p-5 space-y-6 print:space-y-4 print-keep-together">
+      <div className="space-y-1 border-b border-slate-200 pb-4 print:pb-3">
+        <h2 className="text-base font-semibold text-slate-900">Selection Process & Evaluation Pattern</h2>
+        <p className="text-xs text-slate-500">Multi-stage merit evaluation and verification workflow</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 print:grid-cols-3 gap-5 print:gap-3">
+        <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
+          <div className="text-xs font-mono font-semibold text-indigo-700">Stage 01</div>
+          <h3 className="text-sm font-semibold text-slate-900">Screening & Shortlisting</h3>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Scrutiny of academic credentials, API/research records, and supporting certificates against essential eligibility benchmarks.
+          </p>
+        </div>
+
+        <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
+          <div className="text-xs font-mono font-semibold text-indigo-700">Stage 02</div>
+          <h3 className="text-sm font-semibold text-slate-900">Written / Skill Assessment</h3>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Subject-domain written examination and practical skill/trade proficiency test conducted where prescribed for the cadre.
+          </p>
+        </div>
+
+        <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
+          <div className="text-xs font-mono font-semibold text-indigo-700">Stage 03</div>
+          <h3 className="text-sm font-semibold text-slate-900">Selection Committee Interview</h3>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Personal interview and seminar/presentation before the duly constituted expert selection committee for final merit ranking.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+
+  const importantDatesSection = (
+    <div className="bg-white border border-slate-200 rounded-xl p-6 print:p-5 space-y-4 print-keep-together">
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+        <Calendar className="w-4 h-4 text-slate-500" />
+        <h3 className="text-sm font-semibold text-slate-900">Important Dates</h3>
+      </div>
+
+      <dl className="divide-y divide-slate-100 text-xs">
+        {scheduleRows.map((row) => (
+          <div key={row.label} className="py-2.5 flex items-center justify-between gap-4">
+            <dt className="text-slate-500">{row.label}</dt>
+            <dd
+              className={`font-mono tabular-nums text-right ${
+                row.emphasize ? 'font-semibold text-rose-700' : 'font-medium text-slate-900'
+              }`}
+            >
+              {row.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+
+  const feeAndHelpdeskSection = (
+    <div className="bg-white border border-slate-200 rounded-xl p-6 print:p-5 space-y-5 print-keep-together">
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-900">
+          <ShieldCheck className="w-4 h-4 text-slate-500" />
+          <span>Fee Exemption & Documents</span>
+        </div>
+        <p className="text-xs text-slate-600 leading-relaxed">
+          Application fee is ₹{Number(post.applicationFee) || 0}.{' '}
+          {post.feeExemptCategories?.length
+            ? `Candidates belonging to ${post.feeExemptCategories.join(', ')} categories are exempted from fee payment upon uploading valid category certificates.`
+            : 'Exemptions apply strictly as per Institute and Government of India norms.'}
+        </p>
+        <ul className="text-xs text-slate-600 space-y-1.5 pt-1 list-disc pl-4">
+          <li>Scanned passport photograph & signature</li>
+          <li>Matriculation, UG, PG & Ph.D. degree certificates</li>
+          <li>Experience certificates, NOC (if employed) & category proofs</li>
+        </ul>
+      </div>
+
+      <div className="pt-4 border-t border-slate-200 space-y-1.5">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-900">
+          <Mail className="w-4 h-4 text-slate-500" />
+          <span>Recruitment Helpdesk</span>
+        </div>
+        <p className="text-xs text-slate-600 leading-relaxed">
+          For clarifications regarding advertisement {drive.advtNumber}, write to{' '}
+          <span className="font-medium text-slate-900">recruitment@bitmesra.ac.in</span> citing Post Code{' '}
+          <span className="font-mono">{post.postCode}</span>.
+        </p>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      <div className={`max-w-6xl mx-auto pb-16 space-y-6 ${theme.rootContainer}`}>
+        {/* Top Utility Navigation Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap shrink-0"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>{isLoggedIn && currentRole === 'applicant' ? 'Back to Applicant Dashboard' : 'Back to All Notices'}</span>
+          </button>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleShareNotice}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 transition-colors whitespace-nowrap shrink-0"
+            >
+              {copiedNotice ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5 text-slate-500" />}
+              <span>{copiedNotice ? 'Link Copied' : 'Share Notice'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 transition-colors whitespace-nowrap shrink-0"
+            >
+              <Printer className="w-3.5 h-3.5 text-slate-500" />
+              <span>Print Advertisement</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Institutional Masthead & Key Terms Strip */}
+        {mastheadSection}
 
       {/* Main 2-Column Specification & Action Rail */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Primary Column: Detailed Specification */}
         <div className="lg:col-span-8 space-y-6">
           {/* 1. Position Summary & Official Details */}
-          <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 space-y-6">
-            <div className="space-y-1 border-b border-slate-200 pb-4">
-              <h2 className="text-base font-semibold text-slate-900">Position Overview & Notification Scope</h2>
-              <p className="text-xs text-slate-500">Official terms of recruitment issued by {organizationName}</p>
-            </div>
-
-            <p className="text-sm text-slate-700 leading-relaxed max-w-prose">
-              {drive.description ||
-                `Online applications are invited from eligible Indian nationals and qualified professionals for the post of ${post.title} in the Department of ${post.departmentName} at ${displayCampus}. Appointments shall be governed by Institute statutes and UGC / AICTE norms where applicable.`}
-            </p>
-
-            {/* Structured Specification Definition List */}
-            <dl className="grid grid-cols-1 sm:grid-cols-2 border-t border-slate-200 pt-5 gap-x-8 gap-y-4 text-sm">
-              <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
-                <dt className="text-xs font-medium text-slate-500">Recruitment Drive</dt>
-                <dd className="font-medium text-slate-900">{drive.title}</dd>
-              </div>
-              <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
-                <dt className="text-xs font-medium text-slate-500">Drive & Advertisement Reference</dt>
-                <dd className="font-mono text-xs font-medium text-slate-900 tabular-nums">
-                  {drive.driveCode} / {drive.advtNumber}
-                </dd>
-              </div>
-              <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
-                <dt className="text-xs font-medium text-slate-500">Department / Academic Unit</dt>
-                <dd className="font-medium text-slate-900">{post.departmentName}</dd>
-              </div>
-              <div className="flex flex-col space-y-0.5 border-b border-slate-100 pb-3">
-                <dt className="text-xs font-medium text-slate-500">Place of Posting (Campus)</dt>
-                <dd className="font-medium text-slate-900">{displayCampus}</dd>
-              </div>
-              <div className="flex flex-col space-y-0.5 pb-1">
-                <dt className="text-xs font-medium text-slate-500">Position Category</dt>
-                <dd className="font-medium text-slate-900">{displayCategory}</dd>
-              </div>
-              <div className="flex flex-col space-y-0.5 pb-1">
-                <dt className="text-xs font-medium text-slate-500">Probation & Appointment Terms</dt>
-                <dd className="font-medium text-slate-900">Regular / 24 Months Probation</dd>
-              </div>
-            </dl>
-          </section>
+          {overviewSection}
 
           {/* 2. Category-wise Vacancy Breakdown Table */}
-          {drive.showCategoryRow !== false && (
-            <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 space-y-5">
-              <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-slate-200 pb-4">
-                <div>
-                  <h2 className="text-base font-semibold text-slate-900">Category-Wise Vacancy Distribution</h2>
-                  <p className="text-xs text-slate-500">Reservation roster applicable as per Government of India & Institute guidelines</p>
-                </div>
-                <span className="text-xs font-mono font-semibold text-slate-700 tabular-nums">
-                  Total: {Number(post.vacanciesTotal) || 0} Posts
-                </span>
-              </div>
-
-              <div className="overflow-x-auto border border-slate-200 rounded-lg">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600">
-                      {vacancyColumns.map((col) => (
-                        <th key={col.code} className="px-4 py-3 text-center whitespace-nowrap">
-                          <div>{col.code}</div>
-                          <div className="text-[11px] font-normal text-slate-400">{col.label}</div>
-                        </th>
-                      ))}
-                      <th className="px-4 py-3 text-center bg-slate-100/80 text-slate-900 whitespace-nowrap">
-                        <div>Total</div>
-                        <div className="text-[11px] font-normal text-slate-500">Sanctioned</div>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="text-sm font-semibold text-slate-900 font-mono tabular-nums">
-                      {vacancyColumns.map((col) => (
-                        <td key={col.code} className="px-4 py-3.5 text-center border-r border-slate-100 last:border-r-0">
-                          {col.count}
-                        </td>
-                      ))}
-                      <td className="px-4 py-3.5 text-center bg-slate-50 text-indigo-700 font-bold">
-                        {Number(post.vacanciesTotal) || 0}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
+          {vacancyTableSection}
 
           {/* 3. Eligibility, Qualification & Age Criteria */}
-          <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 space-y-6">
-            <div className="space-y-1 border-b border-slate-200 pb-4">
-              <h2 className="text-base font-semibold text-slate-900">Eligibility & Qualification Criteria</h2>
-              <p className="text-xs text-slate-500">Mandatory academic, professional experience, and age requirements</p>
-            </div>
-
-            <div className="space-y-6">
-              {/* Essential Qualification */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                  <GraduationCap className="w-4 h-4 text-slate-500" />
-                  <span>Essential Educational Qualification</span>
-                </div>
-                <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 text-sm text-slate-800 leading-relaxed">
-                  {post.minQualification}
-                </div>
-              </div>
-
-              {/* Experience & Age Limits */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
-                <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
-                  <div className="text-xs font-medium text-slate-500">Minimum Experience</div>
-                  <div className="text-base font-semibold text-slate-900 tabular-nums">
-                    {post.requiredExperienceYears} {post.requiredExperienceYears === 1 ? 'Year' : 'Years'}
-                  </div>
-                  <p className="text-xs text-slate-500">Post-qualification relevant service</p>
-                </div>
-
-                <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
-                  <div className="text-xs font-medium text-slate-500">Minimum Age Limit</div>
-                  <div className="text-base font-semibold text-slate-900 tabular-nums">
-                    {post.minAge} Years
-                  </div>
-                  <p className="text-xs text-slate-500">As on closing date of notice</p>
-                </div>
-
-                <div className="p-4 rounded-lg border border-slate-200 bg-white space-y-1">
-                  <div className="text-xs font-medium text-slate-500">Maximum Age Limit</div>
-                  <div className="text-base font-semibold text-slate-900 tabular-nums">
-                    {post.maxAge} Years
-                  </div>
-                  <p className="text-xs text-slate-500">Age relaxation as per GoI norms</p>
-                </div>
-              </div>
-
-              {/* Syllabus / Additional Notes if present */}
-              {drive.syllabusContent && (
-                <div className="pt-4 border-t border-slate-100 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                    <FileText className="w-4 h-4 text-slate-500" />
-                    <span>Syllabus & Assessment Scope</span>
-                  </div>
-                  <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
-                    {drive.syllabusContent}
-                  </p>
-                </div>
-              )}
-            </div>
-          </section>
+          {eligibilitySection}
 
           {/* 4. Selection Methodology */}
-          <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 space-y-6">
-            <div className="space-y-1 border-b border-slate-200 pb-4">
-              <h2 className="text-base font-semibold text-slate-900">Selection Process & Evaluation Pattern</h2>
-              <p className="text-xs text-slate-500">Multi-stage merit evaluation and verification workflow</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
-                <div className="text-xs font-mono font-semibold text-indigo-700">Stage 01</div>
-                <h3 className="text-sm font-semibold text-slate-900">Screening & Shortlisting</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Scrutiny of academic credentials, API/research records, and supporting certificates against essential eligibility benchmarks.
-                </p>
-              </div>
-
-              <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
-                <div className="text-xs font-mono font-semibold text-indigo-700">Stage 02</div>
-                <h3 className="text-sm font-semibold text-slate-900">Written / Skill Assessment</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Subject-domain written examination and practical skill/trade proficiency test conducted where prescribed for the cadre.
-                </p>
-              </div>
-
-              <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2">
-                <div className="text-xs font-mono font-semibold text-indigo-700">Stage 03</div>
-                <h3 className="text-sm font-semibold text-slate-900">Selection Committee Interview</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Personal interview and seminar/presentation before the duly constituted expert selection committee for final merit ranking.
-                </p>
-              </div>
-            </div>
-          </section>
+          {selectionSection}
         </div>
 
         {/* Right Sticky Action & Schedule Rail */}
@@ -526,62 +613,30 @@ export const PublicNoticeDetail: React.FC<PublicNoticeDetailProps> = ({
           </div>
 
           {/* Key Recruitment Dates */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
-            <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
-              <Calendar className="w-4 h-4 text-slate-500" />
-              <h3 className="text-sm font-semibold text-slate-900">Important Dates</h3>
-            </div>
-
-            <dl className="divide-y divide-slate-100 text-xs">
-              {scheduleRows.map((row) => (
-                <div key={row.label} className="py-2.5 flex items-center justify-between gap-4">
-                  <dt className="text-slate-500">{row.label}</dt>
-                  <dd
-                    className={`font-mono tabular-nums text-right ${
-                      row.emphasize ? 'font-semibold text-rose-700' : 'font-medium text-slate-900'
-                    }`}
-                  >
-                    {row.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+          {importantDatesSection}
 
           {/* Fee Concession & Applicant Checklist */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-5">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-900">
-                <ShieldCheck className="w-4 h-4 text-slate-500" />
-                <span>Fee Exemption & Documents</span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Application fee is ₹{Number(post.applicationFee) || 0}.{' '}
-                {post.feeExemptCategories?.length
-                  ? `Candidates belonging to ${post.feeExemptCategories.join(', ')} categories are exempted from fee payment upon uploading valid category certificates.`
-                  : 'Exemptions apply strictly as per Institute and Government of India norms.'}
-              </p>
-              <ul className="text-xs text-slate-600 space-y-1.5 pt-1 list-disc pl-4">
-                <li>Scanned passport photograph & signature</li>
-                <li>Matriculation, UG, PG & Ph.D. degree certificates</li>
-                <li>Experience certificates, NOC (if employed) & category proofs</li>
-              </ul>
-            </div>
-
-            <div className="pt-4 border-t border-slate-200 space-y-1.5">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-900">
-                <Mail className="w-4 h-4 text-slate-500" />
-                <span>Recruitment Helpdesk</span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                For clarifications regarding advertisement {drive.advtNumber}, write to{' '}
-                <span className="font-medium text-slate-900">recruitment@bitmesra.ac.in</span> citing Post Code{' '}
-                <span className="font-mono">{post.postCode}</span>.
-              </p>
-            </div>
-          </div>
+          {feeAndHelpdeskSection}
         </aside>
       </div>
     </div>
+
+      {createPortal(
+        <div className="notice-detail-print-portal hidden print:block bg-white text-slate-900">
+          <div className="max-w-4xl mx-auto space-y-4">
+            {mastheadSection}
+            {overviewSection}
+            {vacancyTableSection}
+            {eligibilitySection}
+            {selectionSection}
+            <div className="grid grid-cols-2 gap-4 items-start">
+              {importantDatesSection}
+              {feeAndHelpdeskSection}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 };

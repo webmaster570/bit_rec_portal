@@ -108,7 +108,9 @@ textarea:disabled,
   }
 
   html:has(body.has-application-preview-modal),
-  body.has-application-preview-modal {
+  body.has-application-preview-modal,
+  html:has(body.has-public-notice-detail),
+  body.has-public-notice-detail {
     height: auto !important;
     overflow: visible !important;
     background: #ffffff !important;
@@ -120,6 +122,33 @@ textarea:disabled,
 
   body.has-application-preview-modal > *:not(.application-preview-print-root) {
     display: none !important;
+  }
+
+  body.has-public-notice-detail:not(.has-application-preview-modal) > *:not(.notice-detail-print-portal) {
+    display: none !important;
+  }
+
+  .notice-detail-print-portal {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .notice-detail-print-portal h2,
+  .notice-detail-print-portal h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .notice-detail-print-portal tr,
+  .notice-detail-print-portal .print-keep-together {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   .application-preview-print-root {
