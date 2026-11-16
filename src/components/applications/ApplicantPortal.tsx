@@ -1030,17 +1030,17 @@ export const ApplicantPortal: React.FC = () => {
 
               {/* Jobs Listing */}
               {filteredJobs.length === 0 ? (
-                <div className="p-12 text-center border border-dashed border-slate-300 rounded-xl bg-slate-50/50 space-y-2">
+                <div className="p-10 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50 space-y-2">
                   <Briefcase className="w-8 h-8 text-slate-300 mx-auto" />
-                  <h4 className={`text-sm font-semibold ${titleColorClass}`}>
+                  <h4 className="text-sm font-bold text-slate-800">
                     No {jobCategoryTab} positions found
                   </h4>
-                  <p className="text-xs text-blue-700 max-w-md mx-auto">
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
                     Try changing the selected campus filter or search keyword, or switch between Teaching and Non-Teaching tabs.
                   </p>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-200 border border-slate-200 rounded-xl overflow-hidden bg-white">
+                <div className="space-y-3">
                   {filteredJobs.map(({ drive, post, category, campus }) => {
                     const existingApp = myUserApps.find(
                       (a) => a.driveId === drive.id && a.postId === post.id
@@ -1049,71 +1049,74 @@ export const ApplicantPortal: React.FC = () => {
                     return (
                       <div
                         key={`${drive.id}-${post.id}`}
-                        className="p-5 hover:bg-slate-50/60 transition flex flex-col lg:flex-row lg:items-center justify-between gap-5"
+                        className="bg-white border border-slate-200 hover:border-indigo-300 rounded-xl p-4 sm:p-5 shadow-2xs transition flex flex-col lg:flex-row lg:items-center justify-between gap-4"
                       >
                         <div className="space-y-2 flex-1">
-                          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500">
-                            <span className={`font-semibold ${theme.accentColor}`}>{category}</span>
-                            <span aria-hidden="true">·</span>
-                            <span className="font-semibold text-emerald-700 inline-flex items-center gap-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 text-[10px] font-bold uppercase tracking-wider">
+                              {category}
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-bold inline-flex items-center gap-1">
                               <MapPin className="w-3 h-3" />
                               {campus}
                             </span>
-                            <span aria-hidden="true">·</span>
-                            <span className="font-mono text-slate-700">{drive.advtNumber}</span>
-                            <span aria-hidden="true">·</span>
-                            <span className="font-mono text-slate-600">Code: {post.postCode}</span>
+                            <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[10px] font-bold">
+                              {drive.advtNumber}
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-mono text-[10px] font-semibold">
+                              Code: {post.postCode}
+                            </span>
                           </div>
 
                           <div>
-                            <h4 className={`text-base font-bold leading-snug ${titleColorClass}`}>
+                            <h4 className="text-base font-extrabold text-slate-900 leading-snug">
                               {post.title}
                             </h4>
-                            <p className="text-xs text-blue-700 mt-0.5 font-medium">
-                              {drive.title} · <span className="font-semibold">{post.departmentName}</span>
+                            <p className="text-xs text-slate-500 font-medium mt-0.5">
+                              {drive.title} • <span className="text-slate-700 font-semibold">{post.departmentName}</span>
                             </p>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-slate-600 pt-1 tabular-nums">
+                          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[11px] text-slate-600 pt-1 tabular-nums">
                             <span className="flex items-center gap-1.5">
                               <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                              Pay Scale: <strong className="text-slate-900 font-semibold">{post.payScale}</strong>
+                              Pay Scale: <strong className="text-slate-800">{post.payScale}</strong>
                             </span>
                             <span className="flex items-center gap-1.5">
                               <Users className="w-3.5 h-3.5 text-slate-400" />
-                              Vacancies: <strong className="text-slate-900 font-semibold">{Number(post.vacanciesTotal) || 0}</strong>
+                              Vacancies: <strong className="text-slate-800">{Number(post.vacanciesTotal) || 0}</strong>
                             </span>
                             <span className="flex items-center gap-1.5">
                               <CreditCard className="w-3.5 h-3.5 text-slate-400" />
-                              Fee: <strong className="text-slate-900 font-semibold">₹{post.applicationFee}</strong>
+                              Fee: <strong className="text-slate-800">₹{post.applicationFee}</strong>
                             </span>
                             <span className="flex items-center gap-1.5">
                               <Calendar className="w-3.5 h-3.5 text-rose-500" />
-                              Closing Date: <strong className="text-rose-700 font-semibold">{new Date(drive.closingDate).toLocaleDateString()}</strong>
+                              Closing Date: <strong className="text-rose-600">{new Date(drive.closingDate).toLocaleDateString()}</strong>
                             </span>
                           </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-center justify-center gap-2 shrink-0 min-w-[175px]">
+                        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-center justify-center gap-2 shrink-0">
                           {existingApp ? (
                             existingApp.stage === 'draft' ? (
                               <button
                                 type="button"
                                 onClick={() => setEditingAppId(existingApp.id)}
-                                className="w-full px-4 py-2.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs flex items-center justify-center gap-2 transition whitespace-nowrap"
+                                className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition whitespace-nowrap"
                               >
-                                <ArrowRight className="w-3.5 h-3.5" />
+                                <ArrowRight className="w-4 h-4" />
                                 <span>Continue Draft</span>
                               </button>
                             ) : (
                               <>
-                                <span className="text-[11px] font-mono font-semibold text-emerald-700 text-center">
+                                <span className="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold text-center">
                                   Applied ({existingApp.applicationNo})
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => setActiveTab('my_jobs')}
-                                  className="w-full px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition whitespace-nowrap"
+                                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition whitespace-nowrap"
                                 >
                                   <Eye className="w-3.5 h-3.5" />
                                   <span>View My Application</span>
@@ -1124,7 +1127,7 @@ export const ApplicantPortal: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => handleSelectJobToApply(drive.id, post.id, campus)}
-                              className="w-full px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs flex items-center justify-center gap-2 transition whitespace-nowrap"
+                              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition active:scale-98 whitespace-nowrap"
                             >
                               <Send className="w-3.5 h-3.5" />
                               <span>Apply Online</span>
@@ -1138,7 +1141,7 @@ export const ApplicantPortal: React.FC = () => {
                               setCtxPostId(post.id);
                               setActiveTab('notice_detail');
                             }}
-                            className="text-xs font-semibold text-indigo-700 hover:text-indigo-900 hover:underline flex items-center justify-center gap-1 py-0.5 transition whitespace-nowrap"
+                            className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center justify-center gap-1 py-0.5 transition whitespace-nowrap"
                           >
                             <FileText className="w-3.5 h-3.5" />
                             <span>View Detailed Advertisement</span>
