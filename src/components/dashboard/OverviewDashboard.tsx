@@ -407,17 +407,17 @@ export const OverviewDashboard: React.FC<{
 
               {/* 2 Category Tabs: Teaching & Non-Teaching */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-                <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl w-full sm:w-auto">
+                <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl w-full sm:w-auto border border-slate-200/80">
                   <button
                     type="button"
                     onClick={() => setVacCategoryTab('Teaching')}
                     className={`flex-1 sm:flex-initial px-5 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition ${
                       vacCategoryTab === 'Teaching'
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                        ? 'bg-gradient-to-r from-blue-700 to-indigo-700 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/70'
                     }`}
                   >
-                    <GraduationCap className="w-4 h-4" />
+                    <GraduationCap className={`w-4 h-4 ${vacCategoryTab === 'Teaching' ? 'text-white' : 'text-slate-400'}`} />
                     <span>Teaching</span>
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
@@ -433,11 +433,11 @@ export const OverviewDashboard: React.FC<{
                     onClick={() => setVacCategoryTab('Non-Teaching')}
                     className={`flex-1 sm:flex-initial px-5 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition ${
                       vacCategoryTab === 'Non-Teaching'
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                        ? 'bg-gradient-to-r from-blue-700 to-indigo-700 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/70'
                     }`}
                   >
-                    <Briefcase className="w-4 h-4" />
+                    <Briefcase className={`w-4 h-4 ${vacCategoryTab === 'Non-Teaching' ? 'text-white' : 'text-slate-400'}`} />
                     <span>Non-Teaching</span>
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
