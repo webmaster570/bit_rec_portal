@@ -188,6 +188,7 @@ export interface ResearchPaperItem {
   issnIsbnNo: string;
   refereed: string;
   author: string;
+  publisherCityCountry?: string;
   year: string;
 }
 
@@ -211,9 +212,67 @@ export interface ExperienceRecord {
   proofSlNo?: string;
 }
 
+export const DOCUMENT_CATEGORIES = [
+  { value: 'matriculation_certificate_and_marksheet', label: 'Matriculation certificate and Marksheet' },
+  { value: 'intermediate_certificate_and_marksheets', label: 'Intermediate certificate and Marksheets' },
+  { value: 'graduation_certificate_and_marksheets', label: 'Graduation certificate and marksheets' },
+  { value: 'post_graduation_certificate_and_marksheets', label: 'Post-graduation certificate and marksheets' },
+  { value: 'other_essential_qualification_certificates', label: 'Other essential qualification certificates' },
+  { value: 'experience_certificates', label: 'Experience certificates' },
+  { value: 'caste_category_certificate', label: 'Caste/category certificate, if applicable' },
+  { value: 'ews_certificate', label: 'EWS certificate, if applicable' },
+  { value: 'pwbd_certificate', label: 'PwBD certificate, if applicable' },
+  { value: 'noc_from_present_employer', label: 'NOC from present employer, where required' },
+  { value: 'vigilance_integrity_certificate', label: 'Vigilance/Integrity certificate, where required' },
+  { value: 'apar_acr_records', label: 'APAR/ACR records, where required' },
+  { value: 'proof_of_pay_level_basic_pay', label: 'Proof of pay level/basic pay' },
+  { value: 'any_other_supporting_document', label: 'Any other supporting document' },
+] as const;
+
+export type DocumentCategoryType = (typeof DOCUMENT_CATEGORIES)[number]['value'];
+
+const LEGACY_DOCUMENT_CATEGORY_LABELS: Record<string, string> = {
+  degree_10th: 'Matriculation certificate and Marksheet',
+  '10th_certificate': 'Matriculation certificate and Marksheet',
+  degree_12th: 'Intermediate certificate and Marksheets',
+  '12th_certificate': 'Intermediate certificate and Marksheets',
+  degree_ug: 'Graduation certificate and marksheets',
+  ug_degree: 'Graduation certificate and marksheets',
+  degree_pg: 'Post-graduation certificate and marksheets',
+  pg_degree: 'Post-graduation certificate and marksheets',
+  degree_phd: 'Other essential qualification certificates',
+  phd_degree: 'Other essential qualification certificates',
+  experience_proof: 'Experience certificates',
+  exp_certificate: 'Experience certificates',
+  caste_certificate: 'Caste/category certificate, if applicable',
+  noc_certificate: 'NOC from present employer, where required',
+  id_proof: 'ID Proof (Aadhaar/PAN)',
+  other: 'Any other supporting document',
+};
+
+export const getDocumentCategoryLabel = (type: string): string => {
+  const matched = DOCUMENT_CATEGORIES.find((cat) => cat.value === type);
+  if (matched) return matched.label;
+  if (LEGACY_DOCUMENT_CATEGORY_LABELS[type]) return LEGACY_DOCUMENT_CATEGORY_LABELS[type];
+  return type.replace(/_/g, ' ');
+};
+
 export interface DocumentAttachment {
   id: string;
-  type: 'photo' | 'signature' | 'id_proof' | 'caste_certificate' | '10th_certificate' | '12th_certificate' | 'ug_degree' | 'pg_degree' | 'phd_degree' | 'exp_certificate' | 'noc_certificate';
+  type:
+    | DocumentCategoryType
+    | 'photo'
+    | 'signature'
+    | 'id_proof'
+    | 'caste_certificate'
+    | '10th_certificate'
+    | '12th_certificate'
+    | 'ug_degree'
+    | 'pg_degree'
+    | 'phd_degree'
+    | 'exp_certificate'
+    | 'noc_certificate'
+    | (string & {});
   name: string;
   fileSize: string;
   uploadedAt: string;

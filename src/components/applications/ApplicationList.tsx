@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { Application, ApplicationStage } from '../../types';
+import { Application, ApplicationStage, getDocumentCategoryLabel } from '../../types';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import { OfferLetterModal } from '../common/OfferLetterModal';
 import { ApplicationPreviewModal } from './ApplicationPreviewModal';
@@ -490,7 +490,7 @@ export const ApplicationList: React.FC = () => {
                     >
                       <div>
                         <span className="font-semibold text-slate-900 block">{doc.name}</span>
-                        <span className="text-[10px] text-slate-500 uppercase">{doc.type.replace(/_/g, ' ')} • {doc.fileSize}</span>
+                        <span className="text-[10px] text-slate-500">{getDocumentCategoryLabel(doc.type)} • {doc.fileSize}</span>
                       </div>
                       <span
                         className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${

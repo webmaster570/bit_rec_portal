@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { Application, ApplicationStage } from '../../types';
+import { Application, ApplicationStage, getDocumentCategoryLabel } from '../../types';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import { OfferLetterModal } from '../common/OfferLetterModal';
 import { ApplicationPreviewModal } from '../applications/ApplicationPreviewModal';
@@ -1115,33 +1115,33 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                         <span className="text-[10px] font-bold text-slate-700 block mb-1.5">
                           Research Publication – Books, Chapters, Edited Works, Articles (In Related Areas Only) if any
                         </span>
-                        {selectedAppDetail.researchBookItems && selectedAppDetail.researchBookItems.some(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim()) ? (
+                        {selectedAppDetail.researchBookItems && selectedAppDetail.researchBookItems.some(r => r.title?.trim() || r.publicationType?.trim() || r.publisherCityCountry?.trim() || r.issnIsbnNo?.trim() || r.author?.trim() || r.journalNameAndPage?.trim()) ? (
                           <div className="overflow-x-auto bg-white border border-slate-200 rounded-lg">
-                            <table className="w-full text-left text-[10px] border-collapse min-w-[600px]">
+                            <table className="w-full text-left text-[10px] border-collapse min-w-[640px]">
                               <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
                                 <tr>
                                   <th className="p-2 border-r border-slate-200 text-center">S.No</th>
                                   <th className="p-2 border-r border-slate-200">Publication type</th>
-                                  <th className="p-2 border-r border-slate-200">Title of the paper</th>
-                                  <th className="p-2 border-r border-slate-200">Journal Name /page number</th>
+                                  <th className="p-2 border-r border-slate-200">Title</th>
                                   <th className="p-2 border-r border-slate-200">ISSN/ISBN NO.</th>
                                   <th className="p-2 border-r border-slate-200">Refereed</th>
-                                  <th className="p-2 border-r border-slate-200">Author</th>
+                                  <th className="p-2 border-r border-slate-200">Author/Co-Authors</th>
+                                  <th className="p-2 border-r border-slate-200">Publisher (City/Country)</th>
                                   <th className="p-2 text-center">Year</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-slate-100">
                                 {selectedAppDetail.researchBookItems
-                                  .filter(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim())
+                                  .filter(r => r.title?.trim() || r.publicationType?.trim() || r.publisherCityCountry?.trim() || r.issnIsbnNo?.trim() || r.author?.trim() || r.journalNameAndPage?.trim())
                                   .map((item, idx) => (
                                     <tr key={idx}>
                                       <td className="p-2 border-r border-slate-100 text-center font-semibold">{idx + 1}</td>
                                       <td className="p-2 border-r border-slate-100">{item.publicationType || '-'}</td>
                                       <td className="p-2 border-r border-slate-100 font-semibold">{item.title || '-'}</td>
-                                      <td className="p-2 border-r border-slate-100">{item.journalNameAndPage || '-'}</td>
                                       <td className="p-2 border-r border-slate-100 font-mono">{item.issnIsbnNo || '-'}</td>
                                       <td className="p-2 border-r border-slate-100">{item.refereed || '-'}</td>
                                       <td className="p-2 border-r border-slate-100">{item.author || '-'}</td>
+                                      <td className="p-2 border-r border-slate-100">{item.publisherCityCountry || item.journalNameAndPage || '-'}</td>
                                       <td className="p-2 text-center font-mono">{item.year || '-'}</td>
                                     </tr>
                                   ))}
@@ -1294,7 +1294,7 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                         <div key={doc.id} className="p-2.5 sm:p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-2">
                           <div className="min-w-0">
                             <span className="font-bold text-slate-900 block truncate">{doc.name}</span>
-                            <span className="text-[10px] text-slate-500 uppercase block truncate">{doc.type.replace(/_/g, ' ')} • {doc.fileSize}</span>
+                            <span className="text-[10px] text-slate-500 block truncate">{getDocumentCategoryLabel(doc.type)} • {doc.fileSize}</span>
                           </div>
                           <span
                             className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase shrink-0 ${

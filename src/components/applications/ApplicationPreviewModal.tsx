@@ -477,33 +477,33 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                     <h4 className="font-bold text-slate-900 text-[9.5pt]">
                       Research Publication – Books, Chapters, Edited Works, Articles (In Related Areas Only) if any
                     </h4>
-                    {application.researchBookItems && application.researchBookItems.some(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim()) ? (
+                    {application.researchBookItems && application.researchBookItems.some(r => r.title?.trim() || r.publicationType?.trim() || r.publisherCityCountry?.trim() || r.issnIsbnNo?.trim() || r.author?.trim() || r.journalNameAndPage?.trim()) ? (
                       <div className="overflow-hidden border border-slate-900 rounded-lg">
                         <table className="w-full border-collapse text-[8pt] font-sans">
                           <thead>
                             <tr className="bg-slate-50 text-slate-700 font-bold border-b border-slate-300">
                               <th className="p-2 border-r border-slate-200 text-center w-10">S.No</th>
                               <th className="p-2 border-r border-slate-200 text-left">Publication type</th>
-                              <th className="p-2 border-r border-slate-200 text-left">Title of the paper</th>
-                              <th className="p-2 border-r border-slate-200 text-left">Journal Name /page number</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Title</th>
                               <th className="p-2 border-r border-slate-200 text-left">ISSN/ISBN NO.</th>
                               <th className="p-2 border-r border-slate-200 text-center">Refereed</th>
-                              <th className="p-2 border-r border-slate-200 text-left">Author</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Author/Co-Authors</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Publisher (City/Country)</th>
                               <th className="p-2 text-center w-14">Year</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-200">
                             {application.researchBookItems
-                              .filter(r => r.title?.trim() || r.publicationType?.trim() || r.journalNameAndPage?.trim())
+                              .filter(r => r.title?.trim() || r.publicationType?.trim() || r.publisherCityCountry?.trim() || r.issnIsbnNo?.trim() || r.author?.trim() || r.journalNameAndPage?.trim())
                               .map((item, idx) => (
                                 <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/40'}>
                                   <td className="p-2 border-r border-slate-200 text-center font-bold">{idx + 1}</td>
                                   <td className="p-2 border-r border-slate-200">{item.publicationType || '-'}</td>
                                   <td className="p-2 border-r border-slate-200 font-semibold">{item.title || '-'}</td>
-                                  <td className="p-2 border-r border-slate-200">{item.journalNameAndPage || '-'}</td>
                                   <td className="p-2 border-r border-slate-200 font-mono">{item.issnIsbnNo || '-'}</td>
                                   <td className="p-2 border-r border-slate-200 text-center">{item.refereed || '-'}</td>
                                   <td className="p-2 border-r border-slate-200">{item.author || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200">{item.publisherCityCountry || item.journalNameAndPage || '-'}</td>
                                   <td className="p-2 text-center font-mono">{item.year || '-'}</td>
                                 </tr>
                               ))}

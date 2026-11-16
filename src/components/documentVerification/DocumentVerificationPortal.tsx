@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { Application } from '../../types';
+import { Application, getDocumentCategoryLabel } from '../../types';
 import {
   FileSearch,
   Search,
@@ -169,8 +169,8 @@ export const DocumentVerificationPortal: React.FC = () => {
                           <FileText className="w-5 h-5 text-cyan-600" />
                           <div>
                             <span className="font-bold text-slate-900 text-xs block">{doc.name}</span>
-                            <span className="text-[10px] text-slate-500 uppercase">
-                              Type: {doc.type.replace(/_/g, ' ')} • Size: {doc.fileSize}
+                            <span className="text-[10px] text-slate-500">
+                              Type: {getDocumentCategoryLabel(doc.type)} • Size: {doc.fileSize}
                             </span>
                             {doc.discrepancyReason && (
                               <span className="text-[10px] text-amber-700 block font-medium">

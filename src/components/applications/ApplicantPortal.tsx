@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
 import { THEME_CONFIGS, getThemeTitleColor } from '../../themeStyles';
-import { Application, OtherExamRecord, PresentEmploymentDetails, ResearchPaperItem, ResearchProjectItem, RecruitmentCategory, Campus } from '../../types';
+import { Application, DOCUMENT_CATEGORIES, DocumentAttachment, getDocumentCategoryLabel, OtherExamRecord, PresentEmploymentDetails, ResearchPaperItem, ResearchProjectItem, RecruitmentCategory, Campus } from '../../types';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import {
   Send,
@@ -342,7 +342,7 @@ export const ApplicantPortal: React.FC = () => {
     { publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', year: '' }
   ]);
   const [researchBookItems, setResearchBookItems] = useState<ResearchPaperItem[]>([
-    { publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', year: '' }
+    { publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', publisherCityCountry: '', year: '' }
   ]);
   const [researchProjectItems, setResearchProjectItems] = useState<ResearchProjectItem[]>([
     { majorMinor: '', period: '', totalGrants: '', sponsoringBody: '', outcome: '' }
@@ -355,6 +355,7 @@ export const ApplicantPortal: React.FC = () => {
   });
 
   const [documents, setDocuments] = useState<Application['documents']>([]);
+  const [selectedDocCategory, setSelectedDocCategory] = useState<string>(DOCUMENT_CATEGORIES[0].value);
 
   const [declarationAccepted, setDeclarationAccepted] = useState(false);
   const [showPaymentError, setShowPaymentError] = useState(false);
@@ -498,7 +499,12 @@ export const ApplicantPortal: React.FC = () => {
           setResearchPaperItems(draftApp.researchPaperItems);
         }
         if (draftApp.researchBookItems && draftApp.researchBookItems.length > 0) {
-          setResearchBookItems(draftApp.researchBookItems);
+          setResearchBookItems(
+            draftApp.researchBookItems.map((item) => ({
+              ...item,
+              publisherCityCountry: item.publisherCityCountry ?? '',
+            }))
+          );
         }
         if (draftApp.researchProjectItems && draftApp.researchProjectItems.length > 0) {
           setResearchProjectItems(draftApp.researchProjectItems);
@@ -724,9 +730,10 @@ export const ApplicantPortal: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: string = 'other') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: string = 'any_other_supporting_document') => {
     const file = e.target.files?.[0];
     if (!file) return;
+    e.target.value = '';
 
     setIsUploading(true);
     try {
@@ -748,9 +755,9 @@ export const ApplicantPortal: React.FC = () => {
         const data = await res.json();
         if (data.success) {
           setUploadError(null);
-          const newDoc = {
+          const newDoc: DocumentAttachment = {
             id: `doc-${Date.now()}`,
-            type: type,
+            type: type as DocumentAttachment['type'],
             name: data.name,
             fileSize: data.size,
             uploadedAt: new Date().toISOString().split('T')[0],
@@ -2852,7 +2859,7 @@ export const ApplicantPortal: React.FC = () => {
                       onClick={() =>
                         setResearchBookItems([
                           ...researchBookItems,
-                          { publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', year: '' },
+                          { publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', publisherCityCountry: '', year: '' },
                         ])
                       }
                       className="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold inline-flex items-center gap-1.5 transition whitespace-nowrap"
@@ -2863,16 +2870,16 @@ export const ApplicantPortal: React.FC = () => {
                   </div>
 
                   <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white">
-                    <table className="w-full text-xs text-left border-collapse min-w-[840px]">
+                    <table className="w-full text-xs text-left border-collapse min-w-[900px]">
                       <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
                         <tr>
                           <th className="px-3 py-2.5 border-r border-slate-200 w-14 text-center">S.No</th>
                           <th className="px-3 py-2.5 border-r border-slate-200 w-36">Publication type</th>
-                          <th className="px-3 py-2.5 border-r border-slate-200">Title of the paper</th>
-                          <th className="px-3 py-2.5 border-r border-slate-200">Journal Name / page number</th>
-                          <th className="px-3 py-2.5 border-r border-slate-200 w-36">ISSN / ISBN NO.</th>
+                          <th className="px-3 py-2.5 border-r border-slate-200">Title</th>
+                          <th className="px-3 py-2.5 border-r border-slate-200 w-36">ISSN/ISBN NO.</th>
                           <th className="px-3 py-2.5 border-r border-slate-200 w-28">Refereed</th>
-                          <th className="px-3 py-2.5 border-r border-slate-200 w-36">Author</th>
+                          <th className="px-3 py-2.5 border-r border-slate-200 w-40">Author/Co-Authors</th>
+                          <th className="px-3 py-2.5 border-r border-slate-200 w-48">Publisher (City/Country)</th>
                           <th className="px-3 py-2.5 border-r border-slate-200 w-24">Year</th>
                           <th className="px-2 py-2.5 w-12 text-center">Action</th>
                         </tr>
@@ -2887,7 +2894,7 @@ export const ApplicantPortal: React.FC = () => {
                               <input
                                 type="text"
                                 list="research-book-pub-types"
-                                placeholder="Type"
+                                placeholder="Book / Chapter / Article"
                                 value={item.publicationType}
                                 onChange={(e) => {
                                   const copy = [...researchBookItems];
@@ -2913,20 +2920,7 @@ export const ApplicantPortal: React.FC = () => {
                             <td className="p-2 border-r border-slate-200">
                               <input
                                 type="text"
-                                placeholder="Journal / Publisher / page no."
-                                value={item.journalNameAndPage}
-                                onChange={(e) => {
-                                  const copy = [...researchBookItems];
-                                  copy[idx] = { ...copy[idx], journalNameAndPage: e.target.value };
-                                  setResearchBookItems(copy);
-                                }}
-                                className={tableInputClass}
-                              />
-                            </td>
-                            <td className="p-2 border-r border-slate-200">
-                              <input
-                                type="text"
-                                placeholder="ISSN/ISBN"
+                                placeholder="ISSN/ISBN NO."
                                 value={item.issnIsbnNo}
                                 onChange={(e) => {
                                   const copy = [...researchBookItems];
@@ -2954,11 +2948,24 @@ export const ApplicantPortal: React.FC = () => {
                             <td className="p-2 border-r border-slate-200">
                               <input
                                 type="text"
-                                placeholder="Author"
+                                placeholder="Author / Co-Authors"
                                 value={item.author}
                                 onChange={(e) => {
                                   const copy = [...researchBookItems];
                                   copy[idx] = { ...copy[idx], author: e.target.value };
+                                  setResearchBookItems(copy);
+                                }}
+                                className={tableInputClass}
+                              />
+                            </td>
+                            <td className="p-2 border-r border-slate-200">
+                              <input
+                                type="text"
+                                placeholder="Publisher (City/Country)"
+                                value={item.publisherCityCountry || ''}
+                                onChange={(e) => {
+                                  const copy = [...researchBookItems];
+                                  copy[idx] = { ...copy[idx], publisherCityCountry: e.target.value };
                                   setResearchBookItems(copy);
                                 }}
                                 className={tableInputClass}
@@ -2982,7 +2989,7 @@ export const ApplicantPortal: React.FC = () => {
                                 type="button"
                                 onClick={() => {
                                   if (researchBookItems.length === 1) {
-                                    setResearchBookItems([{ publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', year: '' }]);
+                                    setResearchBookItems([{ publicationType: '', title: '', journalNameAndPage: '', issnIsbnNo: '', refereed: '', author: '', publisherCityCountry: '', year: '' }]);
                                   } else {
                                     setResearchBookItems(researchBookItems.filter((_, i) => i !== idx));
                                   }
@@ -3609,17 +3616,15 @@ export const ApplicantPortal: React.FC = () => {
                       </label>
                       <select
                         id="docTypeSelect"
+                        value={selectedDocCategory}
+                        onChange={(e) => setSelectedDocCategory(e.target.value)}
                         className={formInputClass}
                       >
-                        <option value="degree_10th">10th Class Certificate</option>
-                        <option value="degree_12th">12th Class / Diploma Certificate</option>
-                        <option value="degree_ug">Undergraduate Degree</option>
-                        <option value="degree_pg">Postgraduate Degree</option>
-                        <option value="degree_phd">PhD / Research Degree</option>
-                        <option value="experience_proof">Experience / NOC Certificate</option>
-                        <option value="caste_certificate">Caste / Category Certificate</option>
-                        <option value="id_proof">ID Proof (Aadhaar/PAN)</option>
-                        <option value="other">Other Supporting Document</option>
+                        {DOCUMENT_CATEGORIES.map((category) => (
+                          <option key={category.value} value={category.value}>
+                            {category.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
@@ -3627,13 +3632,8 @@ export const ApplicantPortal: React.FC = () => {
                       <label className={formLabelClass}>Upload Supporting File</label>
                       <div
                         onClick={() => {
-                          const type = (document.getElementById('docTypeSelect') as HTMLSelectElement).value;
                           if (!isUploading) {
-                            const input = fileInputRef.current;
-                            if (input) {
-                              input.setAttribute('data-current-type', type);
-                              input.click();
-                            }
+                            fileInputRef.current?.click();
                           }
                         }}
                         className={`bg-white px-4 py-2 rounded-lg border border-dashed ${
@@ -3644,8 +3644,7 @@ export const ApplicantPortal: React.FC = () => {
                           type="file"
                           ref={fileInputRef}
                           onChange={(e) => {
-                            const type = e.currentTarget.getAttribute('data-current-type') || 'other';
-                            handleFileUpload(e, type);
+                            handleFileUpload(e, selectedDocCategory);
                           }}
                           className="hidden"
                           accept=".pdf,.jpg,.jpeg,.png"
@@ -3685,8 +3684,8 @@ export const ApplicantPortal: React.FC = () => {
                           <span className="text-xs font-semibold text-slate-900 block truncate" title={doc.name}>
                             {doc.name}
                           </span>
-                          <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                            <span className="capitalize">{doc.type.replace(/_/g, ' ')}</span>
+                          <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                            <span>{getDocumentCategoryLabel(doc.type)}</span>
                             <span aria-hidden="true">·</span>
                             <span className="font-mono tabular-nums">{doc.fileSize}</span>
                           </div>
