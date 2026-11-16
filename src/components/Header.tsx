@@ -62,6 +62,38 @@ export const Header: React.FC<HeaderProps> = ({
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [showNotifPopover, setShowNotifPopover] = useState(false);
   const [isChangePassOpen, setIsChangePassOpen] = useState(false);
+  const roleDropdownRef = React.useRef<HTMLDivElement | null>(null);
+  const notifPopoverRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    setShowRoleDropdown(false);
+    setShowNotifPopover(false);
+    setIsChangePassOpen(false);
+  }, [isLoggedIn, currentUser?.email]);
+
+  React.useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (roleDropdownRef.current && !roleDropdownRef.current.contains(target)) {
+        setShowRoleDropdown(false);
+      }
+      if (notifPopoverRef.current && !notifPopoverRef.current.contains(target)) {
+        setShowNotifPopover(false);
+      }
+    };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowRoleDropdown(false);
+        setShowNotifPopover(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
 
   const currentRoleInfo = roles.find((r) => r.id === currentRole);
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -146,9 +178,12 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <div className="flex items-center gap-2 sm:gap-4">
                 {/* Notifications */}
-                <div className="relative">
+                <div className="relative" ref={notifPopoverRef}>
                   <button
-                    onClick={() => setShowNotifPopover(!showNotifPopover)}
+                    onClick={() => {
+                      setShowRoleDropdown(false);
+                      setShowNotifPopover(!showNotifPopover);
+                    }}
                     className={`p-2 rounded-xl transition relative ${isHeaderBranded ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'text-slate-500 hover:bg-slate-100'}`}
                   >
                     <Bell className="w-5 h-5" />
@@ -199,9 +234,12 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
 
                 {/* User Dropdown */}
-                <div className="relative">
+                <div className="relative" ref={roleDropdownRef}>
                   <button
-                    onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+                    onClick={() => {
+                      setShowNotifPopover(false);
+                      setShowRoleDropdown(!showRoleDropdown);
+                    }}
                     className={`flex items-center gap-2.5 p-1 pr-3 rounded-full transition border ${isHeaderBranded ? 'bg-white/10 border-white/20 hover:bg-white/20' : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'}`}
                   >
                     <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-sm ring-2 ring-white/20">
@@ -256,7 +294,12 @@ export const Header: React.FC<HeaderProps> = ({
 
                        <div className="mt-3 pt-3 border-t border-slate-50 px-2">
                          <button
-                           onClick={() => { logout(); setActiveTab('public_recruitment'); }}
+                           onClick={() => {
+                             setShowRoleDropdown(false);
+                             setShowNotifPopover(false);
+                             logout();
+                             setActiveTab('public_recruitment');
+                           }}
                            className="w-full text-left px-3 py-2 rounded-xl text-xs font-black text-rose-600 hover:bg-rose-50 flex items-center gap-3 transition-colors"
                          >
                            <LogOut className="w-4 h-4" />

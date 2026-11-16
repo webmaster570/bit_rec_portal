@@ -51,11 +51,20 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setIsRefreshingCaptcha(false);
   };
 
+  const resetFormState = React.useCallback(() => {
+    setEmail('');
+    setPassword('');
+    setCaptchaText('');
+    setError('');
+    setIsSubmitting(false);
+  }, []);
+
   React.useEffect(() => {
+    resetFormState();
     if (isOpen) {
       fetchCaptcha();
     }
-  }, [isOpen]);
+  }, [isOpen, resetFormState]);
 
   if (!isOpen) return null;
 
@@ -75,6 +84,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     // Call secureLogin
     const result = await secureLogin(email, password, captchaId, captchaText);
     if (result.success && result.user) {
+      resetFormState();
       onLoginSuccess(result.user.role); 
       onClose();
     } else {
@@ -92,6 +102,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     
     // Directly call context login (bypass API/Database)
     login(selectedRole, dummyEmail, dummyName);
+    resetFormState();
     onLoginSuccess(selectedRole);
     onClose();
   };
@@ -142,7 +153,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
             {/* Email / Registration Number */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
@@ -153,6 +164,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 <input
                   type="text"
                   required
+                  autoComplete="off"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="candidate@domain.edu"
@@ -171,6 +183,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 <input
                   type="password"
                   required
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
@@ -210,6 +223,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 <input
                   type="text"
                   required
+                  autoComplete="off"
                   value={captchaText}
                   onChange={(e) => setCaptchaText(e.target.value)}
                   placeholder="CODE"
