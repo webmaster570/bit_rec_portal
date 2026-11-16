@@ -297,6 +297,30 @@ export interface NatureOfExperience {
   other?: ExperienceNatureDetail & { description?: string };
 }
 
+export const calculateTotalExperience = (noe?: NatureOfExperience) => {
+  const keys = ['teaching', 'administrative', 'research', 'other'] as const;
+  let years = 0;
+  let months = 0;
+  let days = 0;
+  keys.forEach((key) => {
+    years += Math.max(0, Number(noe?.[key]?.years) || 0);
+    months += Math.max(0, Number(noe?.[key]?.months) || 0);
+    days += Math.max(0, Number(noe?.[key]?.days) || 0);
+  });
+  const extraMonths = Math.floor(days / 30);
+  const remDays = days % 30;
+  const combinedMonths = months + extraMonths;
+  const extraYears = Math.floor(combinedMonths / 12);
+  const remMonths = combinedMonths % 12;
+  const finalYears = years + extraYears;
+  return {
+    years: finalYears,
+    months: remMonths,
+    days: remDays,
+    formatted: `${finalYears} Years ${remMonths} Months ${remDays} Days`,
+  };
+};
+
 export interface ApplicantProfile {
   applicantId: string;
   regNumber: string;

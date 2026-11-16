@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { Application, ApplicationStage, getDocumentCategoryLabel } from '../../types';
+import { Application, ApplicationStage, calculateTotalExperience, getDocumentCategoryLabel } from '../../types';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import { OfferLetterModal } from '../common/OfferLetterModal';
 import { ApplicationPreviewModal } from '../applications/ApplicationPreviewModal';
@@ -1052,6 +1052,33 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                             <p className="text-slate-500 text-[11px] mt-1">{exp.jobDescription}</p>
                           </div>
                         ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {(selectedAppDetail.natureOfExperience || selectedAppDetail.totalExperienceYearsMonths) && (
+                    <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 space-y-2.5">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                          <Clock className="w-4 h-4 text-indigo-600" />
+                          Nature of Experience
+                        </h4>
+                        <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold">
+                          Total Experience: {selectedAppDetail.totalExperienceYearsMonths || calculateTotalExperience(selectedAppDetail.natureOfExperience).formatted}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {(['teaching', 'administrative', 'research', 'other'] as const).map((key) => {
+                          const item = selectedAppDetail.natureOfExperience?.[key];
+                          return (
+                            <div key={key} className="p-2.5 bg-white border border-slate-200 rounded-lg">
+                              <span className="text-[10px] font-bold text-slate-500 uppercase block">{key}</span>
+                              <span className="font-mono font-bold text-slate-900 text-xs">
+                                {item?.years || 0}Y {item?.months || 0}M {item?.days || 0}D
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   )}

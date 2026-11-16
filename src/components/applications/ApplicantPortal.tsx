@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
 import { THEME_CONFIGS, getThemeTitleColor } from '../../themeStyles';
-import { Application, DOCUMENT_CATEGORIES, DocumentAttachment, getDocumentCategoryLabel, OtherExamRecord, PresentEmploymentDetails, ResearchPaperItem, ResearchProjectItem, RecruitmentCategory, Campus } from '../../types';
+import { Application, calculateTotalExperience, DOCUMENT_CATEGORIES, DocumentAttachment, getDocumentCategoryLabel, OtherExamRecord, PresentEmploymentDetails, ResearchPaperItem, ResearchProjectItem, RecruitmentCategory, Campus } from '../../types';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import {
   Send,
@@ -392,8 +392,10 @@ export const ApplicantPortal: React.FC = () => {
     }, 2000);
   };
 
+  const [isTotalExpManual, setIsTotalExpManual] = useState(false);
+
   const [pdfExtraFields, setPdfExtraFields] = useState({
-    totalExperienceYearsMonths: '3 Years 6 Months',
+    totalExperienceYearsMonths: '4 Years 6 Months 0 Days',
     relevantExperience: '3 Years in Higher Education',
     presentEmployer: 'Pune Institute of Computer Technology',
     presentDesignation: 'Assistant Professor',
@@ -536,6 +538,16 @@ export const ApplicantPortal: React.FC = () => {
         });
         if (Object.keys(extraFields).length > 0) {
           setPdfExtraFields(prev => ({ ...prev, ...extraFields }));
+          if (extraFields.totalExperienceYearsMonths && draftApp.natureOfExperience) {
+            const calc = calculateTotalExperience(draftApp.natureOfExperience).formatted;
+            setIsTotalExpManual(extraFields.totalExperienceYearsMonths !== calc);
+          }
+        } else if (draftApp.natureOfExperience) {
+          setPdfExtraFields(prev => ({
+            ...prev,
+            totalExperienceYearsMonths: calculateTotalExperience(draftApp.natureOfExperience).formatted,
+          }));
+          setIsTotalExpManual(false);
         }
 
         // Map new Misc fields
@@ -2561,42 +2573,66 @@ export const ApplicantPortal: React.FC = () => {
                             <td className="p-2 border-r border-slate-200">
                               <input
                                 type="number"
+                                min={0}
                                 placeholder="0"
                                 value={natureOfExperience?.[key]?.years || 0}
-                                onChange={(e) =>
-                                  setNatureOfExperience({
+                                onChange={(e) => {
+                                  const nextNoe = {
                                     ...natureOfExperience,
-                                    [key]: { ...natureOfExperience?.[key], years: Number(e.target.value) },
-                                  })
-                                }
+                                    [key]: { ...natureOfExperience?.[key], years: Math.max(0, Number(e.target.value) || 0) },
+                                  };
+                                  setNatureOfExperience(nextNoe);
+                                  if (!isTotalExpManual) {
+                                    setPdfExtraFields((prev) => ({
+                                      ...prev,
+                                      totalExperienceYearsMonths: calculateTotalExperience(nextNoe).formatted,
+                                    }));
+                                  }
+                                }}
                                 className={`${tableInputClass} text-center font-mono tabular-nums`}
                               />
                             </td>
                             <td className="p-2 border-r border-slate-200">
                               <input
                                 type="number"
+                                min={0}
                                 placeholder="0"
                                 value={natureOfExperience?.[key]?.months || 0}
-                                onChange={(e) =>
-                                  setNatureOfExperience({
+                                onChange={(e) => {
+                                  const nextNoe = {
                                     ...natureOfExperience,
-                                    [key]: { ...natureOfExperience?.[key], months: Number(e.target.value) },
-                                  })
-                                }
+                                    [key]: { ...natureOfExperience?.[key], months: Math.max(0, Number(e.target.value) || 0) },
+                                  };
+                                  setNatureOfExperience(nextNoe);
+                                  if (!isTotalExpManual) {
+                                    setPdfExtraFields((prev) => ({
+                                      ...prev,
+                                      totalExperienceYearsMonths: calculateTotalExperience(nextNoe).formatted,
+                                    }));
+                                  }
+                                }}
                                 className={`${tableInputClass} text-center font-mono tabular-nums`}
                               />
                             </td>
                             <td className="p-2 border-r border-slate-200">
                               <input
                                 type="number"
+                                min={0}
                                 placeholder="0"
                                 value={natureOfExperience?.[key]?.days || 0}
-                                onChange={(e) =>
-                                  setNatureOfExperience({
+                                onChange={(e) => {
+                                  const nextNoe = {
                                     ...natureOfExperience,
-                                    [key]: { ...natureOfExperience?.[key], days: Number(e.target.value) },
-                                  })
-                                }
+                                    [key]: { ...natureOfExperience?.[key], days: Math.max(0, Number(e.target.value) || 0) },
+                                  };
+                                  setNatureOfExperience(nextNoe);
+                                  if (!isTotalExpManual) {
+                                    setPdfExtraFields((prev) => ({
+                                      ...prev,
+                                      totalExperienceYearsMonths: calculateTotalExperience(nextNoe).formatted,
+                                    }));
+                                  }
+                                }}
                                 className={`${tableInputClass} text-center font-mono tabular-nums`}
                               />
                             </td>
@@ -2617,7 +2653,73 @@ export const ApplicantPortal: React.FC = () => {
                           </tr>
                         ))}
                       </tbody>
+                      {(() => {
+                        const totalExp = calculateTotalExperience(natureOfExperience);
+                        return (
+                          <tfoot className="bg-blue-50/70 border-t-2 border-blue-200 text-slate-900 font-bold">
+                            <tr>
+                              <td className="px-4 py-2.5 border-r border-blue-100 text-blue-800">
+                                Total Number of Experience
+                              </td>
+                              <td className="px-3 py-2.5 border-r border-blue-100 text-center font-mono tabular-nums">
+                                {totalExp.years}
+                              </td>
+                              <td className="px-3 py-2.5 border-r border-blue-100 text-center font-mono tabular-nums">
+                                {totalExp.months}
+                              </td>
+                              <td className="px-3 py-2.5 border-r border-blue-100 text-center font-mono tabular-nums">
+                                {totalExp.days}
+                              </td>
+                              <td className="px-3 py-2.5 text-center text-[11px] font-semibold text-blue-700 whitespace-nowrap">
+                                {totalExp.years}Y {totalExp.months}M {totalExp.days}D
+                              </td>
+                            </tr>
+                          </tfoot>
+                        );
+                      })()}
                     </table>
+                  </div>
+
+                  {/* Total Number of Experience Field */}
+                  <div className="bg-slate-50/70 border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div className="flex-1">
+                      <label htmlFor="totalNumberOfExperience" className={formLabelClass}>
+                        Total Number of Experience
+                      </label>
+                      <input
+                        id="totalNumberOfExperience"
+                        type="text"
+                        placeholder="e.g. 9 Years 6 Months 0 Days"
+                        value={pdfExtraFields.totalExperienceYearsMonths}
+                        onChange={(e) => {
+                          setIsTotalExpManual(true);
+                          setPdfExtraFields((prev) => ({
+                            ...prev,
+                            totalExperienceYearsMonths: e.target.value,
+                          }));
+                        }}
+                        className={`${formInputClass} font-semibold`}
+                      />
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        Auto-calculated from the Nature of Experience table above. You may adjust manually if positions overlapped.
+                      </p>
+                    </div>
+                    {isTotalExpManual && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsTotalExpManual(false);
+                          setPdfExtraFields((prev) => ({
+                            ...prev,
+                            totalExperienceYearsMonths: calculateTotalExperience(natureOfExperience).formatted,
+                          }));
+                        }}
+                        className="px-3 py-2 rounded-lg bg-white hover:bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold inline-flex items-center gap-1.5 transition whitespace-nowrap shrink-0 self-start sm:self-center"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Sync from Table</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -3919,13 +4021,20 @@ export const ApplicantPortal: React.FC = () => {
                       Candidate Declaration <RequiredMark />
                     </h4>
                   </div>
-                  <p className="leading-relaxed">
-                    I, <span className="font-semibold text-slate-900 underline decoration-slate-400 px-1">{profile.fullName || 'Candidate'}</span> son/daughter of{' '}
-                    <span className="font-semibold text-slate-900 underline decoration-slate-400 px-1">{profile.fatherName || 'Guardian'}</span> hereby declare that all the statements and entries made in this application are true, complete and correct to the best of my knowledge and belief. In the event of any information found false or incorrect or ineligibility being detected before or after the Selection Committee and Executive Council/Board of Management meetings, my candidature/appointment may be cancelled by the University.
-                  </p>
-                  <p className="leading-relaxed">
-                    I have never been convicted or contemplated for any unlawful activity.
-                  </p>
+                  <div className="space-y-3 leading-relaxed text-slate-700">
+                    <p>
+                      I hereby declare that all particulars furnished in this application are true, complete and correct to the best of my knowledge and belief.
+                    </p>
+                    <p>
+                      I understand that my candidature shall be liable to cancellation at any stage of recruitment if any information furnished by me is found to be false, misleading, incomplete or suppressed, or if I am found ineligible under the applicable recruitment rules and conditions prescribed in the advertisement.
+                    </p>
+                    <p>
+                      I further undertake to produce original certificates, testimonials, experience certificates, NOC and other supporting documents whenever required by the University.
+                    </p>
+                    <p>
+                      I agree to abide by the recruitment rules, applicable UGC regulations, Government of India instructions, reservation policy and all other terms and conditions prescribed by the University.
+                    </p>
+                  </div>
                   <label className="inline-flex items-center gap-2.5 cursor-pointer pt-2 select-none">
                     <input
                       type="checkbox"

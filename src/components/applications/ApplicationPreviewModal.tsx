@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { usePortal } from '../../context/PortalContext';
 import { X, Printer, Download, CheckCircle2, ShieldCheck, MapPin, Phone, Mail, Globe } from 'lucide-react';
-import { Application, RecruitmentDrive } from '../../types';
+import { Application, calculateTotalExperience, RecruitmentDrive } from '../../types';
 
 interface Props {
   application: Partial<Application>;
@@ -88,7 +88,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                   Mesra, Ranchi - 835215, Jharkhand, India
                 </p>
                 <div className="pt-4">
-                  <span className="px-6 py-1.5 bg-slate-900 text-white text-sm font-black rounded-full uppercase tracking-[0.2em]">Application Form</span>
+                  <span className="px-6 py-1.5 bg-slate-100 text-black border border-slate-300 text-sm font-black rounded-full uppercase tracking-[0.2em]">Application Form</span>
                 </div>
               </div>
 
@@ -123,13 +123,13 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
 
               {/* REGISTRATION DETAILS */}
               <div className="space-y-3">
-                <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg] w-fit">
+                <h3 className="flex items-center gap-2 bg-slate-100 text-black border border-slate-300 px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg] w-fit">
                   <span className="skew-x-[10deg]">Registration</span>
                 </h3>
                 <div className="overflow-hidden border border-slate-900 rounded-lg shadow-sm">
                   <table className="w-full border-collapse text-[9pt] font-sans">
                     <thead>
-                      <tr className="bg-slate-50 text-slate-700 font-bold uppercase text-[8px] tracking-wider border-b border-slate-300">
+                      <tr className="bg-slate-100 text-slate-700 font-bold uppercase text-[8px] tracking-wider border-b border-slate-300">
                         <th className="p-3 border-r border-slate-200 text-left">Application Number</th>
                         <th className="p-3 border-r border-slate-200 text-left">Post</th>
                         <th className="p-3 border-r border-slate-200 text-left">Campus/Organizational Unit</th>
@@ -162,14 +162,14 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
 
               {/* APPLICATION FEE SUMMARY */}
               <div className="space-y-3">
-                <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg] w-fit">
+                <h3 className="flex items-center gap-2 bg-slate-100 text-black border border-slate-300 px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg] w-fit">
                   <span className="skew-x-[10deg]">Application Fee Summary</span>
                 </h3>
                 
                 <div className="overflow-hidden border border-slate-900 rounded-lg shadow-sm">
                   <table className="w-full border-collapse text-[9pt] font-sans">
                     <thead>
-                      <tr className="bg-slate-50 text-slate-700 font-bold uppercase text-[8px] tracking-wider border-b border-slate-300">
+                      <tr className="bg-slate-100 text-slate-700 font-bold uppercase text-[8px] tracking-wider border-b border-slate-300">
                         <th className="p-3 border-r border-slate-200 text-left">Order id *</th>
                         <th className="p-3 border-r border-slate-200 text-left">Transaction ID *</th>
                         <th className="p-3 border-r border-slate-200 text-left">Amount Paid</th>
@@ -208,7 +208,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
 
               {/* PART 1: PERSONAL PROFILE */}
               <section className="space-y-4">
-                <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
+                <h3 className="flex items-center gap-2 bg-slate-100 text-black border border-slate-300 px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
                   <span className="skew-x-[10deg]">Personal Information</span>
                 </h3>
                 
@@ -299,19 +299,19 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
 
               {/* PART 2: ACADEMIC QUALIFICATIONS */}
               <section className="space-y-4 pt-4">
-                <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
+                <h3 className="flex items-center gap-2 bg-slate-100 text-black border border-slate-300 px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
                   <span className="skew-x-[10deg]">Educational Qualifications</span>
                 </h3>
                 
                 <div className="overflow-hidden border border-slate-900 rounded-lg">
                   <table className="w-full border-collapse text-[9pt] font-sans">
                     <thead>
-                      <tr className="bg-slate-900 text-white font-bold uppercase text-[8px] tracking-wider">
-                        <th className="p-2 border-r border-slate-700 text-left">Exam / Degree</th>
-                        <th className="p-2 border-r border-slate-700 text-left">Board / University</th>
-                        <th className="p-2 border-r border-slate-700 text-left">Specialization</th>
-                        <th className="p-2 border-r border-slate-700 text-center w-16">Year</th>
-                        <th className="p-2 border-r border-slate-700 text-center w-24">Marks (%)</th>
+                      <tr className="bg-slate-100 text-slate-700 font-bold uppercase text-[8px] tracking-wider border-b border-slate-300">
+                        <th className="p-2 border-r border-slate-200 text-left">Exam / Degree</th>
+                        <th className="p-2 border-r border-slate-200 text-left">Board / University</th>
+                        <th className="p-2 border-r border-slate-200 text-left">Specialization</th>
+                        <th className="p-2 border-r border-slate-200 text-center w-16">Year</th>
+                        <th className="p-2 border-r border-slate-200 text-center w-24">Marks (%)</th>
                         <th className="p-2 text-center w-16">Div.</th>
                       </tr>
                     </thead>
@@ -354,7 +354,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
 
               {/* PRESENT EMPLOYMENT DETAILS */}
               <section className="space-y-4 pt-4">
-                <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
+                <h3 className="flex items-center gap-2 bg-slate-100 text-black border border-slate-300 px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
                   <span className="skew-x-[10deg]">Present Employment Details</span>
                 </h3>
                 <div className="overflow-hidden border border-slate-900 rounded-lg">
@@ -384,7 +384,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
 
               {/* PART 3: WORK EXPERIENCE */}
               <section className="space-y-4 pt-4">
-                <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
+                <h3 className="flex items-center gap-2 bg-slate-100 text-black border border-slate-300 px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
                   <span className="skew-x-[10deg]">Professional Experience</span>
                 </h3>
                 
@@ -392,11 +392,11 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                   <div className="overflow-hidden border border-slate-900 rounded-lg">
                     <table className="w-full border-collapse text-[9pt] font-sans">
                       <thead>
-                        <tr className="bg-slate-900 text-white font-bold uppercase text-[8px] tracking-wider">
-                          <th className="p-2 border-r border-slate-700 text-left">Employer / Organization</th>
-                          <th className="p-2 border-r border-slate-700 text-left">Designation</th>
-                          <th className="p-2 border-r border-slate-700 text-center w-24">From</th>
-                          <th className="p-2 border-r border-slate-700 text-center w-24">To</th>
+                        <tr className="bg-slate-100 text-slate-700 font-bold uppercase text-[8px] tracking-wider border-b border-slate-300">
+                          <th className="p-2 border-r border-slate-200 text-left">Employer / Organization</th>
+                          <th className="p-2 border-r border-slate-200 text-left">Designation</th>
+                          <th className="p-2 border-r border-slate-200 text-center w-24">From</th>
+                          <th className="p-2 border-r border-slate-200 text-center w-24">To</th>
                           <th className="p-2 text-left">Duties & Responsibilities</th>
                         </tr>
                       </thead>
@@ -418,12 +418,50 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                     No employment history recorded
                   </div>
                 )}
+
+                {(application.natureOfExperience || application.totalExperienceYearsMonths) && (
+                  <div className="space-y-2 pt-2">
+                    <h4 className="font-bold text-slate-900 text-[9.5pt]">Nature of Experience &amp; Total Experience</h4>
+                    <div className="overflow-hidden border border-slate-900 rounded-lg">
+                      <table className="w-full border-collapse text-[8.5pt] font-sans">
+                        <thead>
+                          <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-300">
+                            <th className="p-2 border-r border-slate-200 text-left">Category</th>
+                            <th className="p-2 border-r border-slate-200 text-center">No. of Years</th>
+                            <th className="p-2 border-r border-slate-200 text-center">No. of Months</th>
+                            <th className="p-2 border-r border-slate-200 text-center">No. of Days</th>
+                            <th className="p-2 text-center">Proof Sl. No.</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200">
+                          {(['teaching', 'administrative', 'research', 'other'] as const).map((key) => (
+                            <tr key={key} className="bg-white">
+                              <td className="p-2 border-r border-slate-200 capitalize font-bold text-slate-800">{key}</td>
+                              <td className="p-2 border-r border-slate-200 text-center font-mono">{application.natureOfExperience?.[key]?.years || 0}</td>
+                              <td className="p-2 border-r border-slate-200 text-center font-mono">{application.natureOfExperience?.[key]?.months || 0}</td>
+                              <td className="p-2 border-r border-slate-200 text-center font-mono">{application.natureOfExperience?.[key]?.days || 0}</td>
+                              <td className="p-2 text-center font-mono">{application.natureOfExperience?.[key]?.proofSlNo || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr className="bg-slate-100 border-t border-slate-300 font-bold text-slate-900">
+                            <td className="p-2 border-r border-slate-200">Total Number of Experience</td>
+                            <td colSpan={4} className="p-2 text-left font-mono">
+                              {application.totalExperienceYearsMonths || calculateTotalExperience(application.natureOfExperience).formatted}
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </section>
 
               {/* PART 4: RESEARCH & MISC */}
               <div className="space-y-6 pt-4">
                 <section className="space-y-4">
-                  <h3 className="flex items-center gap-2 bg-slate-900 text-white px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
+                  <h3 className="flex items-center gap-2 bg-slate-100 text-black border border-slate-300 px-4 py-1.5 font-bold uppercase tracking-widest text-[11pt] skew-x-[-10deg]">
                     <span className="skew-x-[10deg]">Research Publications &amp; Projects</span>
                   </h3>
 
@@ -436,7 +474,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                       <div className="overflow-hidden border border-slate-900 rounded-lg">
                         <table className="w-full border-collapse text-[8pt] font-sans">
                           <thead>
-                            <tr className="bg-slate-50 text-slate-700 font-bold border-b border-slate-300">
+                            <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-300">
                               <th className="p-2 border-r border-slate-200 text-center w-10">S.No</th>
                               <th className="p-2 border-r border-slate-200 text-left">Publication type</th>
                               <th className="p-2 border-r border-slate-200 text-left">Title of the paper</th>
@@ -481,7 +519,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                       <div className="overflow-hidden border border-slate-900 rounded-lg">
                         <table className="w-full border-collapse text-[8pt] font-sans">
                           <thead>
-                            <tr className="bg-slate-50 text-slate-700 font-bold border-b border-slate-300">
+                            <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-300">
                               <th className="p-2 border-r border-slate-200 text-center w-10">S.No</th>
                               <th className="p-2 border-r border-slate-200 text-left">Publication type</th>
                               <th className="p-2 border-r border-slate-200 text-left">Title</th>
@@ -526,7 +564,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                       <div className="overflow-hidden border border-slate-900 rounded-lg">
                         <table className="w-full border-collapse text-[8pt] font-sans">
                           <thead>
-                            <tr className="bg-slate-50 text-slate-700 font-bold border-b border-slate-300">
+                            <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-300">
                               <th className="p-2 border-r border-slate-200 text-center w-10">S.No</th>
                               <th className="p-2 border-r border-slate-200 text-left">Major/Minor</th>
                               <th className="p-2 border-r border-slate-200 text-left">Period</th>
@@ -558,7 +596,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                 </section>
 
                 <section className="space-y-3">
-                  <h3 className="bg-slate-900 text-white px-4 py-1 font-bold uppercase tracking-widest text-[10pt]">Disclosures</h3>
+                  <h3 className="bg-slate-100 text-black border border-slate-300 px-4 py-1.5 font-bold uppercase tracking-widest text-[10pt]">Disclosures</h3>
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-x-8 gap-y-2">
                     {[
                       { label: 'Time Required to Join', val: application.joiningTimeRequired || '-' },
@@ -578,11 +616,11 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
 
               {/* LANGUAGES KNOWN SECTION */}
               <section className="space-y-4 pt-4">
-                <h3 className="bg-slate-900 text-white px-4 py-1 font-bold uppercase tracking-widest text-[10pt]">Languages Known</h3>
+                <h3 className="bg-slate-100 text-black border border-slate-300 px-4 py-1.5 font-bold uppercase tracking-widest text-[10pt]">Languages Known</h3>
                 <div className="overflow-hidden border border-slate-900 rounded-lg">
                   <table className="w-full border-collapse text-[9pt] font-sans">
                     <thead>
-                      <tr className="bg-slate-50 text-slate-700 font-bold uppercase text-[8px] tracking-wider border-b border-slate-300">
+                      <tr className="bg-slate-100 text-slate-700 font-bold uppercase text-[8px] tracking-wider border-b border-slate-300">
                         <th className="p-2 border-r border-slate-200 text-left">Language</th>
                         <th className="p-2 border-r border-slate-200 text-center">Read</th>
                         <th className="p-2 border-r border-slate-200 text-center">Write</th>
@@ -623,7 +661,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
 
               {/* PART 5: REFEREES */}
               <section className="space-y-4 pt-4">
-                <h3 className="bg-slate-900 text-white px-4 py-1 font-bold uppercase tracking-widest text-[10pt]">Professional Referees</h3>
+                <h3 className="bg-slate-100 text-black border border-slate-300 px-4 py-1.5 font-bold uppercase tracking-widest text-[10pt]">Professional Referees</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {application.referees?.map((ref, idx) => (
                     <div key={idx} className="border border-slate-300 p-4 rounded-xl bg-white shadow-sm flex flex-col gap-1">
@@ -649,9 +687,20 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                     <h4 className="font-black uppercase text-[10pt] text-slate-900 flex items-center gap-2">
                       <ShieldCheck className="w-5 h-5 text-emerald-600" /> Applicant&rsquo;s Declaration
                     </h4>
-                    <p className="text-[10pt] font-medium text-slate-700 leading-relaxed text-justify">
-                      I hereby declare that all particulars furnished in this application are true, complete and correct to the best of my knowledge and belief. I understand that my candidature shall be liable to cancellation at any stage of recruitment if any information furnished by me is found to be false, misleading, incomplete or suppressed, or if I am found ineligible under the applicable recruitment rules and conditions prescribed in the advertisement.
-                    </p>
+                    <div className="space-y-2.5 text-[10pt] font-medium text-slate-700 leading-relaxed text-justify">
+                      <p>
+                        I hereby declare that all particulars furnished in this application are true, complete and correct to the best of my knowledge and belief.
+                      </p>
+                      <p>
+                        I understand that my candidature shall be liable to cancellation at any stage of recruitment if any information furnished by me is found to be false, misleading, incomplete or suppressed, or if I am found ineligible under the applicable recruitment rules and conditions prescribed in the advertisement.
+                      </p>
+                      <p>
+                        I further undertake to produce original certificates, testimonials, experience certificates, NOC and other supporting documents whenever required by the University.
+                      </p>
+                      <p>
+                        I agree to abide by the recruitment rules, applicable UGC regulations, Government of India instructions, reservation policy and all other terms and conditions prescribed by the University.
+                      </p>
+                    </div>
                   </div>
 
                   <div className="flex justify-between items-end mt-8">
