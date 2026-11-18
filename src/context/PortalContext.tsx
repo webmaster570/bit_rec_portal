@@ -67,6 +67,7 @@ interface PortalContextType {
   weightageConfig: WeightageConfig;
   setWeightageConfig: (config: WeightageConfig) => void;
   branding: PortalBranding;
+  isBrandingReady: boolean;
   updateBranding: (updates: Partial<PortalBranding>) => void;
   mailConfig: MailConfig;
   updateMailConfig: (config: MailConfig) => void;
@@ -174,6 +175,30 @@ const PortalContext = createContext<PortalContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'recruitment_portal_data_v1';
 const AUTH_STORAGE_KEY = 'recruitment_portal_auth_v1';
+const BRANDING_STORAGE_KEY = 'recruitment_portal_branding_v1';
+
+const loadCachedBranding = (): PortalBranding | null => {
+  try {
+    const saved = localStorage.getItem(BRANDING_STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+        return { ...INITIAL_BRANDING, ...parsed };
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to parse cached branding:', e);
+  }
+  return null;
+};
+
+const saveCachedBranding = (brandingData: PortalBranding) => {
+  try {
+    localStorage.setItem(BRANDING_STORAGE_KEY, JSON.stringify(brandingData));
+  } catch (e) {
+    console.warn('Failed to save branding locally:', e);
+  }
+};
 
 const loadInitialState = <T,>(key: string, fallback: T, storageKey = LOCAL_STORAGE_KEY): T => {
   try {
@@ -229,7 +254,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
   const [weightageConfig, setWeightageConfigState] = useState<WeightageConfig>(DEFAULT_WEIGHTAGE_CONFIG);
   const [mailConfig, setMailConfigState] = useState<MailConfig>(INITIAL_MAIL_CONFIG);
-  const [branding, setBranding] = useState<PortalBranding>(INITIAL_BRANDING);
+  const [branding, setBranding] = useState<PortalBranding>(() => loadCachedBranding() || INITIAL_BRANDING);
+  const [isBrandingReady, setIsBrandingReady] = useState<boolean>(() => loadCachedBranding() !== null);
 
   const [mongoStatus, setMongoStatus] = useState<MongoDbStatus>({
     connected: false,
@@ -369,11 +395,10 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 
-      if (data.branding) {
-        setBranding((prev) => {
-          const merged = { ...INITIAL_BRANDING, ...data.branding };
-          return JSON.stringify(prev) !== JSON.stringify(merged) ? merged : prev;
-        });
+      if (data.branding && typeof data.branding === 'object' && Object.keys(data.branding).length > 0) {
+        const merged = { ...INITIAL_BRANDING, ...data.branding };
+        saveCachedBranding(merged);
+        setBranding((prev) => (JSON.stringify(prev) !== JSON.stringify(merged) ? merged : prev));
       }
       if (data.roles && Array.isArray(data.roles)) {
         setRoles((prev) => (JSON.stringify(prev) !== JSON.stringify(data.roles) ? data.roles : prev));
@@ -496,9 +521,26 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Initial load and periodic real-time sync with MongoDB
   useEffect(() => {
-    refreshFromDatabase();
+    let cancelled = false;
+    const safetyTimer = setTimeout(() => {
+      if (!cancelled) {
+        setIsBrandingReady(true);
+      }
+    }, 3500);
+
+    refreshFromDatabase().finally(() => {
+      clearTimeout(safetyTimer);
+      if (!cancelled) {
+        setIsBrandingReady(true);
+      }
+    });
+
     const interval = setInterval(() => refreshFromDatabase(false), 6000);
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearTimeout(safetyTimer);
+      clearInterval(interval);
+    };
   }, [refreshFromDatabase]);
 
   // Keep session state in dedicated storage
@@ -524,6 +566,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const updateBranding = (updates: Partial<PortalBranding>) => {
     const next = { ...branding, ...updates };
     setBranding(next);
+    saveCachedBranding(next);
 
     runDbTransaction(
       'Branding Configuration',
@@ -1715,6 +1758,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const resetToDemoData = () => {
     localStorage.removeItem(LOCAL_STORAGE_KEY);
+    localStorage.removeItem(BRANDING_STORAGE_KEY);
     runDbTransaction(
       'System Factory Reset',
       'POST /api/reset-data',
@@ -1772,6 +1816,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         weightageConfig,
         setWeightageConfig,
         branding,
+        isBrandingReady,
         updateBranding,
         mailConfig,
         updateMailConfig,

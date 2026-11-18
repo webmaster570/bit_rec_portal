@@ -52,7 +52,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
   const currentRoleInfo = roles.find((r) => r.id === currentRole);
 
-  const isSidebarBranded = !!(branding.sidebarColor && branding.sidebarColor !== 'default' && BRAND_COLORS[branding.sidebarColor]);
+  const sidebarColorConfig = branding.sidebarColor && branding.sidebarColor !== 'default' ? BRAND_COLORS[branding.sidebarColor] : null;
+  const isSidebarBranded = Boolean(sidebarColorConfig);
+  const isThemeSidebarDark = Boolean(
+    branding.theme &&
+    ['crimson', 'academic', 'nature', 'sapphire', 'bit_mesra', 'tech_startup', 'corporate_pro', 'creative_studio', 'industrial_heavy', 'portal_vibrant', 'portal_dark_knight', 'portal_enterprise'].includes(branding.theme)
+  );
+  const isSidebarDark = sidebarColorConfig ? sidebarColorConfig.isDark : isThemeSidebarDark;
 
   // Close mobile side panel on Escape key
   useEffect(() => {
@@ -258,7 +264,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navContent = (
     <>
       <div className="p-3">
-        <div className={`px-3 py-2 mb-2 text-[10px] font-extrabold uppercase tracking-widest ${isSidebarBranded ? 'text-white/50 border-white/10' : 'text-indigo-600 border-slate-200'} border-b`}>
+        <div className={`px-3 py-2 mb-2 text-[10px] font-extrabold uppercase tracking-widest ${isSidebarDark ? 'text-white/50 border-white/10' : 'text-indigo-600 border-slate-200'} border-b`}>
           {isLoggedIn ? 'Navigation Modules' : 'Public Menu'}
         </div>
 
@@ -273,14 +279,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                   isActive
                     ? `${theme.primaryButton} shadow-md`
-                    : `${isSidebarBranded ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'} active:bg-slate-200`
+                    : `${isSidebarDark ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'} active:bg-slate-200`
                 }`}
               >
                 <div className="flex items-center space-x-2.5 min-w-0">
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : (isSidebarBranded ? 'text-white/60' : theme.accentColor)}`} />
+                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : (isSidebarDark ? 'text-white/60' : theme.accentColor)}`} />
                   <span className="truncate">{item.label}</span>
                 </div>
-                <ChevronRight className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white/80' : (isSidebarBranded ? 'text-white/30' : 'text-slate-300')}`} />
+                <ChevronRight className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white/80' : (isSidebarDark ? 'text-white/30' : 'text-slate-300')}`} />
               </button>
             );
           })}
@@ -289,13 +295,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Role Scope Card Footer */}
       {isLoggedIn ? (
-        <div className={`p-3.5 border ${isSidebarBranded ? 'border-white/10 bg-white/5' : 'border-indigo-100 bg-gradient-to-br from-indigo-50/70 to-purple-50/40'} m-2.5 rounded-2xl text-xs shadow-xs shrink-0 space-y-2.5`}>
+        <div className={`p-3.5 border ${isSidebarDark ? 'border-white/10 bg-white/5' : 'border-indigo-100 bg-gradient-to-br from-indigo-50/70 to-purple-50/40'} m-2.5 rounded-2xl text-xs shadow-xs shrink-0 space-y-2.5`}>
           <div>
-            <div className={`flex items-center space-x-2 mb-1 ${isSidebarBranded ? 'text-white' : 'text-slate-900'} font-bold`}>
-              <UserCheck className={`w-4 h-4 ${isSidebarBranded ? 'text-emerald-400' : 'text-emerald-600'} shrink-0`} />
+            <div className={`flex items-center space-x-2 mb-1 ${isSidebarDark ? 'text-white' : 'text-slate-900'} font-bold`}>
+              <UserCheck className={`w-4 h-4 ${isSidebarDark ? 'text-emerald-400' : 'text-emerald-600'} shrink-0`} />
               <span className="truncate">{currentRoleInfo?.name}</span>
             </div>
-            <p className={`text-[11px] ${isSidebarBranded ? 'text-white/60' : 'text-slate-500'} leading-snug`}>
+            <p className={`text-[11px] ${isSidebarDark ? 'text-white/60' : 'text-slate-500'} leading-snug`}>
               {currentRoleInfo?.description}
             </p>
           </div>
@@ -322,10 +328,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }`} />
                 <span className={`text-[10px] font-black uppercase tracking-tight ${
                   mongoStatus.connected 
-                    ? (isSidebarBranded ? 'text-emerald-300' : 'text-emerald-800')
+                    ? (isSidebarDark ? 'text-emerald-300' : 'text-emerald-800')
                     : mongoStatus.missingUri 
-                      ? (isSidebarBranded ? 'text-rose-300' : 'text-rose-800')
-                      : (isSidebarBranded ? 'text-amber-300' : 'text-amber-800')
+                      ? (isSidebarDark ? 'text-rose-300' : 'text-rose-800')
+                      : (isSidebarDark ? 'text-amber-300' : 'text-amber-800')
                 }`}>
                   System: {mongoStatus.connected ? 'Healthy' : mongoStatus.missingUri ? 'Config Error' : 'Connecting'}
                 </span>
@@ -340,20 +346,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          <div className={`text-[10px] ${isSidebarBranded ? 'text-white/40 border-white/10' : 'text-slate-500 border-indigo-100/80'} flex items-center justify-between border-t pt-2`}>
+          <div className={`text-[10px] ${isSidebarDark ? 'text-white/40 border-white/10' : 'text-slate-500 border-indigo-100/80'} flex items-center justify-between border-t pt-2`}>
             <span>Permissions:</span>
-            <span className={`font-mono font-bold px-2 py-0.5 rounded-full border shadow-2xs ${isSidebarBranded ? 'text-emerald-300 bg-white/10 border-white/20' : 'text-indigo-700 bg-white border-indigo-200'}`}>
+            <span className={`font-mono font-bold px-2 py-0.5 rounded-full border shadow-2xs ${isSidebarDark ? 'text-emerald-300 bg-white/10 border-white/20' : 'text-indigo-700 bg-white border-indigo-200'}`}>
               {currentRoleInfo?.permissions.length} Active
             </span>
           </div>
         </div>
       ) : (
-        <div className={`p-3.5 border ${isSidebarBranded ? 'border-white/10 bg-white/5' : 'border-indigo-100 bg-slate-50'} m-2.5 rounded-2xl text-xs shadow-xs space-y-2 shrink-0`}>
-          <div className={`flex items-center space-x-2 ${isSidebarBranded ? 'text-white' : 'text-slate-900'} font-bold`}>
-            <Globe className={`w-4 h-4 ${isSidebarBranded ? 'text-indigo-400' : 'text-indigo-600'} shrink-0`} />
+        <div className={`p-3.5 border ${isSidebarDark ? 'border-white/10 bg-white/5' : 'border-indigo-100 bg-slate-50'} m-2.5 rounded-2xl text-xs shadow-xs space-y-2 shrink-0`}>
+          <div className={`flex items-center space-x-2 ${isSidebarDark ? 'text-white' : 'text-slate-900'} font-bold`}>
+            <Globe className={`w-4 h-4 ${isSidebarDark ? 'text-indigo-400' : 'text-indigo-600'} shrink-0`} />
             <span>Public Visitor View</span>
           </div>
-          <p className={`text-[11px] ${isSidebarBranded ? 'text-white/60' : 'text-slate-500'} leading-snug`}>
+          <p className={`text-[11px] ${isSidebarDark ? 'text-white/60' : 'text-slate-500'} leading-snug`}>
             Sign in or Register to access administrative workflows or track your submitted applications.
           </p>
           <div className="grid grid-cols-2 gap-2 pt-1">
@@ -412,14 +418,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             aria-label="Navigation Menu"
           >
             {/* Mobile Drawer Header with the EXACT Custom/Uploaded Logo */}
-            <div className={`p-4 border-b ${isSidebarBranded ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-gradient-to-r from-slate-50 via-indigo-50/40 to-slate-50'} flex items-center justify-between shrink-0`}>
+            <div className={`p-4 border-b ${isSidebarDark ? 'border-white/10 bg-white/5' : 'border-slate-200 bg-gradient-to-r from-slate-50 via-indigo-50/40 to-slate-50'} flex items-center justify-between shrink-0`}>
               <div className="flex items-center space-x-2.5 min-w-0">
                 {renderLogoBadge('w-10 h-10')}
                 <div className="min-w-0">
-                  <h2 className={`text-xs font-extrabold tracking-tight leading-snug truncate ${isSidebarBranded ? 'text-white' : 'text-slate-900'}`}>
+                  <h2 className={`text-xs font-extrabold tracking-tight leading-snug truncate ${isSidebarDark ? 'text-white' : 'text-slate-900'}`}>
                     {branding.title}
                   </h2>
-                  <span className={`text-[10px] font-bold block uppercase tracking-wider ${isSidebarBranded ? 'text-emerald-400' : 'text-indigo-700'}`}>
+                  <span className={`text-[10px] font-bold block uppercase tracking-wider ${isSidebarDark ? 'text-emerald-400' : 'text-indigo-700'}`}>
                     Recruitment Portal
                   </span>
                 </div>
@@ -427,7 +433,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               <button
                 onClick={() => setIsMobileMenuOpen && setIsMobileMenuOpen(false)}
-                className={`p-2 rounded-xl transition shrink-0 ${isSidebarBranded ? 'text-white/50 hover:text-white hover:bg-white/10' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'}`}
+                className={`p-2 rounded-xl transition shrink-0 ${isSidebarDark ? 'text-white/50 hover:text-white hover:bg-white/10' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'}`}
                 aria-label="Close navigation panel"
               >
                 <X className="w-5 h-5" />
@@ -436,15 +442,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Mobile User Header / Quick Actions */}
             {isLoggedIn && currentUser && (
-              <div className={`p-3 border-b shrink-0 flex items-center justify-between gap-2 ${isSidebarBranded ? 'bg-white/5 border-white/10' : 'bg-indigo-50/70 border-indigo-100/80'}`}>
+              <div className={`p-3 border-b shrink-0 flex items-center justify-between gap-2 ${isSidebarDark ? 'bg-white/5 border-white/10' : 'bg-indigo-50/70 border-indigo-100/80'}`}>
                 <div className="min-w-0">
-                  <div className={`text-xs font-bold truncate ${isSidebarBranded ? 'text-white' : 'text-slate-900'}`}>
+                  <div className={`text-xs font-bold truncate ${isSidebarDark ? 'text-white' : 'text-slate-900'}`}>
                     {currentUser.name}
                   </div>
-                  <div className={`text-[10px] truncate ${isSidebarBranded ? 'text-white/50' : 'text-slate-500'}`}>
+                  <div className={`text-[10px] truncate ${isSidebarDark ? 'text-white/50' : 'text-slate-500'}`}>
                     {currentUser.email}
                   </div>
-                  <span className={`inline-block mt-0.5 px-2 py-0.2 rounded text-[9px] font-bold ${isSidebarBranded ? 'bg-white/10 text-white' : 'bg-indigo-100 text-indigo-800'}`}>
+                  <span className={`inline-block mt-0.5 px-2 py-0.2 rounded text-[9px] font-bold ${isSidebarDark ? 'bg-white/10 text-white' : 'bg-indigo-100 text-indigo-800'}`}>
                     {currentRoleInfo?.name}
                   </span>
                 </div>

@@ -58,6 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
   const isHeaderBranded = !!(branding.navbarColor && branding.navbarColor !== 'default' && BRAND_COLORS[branding.navbarColor]);
   const headerColors = isHeaderBranded ? BRAND_COLORS[branding.navbarColor as any] : null;
+  const isHeaderDark = Boolean(isHeaderBranded && headerColors?.isDark);
 
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [showNotifPopover, setShowNotifPopover] = useState(false);
@@ -116,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header 
-      className={`sticky top-0 z-50 ${isHeaderBranded ? headerColors?.header : 'bg-white'} border-b ${isHeaderBranded ? 'border-white/10' : 'border-slate-200'} ${branding.showNavbarShadow ? 'shadow-md' : 'shadow-none'} transition-all duration-300`}
+      className={`sticky top-0 z-50 ${isHeaderBranded ? headerColors?.header : 'bg-white'} border-b ${isHeaderDark ? 'border-white/10' : 'border-slate-200'} ${branding.showNavbarShadow ? 'shadow-md' : 'shadow-none'} transition-all duration-300`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -124,7 +125,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
             <button
               onClick={onToggleMobileMenu}
-              className={`lg:hidden p-2 rounded-xl transition ${isHeaderBranded ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
+              className={`lg:hidden p-2 rounded-xl transition ${isHeaderDark ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -146,10 +147,10 @@ export const Header: React.FC<HeaderProps> = ({
               )}
 
               <div className="hidden sm:block overflow-hidden">
-                <h1 className={`text-sm sm:text-base font-black tracking-tight leading-tight truncate ${isHeaderBranded ? 'text-white' : 'text-slate-900'}`}>
+                <h1 className={`text-sm sm:text-base font-black tracking-tight leading-tight truncate ${isHeaderDark ? 'text-white' : 'text-slate-900'}`}>
                   {branding.title}
                 </h1>
-                <p className={`text-[10px] sm:text-[11px] font-bold truncate ${isHeaderBranded ? 'text-white/60' : 'text-slate-500'}`}>
+                <p className={`text-[10px] sm:text-[11px] font-bold truncate ${isHeaderDark ? 'text-white/60' : 'text-slate-500'}`}>
                   {branding.subtitle}
                 </p>
               </div>
@@ -162,7 +163,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={onOpenLogin}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${isHeaderBranded ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${isHeaderDark ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
                 >
                   <LogIn className="w-3.5 h-3.5" />
                   <span>Login</span>
@@ -184,7 +185,7 @@ export const Header: React.FC<HeaderProps> = ({
                       setShowRoleDropdown(false);
                       setShowNotifPopover(!showNotifPopover);
                     }}
-                    className={`p-2 rounded-xl transition relative ${isHeaderBranded ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+                    className={`p-2 rounded-xl transition relative ${isHeaderDark ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'text-slate-500 hover:bg-slate-100'}`}
                   >
                     <Bell className="w-5 h-5" />
                     {unreadCount > 0 && (
@@ -240,20 +241,20 @@ export const Header: React.FC<HeaderProps> = ({
                       setShowNotifPopover(false);
                       setShowRoleDropdown(!showRoleDropdown);
                     }}
-                    className={`flex items-center gap-2.5 p-1 pr-3 rounded-full transition border ${isHeaderBranded ? 'bg-white/10 border-white/20 hover:bg-white/20' : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'}`}
+                    className={`flex items-center gap-2.5 p-1 pr-3 rounded-full transition border ${isHeaderDark ? 'bg-white/10 border-white/20 hover:bg-white/20' : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'}`}
                   >
                     <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-sm ring-2 ring-white/20">
                       <User className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="hidden md:block text-left">
-                      <div className={`text-xs font-black leading-tight ${isHeaderBranded ? 'text-white' : 'text-slate-900'}`}>
+                      <div className={`text-xs font-black leading-tight ${isHeaderDark ? 'text-white' : 'text-slate-900'}`}>
                         {currentUser?.name?.split(' ')[0]}
                       </div>
-                      <div className={`text-[10px] font-bold ${isHeaderBranded ? 'text-white/50' : 'text-slate-500'}`}>
+                      <div className={`text-[10px] font-bold ${isHeaderDark ? 'text-white/50' : 'text-slate-500'}`}>
                         {currentRoleInfo?.name || 'Account'}
                       </div>
                     </div>
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showRoleDropdown ? 'rotate-180' : ''} ${isHeaderBranded ? 'text-white/40' : 'text-slate-400'}`} />
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showRoleDropdown ? 'rotate-180' : ''} ${isHeaderDark ? 'text-white/40' : 'text-slate-400'}`} />
                   </button>
 
                   {showRoleDropdown && (

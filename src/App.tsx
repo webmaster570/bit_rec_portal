@@ -27,7 +27,7 @@ import { SystemStatusPortal } from './components/public/SystemStatusPortal';
 import { PublicNoticeDetail } from './components/public/PublicNoticeDetail';
 
 const MainAppContent: React.FC = () => {
-  const { currentRole, isLoggedIn, branding, activeTab, setActiveTab, selectedDriveId, selectedPostId, setSelectedDriveId, setSelectedPostId, setEditingAppId } = usePortal();
+  const { currentRole, isLoggedIn, branding, isBrandingReady, activeTab, setActiveTab, selectedDriveId, selectedPostId, setSelectedDriveId, setSelectedPostId, setEditingAppId } = usePortal();
   const theme = THEME_CONFIGS[branding.theme || 'classic'];
   
   // Apply global shadow intensity and dynamic favicon from branding
@@ -205,6 +205,17 @@ const MainAppContent: React.FC = () => {
         );
     }
   };
+
+  if (!isBrandingReady) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-indigo-600 animate-spin" />
+          <p className="text-xs font-semibold tracking-wide text-slate-500">Loading portal configuration...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen ${theme.rootContainer} text-slate-800 flex flex-col`}>
