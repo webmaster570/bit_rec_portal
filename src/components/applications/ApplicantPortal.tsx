@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
 import { THEME_CONFIGS, getThemeTitleColor } from '../../themeStyles';
-import { Application, calculateTotalExperience, DOCUMENT_CATEGORIES, DocumentAttachment, getDocumentCategoryLabel, OtherExamRecord, PresentEmploymentDetails, ResearchPaperItem, ResearchProjectItem, RecruitmentCategory, Campus } from '../../types';
+import { Application, calculateTotalExperience, DOCUMENT_CATEGORIES, DocumentAttachment, getDocumentCategoryLabel, OtherExamRecord, PhdDetail, PresentEmploymentDetails, ResearchPaperItem, ResearchProjectItem, RecruitmentCategory, Campus } from '../../types';
 import { AdmitCardModal } from '../common/AdmitCardModal';
 import {
   Send,
@@ -307,6 +307,16 @@ export const ApplicantPortal: React.FC = () => {
     }
   ]);
 
+  const [phdDetails, setPhdDetails] = useState<PhdDetail[]>([
+    {
+      status: '',
+      date: '',
+      thesisTitle: '',
+      universityOrInstitution: '',
+      divisionOrAcademicFields: '',
+    }
+  ]);
+
   const [otherQualifications, setOtherQualifications] = useState<OtherExamRecord[]>([
     {
       examName: '',
@@ -490,6 +500,9 @@ export const ApplicantPortal: React.FC = () => {
         // Map fields using functional updates to ensure consistency
         if (draftApp.applicant) setProfile(prev => ({ ...prev, ...draftApp.applicant }));
         if (draftApp.academics) setAcademics(draftApp.academics);
+        if (draftApp.phdDetails && draftApp.phdDetails.length > 0) {
+          setPhdDetails(draftApp.phdDetails);
+        }
         if (draftApp.otherQualifications && draftApp.otherQualifications.length > 0) {
           setOtherQualifications(draftApp.otherQualifications);
         }
@@ -654,6 +667,7 @@ export const ApplicantPortal: React.FC = () => {
       researchPaperItems,
       researchBookItems,
       researchProjectItems,
+      phdDetails,
       otherQualifications,
       ...miscInfo,
       ...extraMisc,
@@ -686,6 +700,7 @@ export const ApplicantPortal: React.FC = () => {
       updateApplication(currentAppId, {
         applicant: profile,
         academics,
+        phdDetails,
         otherQualifications,
         experience,
         documents,
@@ -703,6 +718,7 @@ export const ApplicantPortal: React.FC = () => {
       researchPaperItems,
       researchBookItems,
       researchProjectItems,
+      phdDetails,
       otherQualifications,
       ...miscInfo,
       ...extraMisc,
@@ -720,8 +736,18 @@ export const ApplicantPortal: React.FC = () => {
     };
 
     if (currentAppId) {
-      updateApplication(currentAppId, finalData);
-      setSubmittedApp(applications.find(a => a.id === currentAppId) || null);
+      const updatePayload = {
+        applicant: profile,
+        academics,
+        phdDetails,
+        otherQualifications,
+        experience,
+        documents,
+        ...finalData,
+      };
+      updateApplication(currentAppId, updatePayload);
+      const existingApp = applications.find(a => a.id === currentAppId);
+      setSubmittedApp(existingApp ? { ...existingApp, ...updatePayload } : null);
     } else {
       const createdApp = submitApplication(
         selectedDriveId,
@@ -2047,6 +2073,162 @@ export const ApplicantPortal: React.FC = () => {
                                 onClick={() => setAcademics(academics.filter((_, i) => i !== idx))}
                                 className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
                                 title="Remove row"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Ph.D Details Table */}
+                <div className="space-y-3 pt-4 border-t border-slate-200">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-blue-100 pb-2.5">
+                    <div className="flex items-start gap-2.5">
+                      <span className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+                        <BookOpen className="w-4 h-4" />
+                      </span>
+                      <div>
+                        <h4 className="text-sm font-bold text-blue-700">
+                          Ph.D details
+                        </h4>
+                        <p className="text-xs text-blue-700 font-medium">
+                          Provide doctoral degree status, date, thesis title, university/institution, and division/academic fields (if applicable).
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPhdDetails([
+                          ...phdDetails,
+                          {
+                            status: '',
+                            date: '',
+                            thesisTitle: '',
+                            universityOrInstitution: '',
+                            divisionOrAcademicFields: '',
+                          },
+                        ])
+                      }
+                      className="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold inline-flex items-center gap-1.5 transition whitespace-nowrap"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Ph.D Detail</span>
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white">
+                    <datalist id="phd-status-options">
+                      <option value="Awarded" />
+                      <option value="Thesis Submitted" />
+                      <option value="Submitted" />
+                      <option value="Pursuing" />
+                      <option value="Registered" />
+                      <option value="Not Applicable" />
+                    </datalist>
+                    <table className="w-full text-xs text-left border-collapse min-w-[760px]">
+                      <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                        <tr>
+                          <th className="px-3 py-2.5 border-r border-slate-200 w-36">Status</th>
+                          <th className="px-3 py-2.5 border-r border-slate-200 w-36">Date</th>
+                          <th className="px-3 py-2.5 border-r border-slate-200">Thesis title</th>
+                          <th className="px-3 py-2.5 border-r border-slate-200 w-52">University/Institution</th>
+                          <th className="px-3 py-2.5 border-r border-slate-200 w-48">Division/Academic fields</th>
+                          <th className="px-2 py-2.5 text-center w-12">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {phdDetails.map((phd, idx) => (
+                          <tr key={idx} className="hover:bg-slate-50/60">
+                            <td className="p-2 border-r border-slate-200">
+                              <input
+                                type="text"
+                                list="phd-status-options"
+                                placeholder="e.g. Awarded / Pursuing"
+                                value={phd.status}
+                                onChange={(e) => {
+                                  const copy = [...phdDetails];
+                                  copy[idx] = { ...copy[idx], status: e.target.value };
+                                  setPhdDetails(copy);
+                                }}
+                                className={`${tableInputClass} font-semibold`}
+                              />
+                            </td>
+                            <td className="p-2 border-r border-slate-200">
+                              <input
+                                type="date"
+                                value={phd.date}
+                                onChange={(e) => {
+                                  const copy = [...phdDetails];
+                                  copy[idx] = { ...copy[idx], date: e.target.value };
+                                  setPhdDetails(copy);
+                                }}
+                                className={`${tableInputClass} font-mono tabular-nums`}
+                              />
+                            </td>
+                            <td className="p-2 border-r border-slate-200">
+                              <input
+                                type="text"
+                                placeholder="Enter thesis title"
+                                value={phd.thesisTitle}
+                                onChange={(e) => {
+                                  const copy = [...phdDetails];
+                                  copy[idx] = { ...copy[idx], thesisTitle: e.target.value };
+                                  setPhdDetails(copy);
+                                }}
+                                className={tableInputClass}
+                              />
+                            </td>
+                            <td className="p-2 border-r border-slate-200">
+                              <input
+                                type="text"
+                                placeholder="University / Institution"
+                                value={phd.universityOrInstitution}
+                                onChange={(e) => {
+                                  const copy = [...phdDetails];
+                                  copy[idx] = { ...copy[idx], universityOrInstitution: e.target.value };
+                                  setPhdDetails(copy);
+                                }}
+                                className={tableInputClass}
+                              />
+                            </td>
+                            <td className="p-2 border-r border-slate-200">
+                              <input
+                                type="text"
+                                placeholder="Division / Academic fields"
+                                value={phd.divisionOrAcademicFields}
+                                onChange={(e) => {
+                                  const copy = [...phdDetails];
+                                  copy[idx] = { ...copy[idx], divisionOrAcademicFields: e.target.value };
+                                  setPhdDetails(copy);
+                                }}
+                                className={tableInputClass}
+                              />
+                            </td>
+                            <td className="p-2 text-center">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (phdDetails.length === 1) {
+                                    setPhdDetails([
+                                      {
+                                        status: '',
+                                        date: '',
+                                        thesisTitle: '',
+                                        universityOrInstitution: '',
+                                        divisionOrAcademicFields: '',
+                                      },
+                                    ]);
+                                  } else {
+                                    setPhdDetails(phdDetails.filter((_, i) => i !== idx));
+                                  }
+                                }}
+                                className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                                title={phdDetails.length === 1 ? 'Clear row' : 'Remove row'}
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -4192,6 +4374,7 @@ export const ApplicantPortal: React.FC = () => {
           application={{
             ...profile,
             ...pdfExtraFields,
+            natureOfExperience,
             researchPapers,
             researchPublications,
             researchPaperItems,
@@ -4202,6 +4385,7 @@ export const ApplicantPortal: React.FC = () => {
             referees,
             applicant: profile,
             academics,
+            phdDetails,
             otherQualifications,
             experience,
             documents,
@@ -4210,7 +4394,13 @@ export const ApplicantPortal: React.FC = () => {
             departmentName: activePost?.departmentName,
             campus: activePost?.campus,
             advtNumber: activeDrive?.advtNumber,
-            applicationNo: applications.find(a => a.id === currentAppId)?.applicationNo || profile.regNumber || 'DRAFT-PREVIEW',
+            applicationNo: submittedApp?.applicationNo || applications.find(a => a.id === currentAppId)?.applicationNo || profile.regNumber || 'DRAFT-PREVIEW',
+            submittedAt: submittedApp?.submittedAt || applications.find(a => a.id === currentAppId)?.submittedAt,
+            declarationAccepted,
+            orderId: paymentDetails.orderId,
+            transactionId: paymentDetails.transactionId,
+            paymentMode: paymentDetails.paymentMode,
+            paymentDate: paymentDetails.paymentDate,
             languages,
             presentEmploymentDetails,
           }}

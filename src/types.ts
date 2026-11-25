@@ -154,6 +154,14 @@ export interface AcademicRecord {
   proofSlNo?: string;
 }
 
+export interface PhdDetail {
+  status: string;
+  date: string;
+  thesisTitle: string;
+  universityOrInstitution: string;
+  divisionOrAcademicFields: string;
+}
+
 export interface OtherExamRecord {
   examName: string;
   rollNo?: string;
@@ -418,6 +426,7 @@ export interface Application {
   category: RecruitmentCategory;
   applicant: ApplicantProfile;
   academics: AcademicRecord[];
+  phdDetails?: PhdDetail[];
   otherQualifications?: OtherExamRecord[];
   experience: ExperienceRecord[];
   documents: DocumentAttachment[];

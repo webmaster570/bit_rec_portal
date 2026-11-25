@@ -973,6 +973,56 @@ export const MyJobsPortal: React.FC<MyJobsPortalProps> = ({ onNavigate }) => {
                     </div>
                   </div>
 
+                  {selectedAppDetail.phdDetails &&
+                    selectedAppDetail.phdDetails.some(
+                      (p) =>
+                        p.status?.trim() ||
+                        p.date?.trim() ||
+                        p.thesisTitle?.trim() ||
+                        p.universityOrInstitution?.trim() ||
+                        p.divisionOrAcademicFields?.trim()
+                    ) && (
+                      <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 space-y-2.5">
+                        <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                          <GraduationCap className="w-4 h-4 text-indigo-600" />
+                          Ph.D details
+                        </h4>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left min-w-[540px]">
+                            <thead className="text-[10px] uppercase text-slate-500 border-b border-slate-200">
+                              <tr>
+                                <th className="py-2">Status</th>
+                                <th className="py-2">Date</th>
+                                <th className="py-2">Thesis title</th>
+                                <th className="py-2">University/Institution</th>
+                                <th className="py-2">Division/Academic fields</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-200">
+                              {selectedAppDetail.phdDetails
+                                .filter(
+                                  (p) =>
+                                    p.status?.trim() ||
+                                    p.date?.trim() ||
+                                    p.thesisTitle?.trim() ||
+                                    p.universityOrInstitution?.trim() ||
+                                    p.divisionOrAcademicFields?.trim()
+                                )
+                                .map((phd, idx) => (
+                                  <tr key={idx}>
+                                    <td className="py-2 font-bold text-slate-900">{phd.status || '-'}</td>
+                                    <td className="py-2 text-slate-700 font-mono">{phd.date || '-'}</td>
+                                    <td className="py-2 text-slate-800">{phd.thesisTitle || '-'}</td>
+                                    <td className="py-2 text-slate-700">{phd.universityOrInstitution || '-'}</td>
+                                    <td className="py-2 text-slate-700">{phd.divisionOrAcademicFields || '-'}</td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
                   {selectedAppDetail.otherQualifications && selectedAppDetail.otherQualifications.some(o => o.examName?.trim()) && (
                     <div className="bg-slate-50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 space-y-2.5">
                       <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">

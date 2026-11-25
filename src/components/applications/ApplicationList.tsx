@@ -395,6 +395,53 @@ export const ApplicationList: React.FC = () => {
                   </tbody>
                 </table>
 
+                {selectedAppDetail.phdDetails &&
+                  selectedAppDetail.phdDetails.some(
+                    (p) =>
+                      p.status?.trim() ||
+                      p.date?.trim() ||
+                      p.thesisTitle?.trim() ||
+                      p.universityOrInstitution?.trim() ||
+                      p.divisionOrAcademicFields?.trim()
+                  ) && (
+                    <div className="pt-3 border-t border-slate-200/60 mt-3 space-y-1.5">
+                      <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider block">
+                        Ph.D details
+                      </span>
+                      <table className="w-full text-left">
+                        <thead className="text-[10px] uppercase text-slate-500 border-b border-slate-200">
+                          <tr>
+                            <th className="py-1">Status</th>
+                            <th className="py-1">Date</th>
+                            <th className="py-1">Thesis title</th>
+                            <th className="py-1">University/Institution</th>
+                            <th className="py-1">Division/Academic fields</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200">
+                          {selectedAppDetail.phdDetails
+                            .filter(
+                              (p) =>
+                                p.status?.trim() ||
+                                p.date?.trim() ||
+                                p.thesisTitle?.trim() ||
+                                p.universityOrInstitution?.trim() ||
+                                p.divisionOrAcademicFields?.trim()
+                            )
+                            .map((phd, i) => (
+                              <tr key={i}>
+                                <td className="py-1.5 font-semibold text-slate-900">{phd.status || '-'}</td>
+                                <td className="py-1.5 text-slate-700 font-mono">{phd.date || '-'}</td>
+                                <td className="py-1.5 text-slate-800">{phd.thesisTitle || '-'}</td>
+                                <td className="py-1.5 text-slate-700">{phd.universityOrInstitution || '-'}</td>
+                                <td className="py-1.5 text-slate-700">{phd.divisionOrAcademicFields || '-'}</td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
                 {selectedAppDetail.otherQualifications && selectedAppDetail.otherQualifications.some(o => o.examName?.trim()) && (
                   <div className="pt-3 border-t border-slate-200/60 mt-3 space-y-1.5">
                     <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider block">

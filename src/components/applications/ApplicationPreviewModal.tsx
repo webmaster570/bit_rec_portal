@@ -330,6 +330,57 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                   </table>
                 </div>
 
+                {/* Ph.D Details */}
+                {(() => {
+                  const filledPhdDetails = (application.phdDetails || []).filter(
+                    (p) =>
+                      p.status?.trim() ||
+                      p.date?.trim() ||
+                      p.thesisTitle?.trim() ||
+                      p.universityOrInstitution?.trim() ||
+                      p.divisionOrAcademicFields?.trim()
+                  );
+                  return (
+                    <div className="space-y-2 mt-4">
+                      <h4 className="font-bold text-slate-900 text-[9.5pt] px-1">Ph.D details</h4>
+                      <div className="overflow-hidden border border-slate-900 rounded-lg">
+                        <table className="w-full border-collapse text-[8.5pt] font-sans">
+                          <thead>
+                            <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-300">
+                              <th className="p-2 border-r border-slate-200 text-left w-28">Status</th>
+                              <th className="p-2 border-r border-slate-200 text-center w-24">Date</th>
+                              <th className="p-2 border-r border-slate-200 text-left">Thesis title</th>
+                              <th className="p-2 border-r border-slate-200 text-left">University/Institution</th>
+                              <th className="p-2 text-left">Division/Academic fields</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-200">
+                            {filledPhdDetails.length > 0 ? (
+                              filledPhdDetails.map((phd, idx) => (
+                                <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
+                                  <td className="p-2 border-r border-slate-200 font-bold text-slate-900">{phd.status || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200 text-center font-mono text-slate-700">{phd.date || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200 font-semibold text-slate-800">{phd.thesisTitle || '-'}</td>
+                                  <td className="p-2 border-r border-slate-200 text-slate-700">{phd.universityOrInstitution || '-'}</td>
+                                  <td className="p-2 text-slate-700">{phd.divisionOrAcademicFields || '-'}</td>
+                                </tr>
+                              ))
+                            ) : (
+                              <tr className="bg-white">
+                                <td className="p-2 border-r border-slate-200 text-slate-400">-</td>
+                                <td className="p-2 border-r border-slate-200 text-center text-slate-400">-</td>
+                                <td className="p-2 border-r border-slate-200 text-slate-400">-</td>
+                                <td className="p-2 border-r border-slate-200 text-slate-400">-</td>
+                                <td className="p-2 text-slate-400">-</td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Other Qualifications */}
                 {application.otherQualifications && application.otherQualifications.some(o => o.examName?.trim()) && (
                   <div className="space-y-2 mt-4">
@@ -603,7 +654,7 @@ export const ApplicationPreviewModal: React.FC<Props> = ({ application, drive, o
                       { label: 'Computer Proficiency', val: application.hasComputerProficiency ? 'YES' : 'NO' },
                       { label: 'NOC Available', val: application.nocAvailable ? 'YES' : 'NO' },
                       { label: 'Debarred from Exams', val: application.debarredForUnfairMeans ? 'YES' : 'NO' },
-                      { label: 'Disciplinary Pending', val: application.pendingDisciplinaryProceeding ? 'YES' : 'NO' },
+                      { label: 'Disciplinary Pending', val: (application.pendingDisciplinaryProceeding || application.disciplinaryPending) ? 'YES' : 'NO' },
                     ].map((item, i) => (
                       <div key={i} className="flex justify-between items-center border-b border-slate-200/50 pb-1">
                         <span className="text-[9pt] font-medium text-slate-500">{item.label}</span>
